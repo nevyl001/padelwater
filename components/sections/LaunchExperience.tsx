@@ -231,7 +231,7 @@ export function LaunchExperience() {
                           {stage.label}
                         </h2>
                       </div>
-                      <div aria-hidden className="min-h-[min(38svh,320px)]" />
+                      <div aria-hidden className="min-h-[min(46svh,360px)]" />
                       <p className="mx-auto max-w-md justify-self-center text-base leading-relaxed opacity-85 md:text-lg">
                         {stage.text}
                       </p>
@@ -326,7 +326,7 @@ export function LaunchExperience() {
                     )}
                   >
                     {showCan && canFirst ? (
-                      <div data-beat-can className="mx-auto w-full max-w-[180px]">
+                      <div data-beat-can className="mx-auto w-full max-w-[220px]">
                         <ProductCanStage
                           mode="inline"
                           size="inline"
@@ -362,7 +362,7 @@ export function LaunchExperience() {
                     </div>
 
                     {showCan && !canFirst ? (
-                      <div data-beat-can className="mx-auto w-full max-w-[170px]">
+                      <div data-beat-can className="mx-auto w-full max-w-[210px]">
                         <ProductCanStage
                           mode="inline"
                           size="inline"

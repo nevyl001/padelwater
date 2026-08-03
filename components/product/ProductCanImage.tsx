@@ -45,8 +45,8 @@ const shell = {
 
 const sizeClass = {
   hero: "aspect-[3/7] h-[min(58svh,440px)] w-auto",
-  story: "aspect-[3/7] h-[min(36svh,300px)] w-auto",
-  inline: "aspect-[3/7] w-full max-w-[220px]",
+  story: "aspect-[3/7] h-[min(48svh,380px)] w-auto",
+  inline: "aspect-[3/7] w-full max-w-[240px]",
 } as const;
 
 /**
