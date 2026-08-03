@@ -320,6 +320,54 @@
     animation: flavor-wave 14s ease-in-out infinite;
   }
 
+  @keyframes float-ball-a {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+    35% {
+      transform: translate3d(10px, -14px, 0);
+    }
+    70% {
+      transform: translate3d(-8px, 8px, 0);
+    }
+  }
+
+  @keyframes float-ball-b {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+    40% {
+      transform: translate3d(-12px, -10px, 0);
+    }
+    75% {
+      transform: translate3d(9px, 12px, 0);
+    }
+  }
+
+  @keyframes float-ball-c {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(6px, -16px, 0);
+    }
+  }
+
+  .animate-float-ball-a {
+    animation: float-ball-a 7.5s ease-in-out infinite;
+  }
+
+  .animate-float-ball-b {
+    animation: float-ball-b 9s ease-in-out infinite;
+  }
+
+  .animate-float-ball-c {
+    animation: float-ball-c 8.2s ease-in-out infinite;
+  }
+
   @keyframes showcase-panel-in {
     from {
       opacity: 0;

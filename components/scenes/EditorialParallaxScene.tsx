@@ -9,8 +9,7 @@ import { distances, gsapEasings, scales } from "@/lib/motion";
 import { cn } from "@/lib/cn";
 
 /**
- * Brand attitude. Desktop: asymmetric editorial.
- * Mobile: centered, balanced composition with intentional accents.
+ * Brand attitude. Floating balls stay in margin zones — never over copy.
  */
 export function EditorialParallaxScene() {
   const rootRef = useRef<HTMLElement>(null);
@@ -124,6 +123,7 @@ export function EditorialParallaxScene() {
   }, [ready, prefersReducedMotion, strength]);
 
   const animateCourt = ready && !prefersReducedMotion;
+  const float = !prefersReducedMotion;
 
   return (
     <section
@@ -142,13 +142,14 @@ export function EditorialParallaxScene() {
         <div className="absolute inset-0 bg-gradient-to-b from-pw-navy-deep/55 via-pw-navy/20 to-pw-navy-deep/90" />
       </div>
 
-      {/* Soft ambient glow */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,rgba(0,169,203,0.18),transparent_55%),radial-gradient(ellipse_at_80%_85%,rgba(183,243,51,0.1),transparent_40%)]"
       />
 
-      {/* Ghost type — desktop */}
+      {/* Floating balls — margin zones only, behind copy */}
+      <FloatingBallField animated={float} />
+
       <div
         ref={titleRef}
         className="pointer-events-none absolute inset-0 z-[1] hidden items-center justify-center md:flex"
@@ -178,19 +179,14 @@ export function EditorialParallaxScene() {
             {communitySection.text}
           </p>
 
-          {/* Mobile accent row — balanced, intentional */}
-          <div className="relative mx-auto mt-10 max-w-sm md:hidden">
+          <div className="mx-auto mt-10 max-w-sm md:hidden">
             <div className="h-px w-full bg-gradient-to-r from-transparent via-white/25 to-transparent" />
-            <div className="mt-7 flex items-start justify-center gap-4">
-              <PadelBallDecoration className="mt-1 h-9 w-9 shrink-0" />
-              <p className="text-left font-display text-[0.95rem] font-bold uppercase leading-[1.2] tracking-[-0.02em] text-white/60">
-                {brandStatement.lines[0]}
-                <span className="mt-1 block text-white/40">
-                  {brandStatement.lines[1]}
-                </span>
-              </p>
-            </div>
-            <PadelBallDecoration className="absolute -right-1 bottom-[-0.5rem] h-6 w-6 opacity-70" />
+            <p className="mt-7 font-display text-[0.95rem] font-bold uppercase leading-[1.2] tracking-[-0.02em] text-white/60">
+              {brandStatement.lines[0]}
+              <span className="mt-1 block text-white/40">
+                {brandStatement.lines[1]}
+              </span>
+            </p>
           </div>
         </div>
 
@@ -202,15 +198,57 @@ export function EditorialParallaxScene() {
             aria-hidden
             className="absolute right-0 top-1/2 h-64 w-64 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(0,169,203,0.22),transparent_68%)] blur-2xl"
           />
-          <div className="relative">
-            <p className="max-w-[11ch] text-right font-display text-[clamp(1.35rem,2.8vw,2.15rem)] font-bold uppercase leading-[1.08] tracking-[-0.03em] text-white/30">
-              {brandStatement.lines[1]}
-            </p>
-            <PadelBallDecoration className="absolute -right-6 top-[-1.5rem]" />
-          </div>
+          <p className="relative z-[1] max-w-[11ch] text-right font-display text-[clamp(1.35rem,2.8vw,2.15rem)] font-bold uppercase leading-[1.08] tracking-[-0.03em] text-white/30">
+            {brandStatement.lines[1]}
+          </p>
         </div>
       </Container>
     </section>
+  );
+}
+
+/** Soft float accents parked in open margins — never anchored to headlines. */
+function FloatingBallField({ animated }: { animated: boolean }) {
+  const balls = [
+    {
+      className: "left-[4%] top-[14%] h-8 w-8 max-md:left-[6%] max-md:top-[10%] max-md:h-7 max-md:w-7",
+      anim: "animate-float-ball-a",
+      delay: "0s",
+    },
+    {
+      className: "right-[5%] top-[12%] h-11 w-11 max-md:right-[7%] max-md:top-[8%] max-md:h-8 max-md:w-8",
+      anim: "animate-float-ball-b",
+      delay: "0.8s",
+    },
+    {
+      className: "left-[7%] bottom-[12%] h-9 w-9 max-md:left-[8%] max-md:bottom-[10%] max-md:h-7 max-md:w-7",
+      anim: "animate-float-ball-c",
+      delay: "1.4s",
+    },
+    {
+      className: "right-[8%] bottom-[14%] h-7 w-7 max-md:right-[10%] max-md:bottom-[8%] max-md:h-6 max-md:w-6",
+      anim: "animate-float-ball-a",
+      delay: "2.1s",
+    },
+    {
+      className: "left-[22%] top-[8%] h-5 w-5 opacity-75 max-md:hidden",
+      anim: "animate-float-ball-b",
+      delay: "1.1s",
+    },
+  ] as const;
+
+  return (
+    <div aria-hidden className="pointer-events-none absolute inset-0 z-[2] overflow-hidden">
+      {balls.map((ball, i) => (
+        <span
+          key={i}
+          className={cn("absolute drop-shadow-lg", ball.className, animated && ball.anim)}
+          style={animated ? { animationDelay: ball.delay } : undefined}
+        >
+          <PadelBallDecoration className="h-full w-full" />
+        </span>
+      ))}
+    </div>
   );
 }
 
@@ -219,7 +257,7 @@ function PadelBallDecoration({ className }: { className?: string }) {
     <svg
       aria-hidden
       viewBox="0 0 64 64"
-      className={cn("h-12 w-12 drop-shadow-lg", className)}
+      className={cn("h-12 w-12", className)}
     >
       <circle cx="32" cy="32" r="28" fill="#B7F333" />
       <path
