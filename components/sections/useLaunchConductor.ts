@@ -141,11 +141,11 @@ export function useLaunchConductor(
           offPointer = () => window.removeEventListener("pointermove", onMove);
         }
 
-        gsap.set(stages, { autoAlpha: 0, y: isMobile ? 12 : 24 });
+        // Mobile: no Y travel on stages — text band is height-locked
+        gsap.set(stages, { autoAlpha: 0, y: isMobile ? 0 : 24 });
         if (stages[0]) gsap.set(stages[0], { autoAlpha: 1, y: 0 });
         if (holdHint) gsap.set(holdHint, { autoAlpha: 0 });
 
-        // On mobile, kill vertical stage travel — stays inside the text band
         const outY = isMobile ? 0 : -16;
         const inY = isMobile ? 0 : 20;
 
@@ -186,7 +186,11 @@ export function useLaunchConductor(
         );
         tl.fromTo(
           storyCanEl,
-          { autoAlpha: 0, scale: 0.94, y: isMobile ? 12 : 24 },
+          {
+            autoAlpha: 0,
+            scale: isMobile ? 0.96 : 0.94,
+            y: isMobile ? 0 : 24,
+          },
           {
             autoAlpha: 1,
             scale: 1,
@@ -234,6 +238,7 @@ export function useLaunchConductor(
           storyCanEl,
           {
             x: -shift * 0.75,
+            // Never scale past 1 on mobile — can must stay inside its band
             scale: isMobile ? 1 : 1.02,
             y: 0,
             ease: "none",
@@ -261,7 +266,7 @@ export function useLaunchConductor(
           {
             x: 0,
             y: 0,
-            scale: isMobile ? 0.92 : 0.8,
+            scale: isMobile ? 0.9 : 0.8,
             ease: "none",
             duration: 0.45,
           },

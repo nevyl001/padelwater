@@ -2,7 +2,6 @@
 
 import { useRef } from "react";
 import { heroContent, productStoryStages } from "@/data/site-content";
-import { product } from "@/data/product";
 import { Button } from "@/components/ui/Button";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { Container } from "@/components/ui/Container";
@@ -130,60 +129,61 @@ export function LaunchExperienceMobile() {
               animated={animateCourt}
             />
 
-            {/* ── BAND 1: TEXT (fixed height, never overlaps can) ── */}
-            <div className="relative z-20 h-[28svh] shrink-0 overflow-hidden px-5 pt-2">
+            {/* BAND 1 — copy only; clipped so it can never paint over the can */}
+            <div className="relative z-20 h-[24svh] max-h-[210px] shrink-0 overflow-hidden px-5 pt-1">
               {productStoryStages.map((stage, index) => (
                 <div
                   key={stage.id}
                   data-story-stage
                   className={cn(
-                    "absolute inset-x-5 top-2 text-center",
+                    "absolute inset-x-5 top-0 flex h-full flex-col justify-start text-center",
                     index === 0 ? "opacity-100" : "opacity-0",
                   )}
                 >
-                  <p className="text-[0.62rem] uppercase tracking-[0.24em] opacity-55">
+                  <p className="text-[0.58rem] uppercase tracking-[0.22em] opacity-55">
                     {String(index + 1).padStart(2, "0")} · {stage.eyebrow}
                   </p>
-                  <h2 className="mt-1.5 font-display text-[clamp(1.7rem,7.5vw,2.35rem)] font-bold uppercase leading-[1.02] tracking-[-0.03em]">
+                  <h2 className="mt-1 font-display text-[clamp(1.45rem,6.8vw,2.05rem)] font-bold uppercase leading-[1.02] tracking-[-0.03em]">
                     {stage.label}
                   </h2>
                   {stage.layout !== "monument" ? (
-                    <p className="mx-auto mt-2 max-w-[17.5rem] text-[0.82rem] leading-snug opacity-80">
+                    <p className="mx-auto mt-1.5 line-clamp-3 max-w-[17rem] text-[0.78rem] leading-snug opacity-80">
                       {stage.text}
                     </p>
-                  ) : null}
-                  {stage.layout === "side" ? (
-                    <ul className="mt-2 space-y-1 text-[0.7rem] opacity-65">
-                      <li>{product.feature}</li>
-                      <li>{product.flavorLabel}</li>
-                    </ul>
                   ) : null}
                 </div>
               ))}
             </div>
 
-            {/* ── BAND 2: CAN (owns the middle forever) ── */}
-            <div className="relative z-10 flex min-h-0 flex-1 items-center justify-center px-5">
-              <div ref={storyCanRef} className="w-[150px]">
+            {/* BAND 2 — can height-locked to this slot; overflow clipped */}
+            <div className="relative z-10 flex min-h-0 flex-1 items-center justify-center overflow-hidden px-5 py-1">
+              <div
+                ref={storyCanRef}
+                className="mx-auto h-full max-h-full w-auto"
+                style={{ aspectRatio: "3 / 7", maxWidth: "min(132px, 34vw)" }}
+              >
                 <ProductCanStage
                   mode="inline"
                   tone={canTone}
                   size="inline"
                   quiet
-                  showReflection={activeStage === 3}
+                  showReflection={false}
+                  className="h-full w-full [&_[data-product-can-image]]:!aspect-auto [&_[data-product-can-image]]:!h-full [&_[data-product-can-image]]:!w-full [&_[data-product-can-image]]:!max-w-none"
                 />
               </div>
             </div>
 
-            {/* ── BAND 3: FOOTER (monument body + hint) ── */}
-            <div className="relative z-20 h-[16svh] shrink-0 px-5 pb-4">
+            {/* BAND 3 — monument body + hold hint */}
+            <div className="relative z-20 h-[14svh] max-h-[120px] shrink-0 overflow-hidden px-5 pb-3">
               {productStoryStages.map((stage, index) =>
                 stage.layout === "monument" ? (
                   <p
                     key={`bot-${stage.id}`}
                     className={cn(
-                      "absolute inset-x-5 top-1 text-center text-[0.85rem] leading-snug transition-opacity duration-300",
-                      activeStage === index ? "opacity-85" : "pointer-events-none opacity-0",
+                      "absolute inset-x-5 top-0 text-center text-[0.8rem] leading-snug transition-opacity duration-300",
+                      activeStage === index
+                        ? "opacity-85"
+                        : "pointer-events-none opacity-0",
                     )}
                   >
                     {stage.text}
@@ -192,7 +192,7 @@ export function LaunchExperienceMobile() {
               )}
               <p
                 data-hold-hint
-                className="absolute inset-x-0 bottom-3 text-center text-[0.58rem] uppercase tracking-[0.28em]"
+                className="absolute inset-x-0 bottom-2 text-center text-[0.55rem] uppercase tracking-[0.28em]"
               >
                 Sigue explorando
               </p>
@@ -201,7 +201,7 @@ export function LaunchExperienceMobile() {
         </div>
 
         <div className={cn(showPin && "hidden")}>
-          {productStoryStages.map((stage, index) => (
+          {productStoryStages.map((stage) => (
             <div
               key={stage.id}
               className={cn(
