@@ -52,23 +52,28 @@ export function ProductStory() {
             isDesktop: boolean;
           };
 
+          // Subtle drift from the centered base position
           const positions = isDesktop
             ? [
-                { xPercent: -28, scale: 1 },
-                { xPercent: 0, scale: 1.05 },
-                { xPercent: 30, scale: 0.96 },
-                { xPercent: 0, scale: 1.08 },
+                { xPercent: 0, scale: 1 },
+                { xPercent: -6, scale: 1.04 },
+                { xPercent: 6, scale: 0.98 },
+                { xPercent: 0, scale: 1.06 },
               ]
             : [
-                { xPercent: 0, scale: 0.92 },
+                { xPercent: 0, scale: 0.94 },
                 { xPercent: 0, scale: 1 },
-                { xPercent: 0, scale: 0.95 },
+                { xPercent: 0, scale: 0.97 },
               ];
 
           const texts = gsap.utils.toArray<HTMLElement>(
             root!.querySelectorAll("[data-stage]"),
           );
 
+          gsap.set(can, {
+            xPercent: positions[0].xPercent,
+            scale: positions[0].scale,
+          });
           gsap.set(texts, { opacity: 0, y: 24 });
           if (texts[0]) gsap.set(texts[0], { opacity: 1, y: 0 });
 
@@ -154,44 +159,72 @@ export function ProductStory() {
           toneClasses[currentTone],
         )}
       >
-        <Container className="relative z-10 grid w-full items-center gap-10 lg:grid-cols-2">
-          {/* Keep can visible; stack copy when motion is reduced */}
+        <Container className="relative z-10 w-full">
           <div
             className={cn(
               "relative",
-              prefersReducedMotion ? "min-h-0 space-y-0" : "min-h-[12rem]",
+              prefersReducedMotion
+                ? "flex flex-col items-center gap-12 lg:grid lg:grid-cols-2 lg:items-center lg:gap-10"
+                : "flex min-h-[70svh] flex-col items-center justify-center lg:min-h-[28rem]",
             )}
           >
-            {stages.map((stage, index) => (
+            {/* Copy */}
+            <div
+              className={cn(
+                "relative z-20 w-full max-w-md",
+                prefersReducedMotion
+                  ? "order-2 text-center lg:order-1 lg:text-left"
+                  : "order-1 mb-10 text-center lg:absolute lg:left-0 lg:top-1/2 lg:mb-0 lg:max-w-sm lg:-translate-y-1/2 lg:text-left xl:max-w-md",
+              )}
+            >
               <div
-                key={stage.id}
-                data-stage
                 className={cn(
-                  prefersReducedMotion
-                    ? cn("relative", index > 0 && "mt-12")
-                    : "absolute inset-x-0 top-1/2 -translate-y-1/2",
+                  "relative",
+                  !prefersReducedMotion && "min-h-[10rem] lg:min-h-[14rem]",
                 )}
               >
-                <p className="text-xs uppercase tracking-[0.24em] opacity-60">
-                  {String(index + 1).padStart(2, "0")}
-                </p>
-                <h2 className="mt-3 text-editorial">{stage.label}</h2>
-                <p className="mt-5 max-w-md text-body-lg opacity-80">
-                  {stage.text}
-                </p>
+                {stages.map((stage, index) => (
+                  <div
+                    key={stage.id}
+                    data-stage
+                    className={cn(
+                      prefersReducedMotion
+                        ? cn("relative", index > 0 && "mt-12")
+                        : "absolute inset-x-0 top-0",
+                    )}
+                  >
+                    <p className="text-xs uppercase tracking-[0.24em] opacity-60">
+                      {String(index + 1).padStart(2, "0")}
+                    </p>
+                    <h2 className="mt-3 text-editorial">{stage.label}</h2>
+                    <p className="mt-5 text-body-lg opacity-80">{stage.text}</p>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </div>
 
-          <div ref={canRef} className="mx-auto w-full max-w-[260px]">
-            <ProductCan
-              tone={
-                currentTone === "ice" || currentTone === "lime-soft"
-                  ? "ice"
-                  : "navy"
-              }
-              showReflection
-            />
+            {/* Can — centered in the stage */}
+            <div
+              className={cn(
+                "relative z-10 flex w-full justify-center",
+                prefersReducedMotion ? "order-1 lg:order-2" : "order-2",
+              )}
+            >
+              <div
+                ref={canRef}
+                className="w-full max-w-[240px] lg:max-w-[260px]"
+              >
+                <ProductCan
+                  className="max-w-none"
+                  tone={
+                    currentTone === "ice" || currentTone === "lime-soft"
+                      ? "ice"
+                      : "navy"
+                  }
+                  showReflection
+                />
+              </div>
+            </div>
           </div>
         </Container>
       </div>

@@ -107,11 +107,25 @@
 
   .text-display {
     font-family: var(--font-display), ui-sans-serif, sans-serif;
-    font-size: clamp(4rem, 10vw, 10rem);
-    line-height: 0.92;
+    font-size: clamp(3rem, 7vw, 7rem);
+    line-height: 0.94;
     letter-spacing: -0.03em;
     text-transform: uppercase;
     font-weight: 700;
+  }
+
+  .text-hero {
+    font-family: var(--font-display), ui-sans-serif, sans-serif;
+    font-size: clamp(2.5rem, 5.2vw, 4.75rem);
+    line-height: 0.98;
+    letter-spacing: -0.025em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  .container-pw {
+    width: min(100% - 2.5rem, var(--container-max));
+    margin-inline: auto;
   }
 
   .text-editorial {
@@ -147,14 +161,15 @@
     }
   }
 
-  .container-pw {
-    width: min(100% - 2rem, var(--container-max));
-    margin-inline: auto;
-  }
-
   @media (min-width: 768px) {
     .container-pw {
-      width: min(100% - 3.5rem, var(--container-max));
+      width: min(100% - 5rem, var(--container-max));
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .container-pw {
+      width: min(100% - 6.5rem, var(--container-max));
     }
   }
 

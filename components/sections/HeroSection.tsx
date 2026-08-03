@@ -95,17 +95,20 @@ export function HeroSection() {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_70%_40%,rgba(0,169,203,0.18),transparent_55%),radial-gradient(ellipse_at_20%_80%,rgba(183,243,51,0.08),transparent_45%)]" />
       <DotPattern className="bottom-[-10%] right-[-5%] h-[42%] w-[42%] opacity-70" />
 
-      <Container className="relative z-10 grid flex-1 items-center gap-12 py-28 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8 lg:py-24">
-        <div ref={contentRef} className="max-w-xl">
+      <Container className="relative z-10 grid flex-1 items-center gap-12 py-28 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)] lg:gap-16 lg:py-24 xl:gap-20">
+        <div ref={contentRef} className="max-w-2xl lg:pl-2 xl:pl-4">
           <div data-hero-item>
             <SectionLabel tone="lime">{heroContent.eyebrow}</SectionLabel>
           </div>
           <h1
             data-hero-item
-            className="mt-5 text-display text-pw-white"
+            className="mt-5 text-hero text-pw-white"
           >
             {heroContent.titleLines.map((line) => (
-              <span key={line} className="block">
+              <span
+                key={line}
+                className="block sm:whitespace-nowrap"
+              >
                 {line}
               </span>
             ))}

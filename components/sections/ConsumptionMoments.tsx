@@ -13,6 +13,45 @@ const panelTones = [
   "bg-pw-lime-soft text-pw-navy",
 ] as const;
 
+function MomentCard({
+  label,
+  text,
+  tone,
+  compact,
+}: {
+  label: string;
+  text: string;
+  tone: string;
+  compact?: boolean;
+}) {
+  return (
+    <article
+      className={cn(
+        "flex flex-col justify-between rounded-sm",
+        tone,
+        compact
+          ? "h-full w-[min(72vw,38rem)] p-8 md:p-10"
+          : "min-h-[20rem] p-8 md:min-h-[22rem] md:p-10",
+      )}
+    >
+      <p className="text-xs uppercase tracking-[0.24em] opacity-60">{label}</p>
+      <div>
+        <h3 className={compact ? "text-editorial" : "text-section"}>
+          {label}.
+        </h3>
+        <p
+          className={cn(
+            "mt-4 text-body-lg opacity-80",
+            compact ? "max-w-md" : "max-w-xl",
+          )}
+        >
+          {text}
+        </p>
+      </div>
+    </article>
+  );
+}
+
 export function ConsumptionMoments() {
   const rootRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -21,7 +60,9 @@ export function ConsumptionMoments() {
   useEffect(() => {
     const rootEl = rootRef.current;
     const trackEl = trackRef.current;
-    if (!ready || !rootEl || !trackEl || prefersReducedMotion || isMobile) return;
+    if (!ready || !rootEl || !trackEl || prefersReducedMotion || isMobile) {
+      return;
+    }
 
     const root = rootEl;
     const track = trackEl;
@@ -41,7 +82,7 @@ export function ConsumptionMoments() {
           scrollTrigger: {
             trigger: root,
             start: "top top",
-            end: () => `+=${totalScroll()}`,
+            end: () => `+=${Math.max(totalScroll(), window.innerHeight * 0.8)}`,
             pin: true,
             scrub: 0.6,
             anticipatePin: 1,
@@ -65,86 +106,65 @@ export function ConsumptionMoments() {
   return (
     <section
       ref={rootRef}
-      className="relative overflow-hidden bg-pw-ice"
+      className={cn(
+        "relative bg-pw-ice",
+        // Desktop pin scene must fit exactly in the viewport so cards are not clipped
+        "md:h-svh md:overflow-hidden",
+        "max-md:section-pad",
+        prefersReducedMotion && "md:h-auto md:overflow-visible md:section-pad",
+      )}
       aria-label="Momentos de consumo"
     >
-      <div className="section-pad pb-8 md:pb-10">
-        <Container>
+      <div
+        className={cn(
+          "flex flex-col",
+          "md:h-full md:pt-[calc(var(--header-height)+1.25rem)] md:pb-8",
+          prefersReducedMotion && "md:h-auto md:pt-0 md:pb-0",
+        )}
+      >
+        <Container className="shrink-0">
           <SectionLabel>Momento de consumo</SectionLabel>
-          <h2 className="mt-4 max-w-3xl text-editorial text-pw-navy">
+          <h2 className="mt-3 max-w-3xl text-editorial text-pw-navy md:mt-4">
             Antes. Durante. Después.
           </h2>
         </Container>
-      </div>
 
-      {/* Desktop horizontal track */}
-      <div
-        ref={trackRef}
-        className={cn(
-          "hidden md:flex w-max gap-6 px-[max(1.75rem,calc((100vw-85rem)/2))] pb-24",
-          (prefersReducedMotion || isMobile) && "md:hidden",
-        )}
-      >
-        {consumptionMoments.map((moment, index) => (
-          <article
-            key={moment.id}
-            className={cn(
-              "flex h-[58vh] w-[min(78vw,42rem)] flex-col justify-between rounded-sm p-8 md:p-12",
-              panelTones[index],
-            )}
-          >
-            <p className="text-xs uppercase tracking-[0.24em] opacity-60">
-              {moment.label}
-            </p>
-            <div>
-              <h3 className="text-editorial">{moment.label}.</h3>
-              <p className="mt-5 max-w-md text-body-lg opacity-80">
-                {moment.text}
-              </p>
-            </div>
-          </article>
-        ))}
-      </div>
-
-      {/* Mobile / reduced: vertical stack */}
-      <div className="container-pw space-y-5 pb-20 md:hidden">
-        {consumptionMoments.map((moment, index) => (
-          <article
-            key={moment.id}
-            className={cn(
-              "flex min-h-[22rem] flex-col justify-between rounded-sm p-8",
-              panelTones[index],
-            )}
-          >
-            <p className="text-xs uppercase tracking-[0.24em] opacity-60">
-              {moment.label}
-            </p>
-            <div>
-              <h3 className="text-section">{moment.label}.</h3>
-              <p className="mt-4 text-body-lg opacity-80">{moment.text}</p>
-            </div>
-          </article>
-        ))}
-      </div>
-
-      {prefersReducedMotion ? (
-        <div className="container-pw hidden space-y-5 pb-24 md:block">
+        {/* Desktop horizontal track */}
+        <div
+          ref={trackRef}
+          className={cn(
+            "mt-8 hidden min-h-0 w-max flex-1 gap-6 px-[max(1.75rem,calc((100vw-85rem)/2))]",
+            prefersReducedMotion ? "md:hidden" : "md:flex",
+          )}
+        >
           {consumptionMoments.map((moment, index) => (
-            <article
-              key={`reduced-${moment.id}`}
-              className={cn(
-                "flex min-h-[20rem] flex-col justify-between rounded-sm p-10",
-                panelTones[index],
-              )}
-            >
-              <h3 className="text-section">{moment.label}.</h3>
-              <p className="mt-4 max-w-xl text-body-lg opacity-80">
-                {moment.text}
-              </p>
-            </article>
+            <MomentCard
+              key={moment.id}
+              label={moment.label}
+              text={moment.text}
+              tone={panelTones[index]}
+              compact
+            />
           ))}
         </div>
-      ) : null}
+
+        {/* Mobile + reduced-motion vertical stack */}
+        <div
+          className={cn(
+            "container-pw mt-10 space-y-5",
+            prefersReducedMotion ? "md:mt-14 md:block" : "md:hidden",
+          )}
+        >
+          {consumptionMoments.map((moment, index) => (
+            <MomentCard
+              key={moment.id}
+              label={moment.label}
+              text={moment.text}
+              tone={panelTones[index]}
+            />
+          ))}
+        </div>
+      </div>
     </section>
   );
 }
