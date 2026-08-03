@@ -129,9 +129,9 @@ export function LaunchExperienceMobile() {
               animated={animateCourt}
             />
 
-            {/* Gap stays fixed (gap-3); leftover viewport space sits around the cluster */}
-            <div className="relative z-10 flex min-h-0 flex-1 flex-col items-center justify-center gap-3 px-5 pb-5">
-              <div className="relative z-20 h-[6.6rem] w-full max-w-sm shrink-0 overflow-hidden">
+            {/* Packed under the header: tight gaps, no stretchy empty bands */}
+            <div className="relative z-10 flex min-h-0 flex-1 flex-col items-center justify-start gap-2 px-5 pb-4 pt-3">
+              <div className="relative z-20 h-[5.85rem] w-full max-w-sm shrink-0 overflow-hidden">
                 {productStoryStages.map((stage, index) => (
                   <div
                     key={stage.id}
@@ -148,7 +148,7 @@ export function LaunchExperienceMobile() {
                       {stage.label}
                     </h2>
                     {stage.layout !== "monument" ? (
-                      <p className="mx-auto mt-1.5 line-clamp-2 max-w-[17rem] text-[0.8rem] leading-snug opacity-80">
+                      <p className="mx-auto mt-1 line-clamp-2 max-w-[17rem] text-[0.78rem] leading-snug opacity-80">
                         {stage.text}
                       </p>
                     ) : null}
@@ -158,7 +158,7 @@ export function LaunchExperienceMobile() {
 
               <div
                 ref={storyCanRef}
-                className="w-[min(152px,40vw)] shrink-0 [&_[data-product-can-image]]:max-h-[46svh]"
+                className="w-[min(172px,46vw)] shrink-0 [&_[data-product-can-image]]:max-h-[min(52svh,380px)]"
               >
                 <ProductCanStage
                   mode="inline"
@@ -169,16 +169,16 @@ export function LaunchExperienceMobile() {
                 />
               </div>
 
-              <div className="relative z-20 h-12 w-full max-w-sm shrink-0">
+              <div className="relative z-20 mt-1 min-h-10 w-full max-w-sm shrink-0">
                 {productStoryStages.map((stage, index) =>
                   stage.layout === "monument" ? (
                     <p
                       key={`bot-${stage.id}`}
                       className={cn(
-                        "absolute inset-x-0 top-0 text-center text-[0.8rem] leading-snug transition-opacity duration-300",
+                        "text-center text-[0.8rem] leading-snug transition-opacity duration-300",
                         activeStage === index
                           ? "opacity-85"
-                          : "pointer-events-none opacity-0",
+                          : "pointer-events-none absolute inset-x-0 top-0 opacity-0",
                       )}
                     >
                       {stage.text}
@@ -187,7 +187,7 @@ export function LaunchExperienceMobile() {
                 )}
                 <p
                   data-hold-hint
-                  className="absolute inset-x-0 bottom-0 text-center text-[0.55rem] uppercase tracking-[0.28em]"
+                  className="mt-2 text-center text-[0.55rem] uppercase tracking-[0.28em]"
                 >
                   Sigue explorando
                 </p>
