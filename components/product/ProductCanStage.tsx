@@ -13,6 +13,7 @@ type ProductCanStageProps = {
   quiet?: boolean;
   showReflection?: boolean;
   priority?: boolean;
+  showPendingLabel?: boolean;
   mode?: "fixed" | "inline" | "ghost";
 };
 
@@ -25,6 +26,7 @@ export const ProductCanStage = forwardRef<HTMLDivElement, ProductCanStageProps>(
       quiet = false,
       showReflection = true,
       priority = false,
+      showPendingLabel = false,
       mode = "inline",
     },
     ref,
@@ -35,7 +37,8 @@ export const ProductCanStage = forwardRef<HTMLDivElement, ProductCanStageProps>(
           ref={ref}
           aria-hidden
           className={cn(
-            size === "hero" && "aspect-[2/5] h-[min(58svh,440px)] w-auto",
+            size === "hero" &&
+              "aspect-[2/5] h-[min(28svh,220px)] w-auto sm:h-[min(40svh,300px)] md:h-[min(58svh,440px)]",
             size === "story" &&
               "aspect-[2/5] h-[min(54svh,460px)] w-auto max-md:h-[min(46svh,340px)]",
             size === "inline" && "aspect-[2/5] w-full max-w-[240px]",
@@ -63,6 +66,7 @@ export const ProductCanStage = forwardRef<HTMLDivElement, ProductCanStageProps>(
             size={size}
             quiet={quiet}
             priority={priority}
+            showPendingLabel={showPendingLabel}
           />
           <ProductHighlight />
         </div>

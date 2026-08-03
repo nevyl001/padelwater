@@ -13,10 +13,12 @@ type ProductCanImageProps = {
   size?: "hero" | "story" | "inline";
   quiet?: boolean;
   label?: string;
+  /** Only the hero should pass this in development. */
+  showPendingLabel?: boolean;
 };
 
 const sizeClass = {
-  hero: "aspect-[2/5] h-[min(58svh,440px)] w-auto",
+  hero: "aspect-[2/5] h-[min(28svh,220px)] w-auto sm:h-[min(40svh,300px)] md:h-[min(58svh,440px)]",
   story:
     "aspect-[2/5] h-[min(54svh,460px)] w-auto max-md:h-[min(46svh,340px)]",
   inline: "aspect-[2/5] w-full max-w-[240px]",
@@ -33,6 +35,7 @@ export function ProductCanImage({
   tone = "navy",
   size = "inline",
   quiet = false,
+  showPendingLabel = false,
 }: ProductCanImageProps) {
   const image = resolveCanImage(src ?? product.media.front ?? product.media.hero);
 
@@ -57,6 +60,7 @@ export function ProductCanImage({
     <ProductCanSilhouette
       tone={tone}
       quiet={quiet}
+      showPendingLabel={showPendingLabel}
       className={cn(sizeClass[size], className)}
     />
   );

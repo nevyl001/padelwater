@@ -8,16 +8,18 @@ type ScrollIndicatorProps = {
   label?: string;
   href?: string;
   className?: string;
+  /** Extra line + softer presence for cinematic heroes */
+  reinforced?: boolean;
 };
 
 /**
- * Idle scroll affordance. Decorative, not narrative — so it runs on
- * Motion's loop rather than being wired into a scene's GSAP timeline.
+ * Idle scroll affordance. Decorative — Motion loop, not GSAP narrative.
  */
 export function ScrollIndicator({
   label = "Explora el producto",
   href,
   className,
+  reinforced = false,
 }: ScrollIndicatorProps) {
   const { prefersReducedMotion } = useMotionPreferences();
   const Tag = href ? motion.a : motion.div;
@@ -27,6 +29,7 @@ export function ScrollIndicator({
       {...(href ? { href } : {})}
       className={cn(
         "group inline-flex flex-col items-center gap-2 text-[0.65rem] uppercase tracking-[0.28em] text-white/45 transition-colors hover:text-white/80",
+        reinforced && "gap-3 text-white/55",
         className,
       )}
       animate={prefersReducedMotion ? undefined : { y: [0, 6, 0] }}
@@ -36,6 +39,15 @@ export function ScrollIndicator({
           : { duration: 1.8, repeat: Infinity, ease: "easeInOut" }
       }
     >
+      {reinforced ? (
+        <span
+          aria-hidden
+          className={cn(
+            "mb-1 h-10 w-px bg-gradient-to-b from-transparent via-pw-lime/70 to-pw-cyan/50",
+            !prefersReducedMotion && "animate-scroll-line",
+          )}
+        />
+      ) : null}
       <span>{label}</span>
       <svg
         aria-hidden

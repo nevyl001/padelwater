@@ -197,6 +197,130 @@
     }
   }
 
+  /* Aurora — transform-only drifts (GPU). Durations from lib/motion.ts conceptually. */
+  @keyframes aurora-drift-a {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    50% {
+      transform: translate3d(6%, 4%, 0) scale(1.08);
+    }
+  }
+
+  @keyframes aurora-drift-b {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    50% {
+      transform: translate3d(-5%, -6%, 0) scale(1.06);
+    }
+  }
+
+  @keyframes aurora-drift-c {
+    0%,
+    100% {
+      transform: translate3d(-50%, -50%, 0) scale(1);
+    }
+    50% {
+      transform: translate3d(calc(-50% + 3%), calc(-50% - 4%), 0) scale(1.12);
+    }
+  }
+
+  @keyframes orbit-spin-slow {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes orbit-spin-reverse {
+    to {
+      transform: rotate(-360deg);
+    }
+  }
+
+  @keyframes scroll-line-pulse {
+    0%,
+    100% {
+      transform: scaleY(0.35);
+      opacity: 0.35;
+    }
+    50% {
+      transform: scaleY(1);
+      opacity: 0.85;
+    }
+  }
+
+  .animate-aurora-drift-a {
+    animation: aurora-drift-a 18s ease-in-out infinite;
+  }
+
+  .animate-aurora-drift-b {
+    animation: aurora-drift-b 22s ease-in-out infinite;
+  }
+
+  .animate-aurora-drift-c {
+    animation: aurora-drift-c 26s ease-in-out infinite;
+  }
+
+  .animate-orbit-slow {
+    animation: orbit-spin-slow 48s linear infinite;
+  }
+
+  .animate-orbit-reverse {
+    animation: orbit-spin-reverse 64s linear infinite;
+  }
+
+  .animate-scroll-line {
+    animation: scroll-line-pulse 2.2s ease-in-out infinite;
+    transform-origin: top center;
+  }
+
+  @keyframes flavor-drift-a {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(4%, 3%, 0);
+    }
+  }
+
+  @keyframes flavor-drift-b {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(-3%, -4%, 0);
+    }
+  }
+
+  @keyframes flavor-wave {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(-2%, 0, 0);
+    }
+  }
+
+  .animate-flavor-drift-a {
+    animation: flavor-drift-a 16s ease-in-out infinite;
+  }
+
+  .animate-flavor-drift-b {
+    animation: flavor-drift-b 20s ease-in-out infinite;
+  }
+
+  .animate-flavor-wave {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: flavor-wave 14s ease-in-out infinite;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     html {
       scroll-behavior: auto;

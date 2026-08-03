@@ -7,6 +7,8 @@ type CanSilhouetteProps = {
   className?: string;
   tone?: "navy" | "ice" | "water" | "lime";
   quiet?: boolean;
+  /** Dev-only notice — never in production; pass from a single call site. */
+  showPendingLabel?: boolean;
 };
 
 const tones = {
@@ -24,9 +26,12 @@ export function ProductCanSilhouette({
   className,
   tone = "navy",
   quiet = false,
+  showPendingLabel = false,
 }: CanSilhouetteProps) {
   const t = tones[tone];
   const uid = `can-${tone}`;
+  const pendingVisible =
+    showPendingLabel && process.env.NODE_ENV !== "production";
 
   return (
     <div
@@ -37,7 +42,7 @@ export function ProductCanSilhouette({
         viewBox="0 0 160 400"
         className="h-full w-full drop-shadow-[0_28px_50px_rgba(3,17,38,0.28)]"
         role="img"
-        aria-label={`${product.name} ${product.flavorLabel}, ${product.volume}. Fotografía final pendiente.`}
+        aria-label={`${product.name} ${product.flavorLabel}, ${product.volume}${pendingVisible ? ". Fotografía final pendiente." : ""}`}
       >
         <defs>
           <linearGradient id={`${uid}-body`} x1="0" y1="0" x2="1" y2="0">
@@ -177,17 +182,19 @@ export function ProductCanSilhouette({
           </>
         ) : null}
 
-        <text
-          x="80"
-          y="300"
-          textAnchor="middle"
-          fill={t.mute}
-          fontFamily="system-ui, sans-serif"
-          fontSize="5.5"
-          letterSpacing="1.4"
-        >
-          FOTOGRAFÍA FINAL PENDIENTE
-        </text>
+        {pendingVisible ? (
+          <text
+            x="80"
+            y="300"
+            textAnchor="middle"
+            fill={t.mute}
+            fontFamily="system-ui, sans-serif"
+            fontSize="5.5"
+            letterSpacing="1.4"
+          >
+            FOTOGRAFÍA FINAL PENDIENTE
+          </text>
+        ) : null}
 
         {/* Cylinder shine */}
         <path

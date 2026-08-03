@@ -14,7 +14,7 @@ export function AvailabilitySection() {
   return (
     <section
       id="donde"
-      className="bg-pw-ice section-pad anchor-offset"
+      className="bg-pw-ice py-16 anchor-offset md:py-20"
       aria-label="Disponibilidad"
     >
       <Container className="max-w-3xl">

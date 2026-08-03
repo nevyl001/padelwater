@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, type RefObject } from "react";
+import { durations, gsapEasings } from "@/lib/motion";
 import { applyMediaExpansion, prepareMediaExpansion } from "@/components/motion/mediaExpansion";
 
 type ProductShowcaseSceneRefs = {
   rootRef: RefObject<HTMLElement | null>;
+  stageRef: RefObject<HTMLDivElement | null>;
   canRef: RefObject<HTMLDivElement | null>;
-  headlineRef: RefObject<HTMLElement | null>;
-  statsRef: RefObject<HTMLElement | null>;
-  ctaRef: RefObject<HTMLElement | null>;
+  panelRef: RefObject<HTMLDivElement | null>;
 };
 
 type ProductShowcaseSceneFlags = {
@@ -17,10 +17,8 @@ type ProductShowcaseSceneFlags = {
 };
 
 /**
- * One-shot entrance (not pinned) — the can settles into place the same
- * "just physical enough" way as the Story scene's opening, so the two
- * scenes read as one motion language without literally sharing a
- * timeline.
+ * Entrance for the immersive showcase — stage + panel settle into place.
+ * Attribute swaps are handled in the scene (CSS/Motion), not here.
  */
 export function useProductShowcaseSceneTimeline(
   refs: ProductShowcaseSceneRefs,
@@ -32,17 +30,15 @@ export function useProductShowcaseSceneTimeline(
     if (!ready || prefersReducedMotion) return;
 
     const root = refs.rootRef.current;
+    const stage = refs.stageRef.current;
     const can = refs.canRef.current;
-    const headline = refs.headlineRef.current;
-    const stats = refs.statsRef.current;
-    const cta = refs.ctaRef.current;
-    if (!root || !can || !headline || !stats || !cta) return;
+    const panel = refs.panelRef.current;
+    if (!root || !stage || !can || !panel) return;
 
     const rootEl = root;
+    const stageEl = stage;
     const canEl = can;
-    const headlineEl = headline;
-    const statsEl = stats;
-    const ctaEl = cta;
+    const panelEl = panel;
 
     let dead = false;
     let revert: (() => void) | undefined;
@@ -53,46 +49,37 @@ export function useProductShowcaseSceneTimeline(
       if (dead) return;
 
       const ctx = gsap.context(() => {
+        const orbits = stageEl.querySelector("[data-orbital-rings]");
         const reflection = canEl.querySelector("[data-product-reflection]");
         const sheen = canEl.querySelector("[data-highlight-sheen]");
-        const headlineUnits = headlineEl.querySelectorAll("[data-mask-unit]");
-        const statsUnits = statsEl.querySelectorAll("[data-mask-unit]");
-        const ctaUnits = ctaEl.querySelectorAll("[data-mask-unit]");
 
         prepareMediaExpansion(gsap, canEl);
+        gsap.set(panelEl, { opacity: 0, y: 28 });
+        gsap.set(stageEl, { opacity: 0 });
+        if (orbits) gsap.set(orbits, { opacity: 0, scale: 0.92 });
         if (reflection) gsap.set(reflection, { opacity: 0 });
 
         const tl = gsap.timeline({
-          defaults: { ease: "expo.out" },
-          scrollTrigger: { trigger: rootEl, start: "top 70%", once: true },
+          defaults: { ease: gsapEasings.outExpo },
+          scrollTrigger: { trigger: rootEl, start: "top 72%", once: true },
         });
 
-        applyMediaExpansion(tl, canEl, {
-          from: { rotateX: -8, scale: 0.92, y: 24, opacity: 0 },
-          to: { rotateX: 0, scale: 1, y: 0, opacity: 1 },
-          duration: 0.9,
-          position: 0,
-        })
-          .to(reflection, { opacity: 1, duration: 0.3 }, 0.5)
-          .fromTo(
-            headlineUnits,
-            { yPercent: 110, opacity: 0 },
-            { yPercent: 0, opacity: 1, duration: 0.7, stagger: 0.08 },
-            0.15,
-          )
-          .fromTo(
-            statsUnits,
-            { yPercent: 110, opacity: 0 },
-            { yPercent: 0, opacity: 1, duration: 0.5 },
-            0.5,
-          )
-          .fromTo(
-            ctaUnits,
-            { yPercent: 110, opacity: 0 },
-            { yPercent: 0, opacity: 1, duration: 0.5 },
-            0.65,
-          );
+        tl.to(stageEl, { opacity: 1, duration: 0.4 }, 0);
 
+        if (orbits) {
+          tl.to(orbits, { opacity: 1, scale: 1, duration: 0.9 }, 0.05);
+        }
+
+        applyMediaExpansion(tl, canEl, {
+          from: { rotateX: -6, scale: 0.9, y: 32, opacity: 0 },
+          to: { rotateX: 0, scale: 1, y: 0, opacity: 1 },
+          duration: durations.cinematic,
+          position: 0.12,
+        });
+
+        if (reflection) {
+          tl.to(reflection, { opacity: 1, duration: 0.3 }, 0.55);
+        }
         if (sheen) {
           tl.fromTo(
             sheen,
@@ -101,6 +88,24 @@ export function useProductShowcaseSceneTimeline(
             0.6,
           );
         }
+
+        tl.to(
+          panelEl,
+          { opacity: 1, y: 0, duration: 0.7 },
+          0.35,
+        );
+
+        // Soft parallax of stage while section is in view
+        gsap.to(stageEl, {
+          y: -24,
+          ease: gsapEasings.none,
+          scrollTrigger: {
+            trigger: rootEl,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: true,
+          },
+        });
       }, rootEl);
 
       revert = () => {
@@ -120,9 +125,8 @@ export function useProductShowcaseSceneTimeline(
     ready,
     prefersReducedMotion,
     refs.rootRef,
+    refs.stageRef,
     refs.canRef,
-    refs.headlineRef,
-    refs.statsRef,
-    refs.ctaRef,
+    refs.panelRef,
   ]);
 }

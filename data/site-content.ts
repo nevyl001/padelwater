@@ -1,15 +1,15 @@
 export const navigation = [
   { label: "Producto", href: "#producto" },
-  { label: "Por qué Pádel Water", href: "#por-que" },
+  { label: "Momentos", href: "#momentos" },
   { label: "Sabor", href: "#sabor" },
   { label: "Dónde encontrarla", href: "#donde" },
 ] as const;
 
 export const heroContent = {
-  eyebrow: "Hidratación para la cancha",
+  eyebrow: "Para la cancha",
   titleLines: ["Juega fresco.", "Llega más lejos."],
   description:
-    "Pádel Water es hidratación con electrolitos, creada para acompañarte antes, durante y después del partido.",
+    "Pádel Water nace del juego: creada para acompañarte en cada partido.",
   primaryCta: "Descubre Pádel Water",
   primaryHref: "#producto",
   secondaryCta: "Conoce el sabor coco",
@@ -81,7 +81,7 @@ export const benefits = [
 
 export const coconutSection = {
   eyebrow: "Sabor coco",
-  title: "Frescura que se siente desde el primer punto.",
+  title: "Desde el primer punto.",
   text: "Un sabor ligero pensado para acompañar el juego sin distraerte de él.",
 } as const;
 
@@ -105,7 +105,7 @@ export const consumptionMoments = [
 
 export const communitySection = {
   titleLines: ["La cancha se comparte.", "La energía también."],
-  text: "Pádel Water nace del juego en comunidad: partidos, rivales que se vuelven equipo y la frescura que se pasa de mano en mano.",
+  text: "Pádel Water nace del juego en comunidad: partidos, rivales que se vuelven equipo y lo que se pasa de mano en mano.",
 } as const;
 
 export const finalCta = {

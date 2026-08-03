@@ -1,15 +1,10 @@
 import { HeroScene } from "@/components/scenes/HeroScene";
-import { ProductStoryScene } from "@/components/scenes/ProductStoryScene";
-import { BrandStatement } from "@/components/sections/BrandStatement";
-import { BenefitsSection } from "@/components/sections/BenefitsSection";
-import { CoconutSection } from "@/components/sections/CoconutSection";
-import { CourtScene } from "@/components/scenes/CourtScene";
-import { CommunityScene } from "@/components/scenes/CommunityScene";
 import { ProductShowcaseScene } from "@/components/scenes/ProductShowcaseScene";
+import { ConsumptionMomentsScene } from "@/components/scenes/ConsumptionMomentsScene";
+import { EditorialParallaxScene } from "@/components/scenes/EditorialParallaxScene";
+import { FlavorScene } from "@/components/scenes/FlavorScene";
 import { AvailabilitySection } from "@/components/sections/AvailabilitySection";
-import { FAQSection } from "@/components/sections/FAQSection";
 import { FinalScene } from "@/components/scenes/FinalScene";
-import { faqItems } from "@/data/faq";
 import { product } from "@/data/product";
 import { siteConfig } from "@/lib/config";
 
@@ -35,19 +30,6 @@ function JsonLd() {
     size: product.volume,
   };
 
-  const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: faqItems.map((item) => ({
-      "@type": "Question",
-      name: item.question,
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: item.answer,
-      },
-    })),
-  };
-
   return (
     <>
       <script
@@ -58,35 +40,25 @@ function JsonLd() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
       />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-      />
     </>
   );
 }
 
+/**
+ * Narrative flow (one job per section):
+ * Hero → Showcase → Moments → Editorial → Flavor → Availability → Final
+ */
 export default function HomePage() {
   return (
     <>
       <JsonLd />
       <main>
-        {/* Escena 1: Hero */}
         <HeroScene />
-        {/* Escena 2: Product Story */}
-        <ProductStoryScene />
-        <BrandStatement />
-        <BenefitsSection />
-        <CoconutSection />
-        {/* Escena 4: Court */}
-        <CourtScene />
-        {/* Escena 5: Community */}
-        <CommunityScene />
-        {/* Escena 3: Product Showcase */}
         <ProductShowcaseScene />
+        <ConsumptionMomentsScene />
+        <EditorialParallaxScene />
+        <FlavorScene />
         <AvailabilitySection />
-        <FAQSection />
-        {/* Escena 6: Final */}
         <FinalScene />
       </main>
     </>
