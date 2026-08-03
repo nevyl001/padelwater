@@ -192,8 +192,8 @@ export function LaunchExperience() {
               animated={animateCourt}
             />
 
-            {/* Can sits in the lower band on mobile so copy never stacks on it */}
-            <div className="pointer-events-none absolute inset-0 z-[5] flex justify-center max-md:items-end max-md:pb-[14%] md:items-center md:pt-10">
+            {/* Can: mobile sits mid-lower (not glued to bottom); desktop stays centered */}
+            <div className="pointer-events-none absolute inset-x-0 top-[52%] z-[5] flex -translate-y-1/2 justify-center md:inset-0 md:top-auto md:translate-y-0 md:items-center md:pt-10">
               <div
                 ref={storyCanRef}
                 className={cn(activeStage === 3 && "md:translate-y-[6%] md:scale-[0.94]")}
@@ -266,7 +266,7 @@ export function LaunchExperience() {
 
                   <div
                     aria-hidden
-                    className="relative z-0 min-h-[min(36svh,280px)] w-full flex-1 md:hidden"
+                    className="relative z-0 min-h-[min(40svh,300px)] w-full flex-1 md:hidden"
                   />
 
                   {stage.layout === "monument" ? (
