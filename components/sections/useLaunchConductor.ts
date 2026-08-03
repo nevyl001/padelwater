@@ -57,8 +57,8 @@ export function useLaunchConductor(
     const storyCanEl = storyCan;
     const copyEl = copy;
     const vh = isMobile ? STORY_VH_MOBILE : STORY_VH_DESKTOP;
-    // No lateral can shift on phones — it collides with centered copy
-    const shift = isMobile ? 0 : 100;
+    // Mild lateral shift on desktop so copy and can share the frame without drifting off-center
+    const shift = isMobile ? 0 : 56;
 
     let dead = false;
     let revert: (() => void) | undefined;
@@ -181,7 +181,7 @@ export function useLaunchConductor(
         tl.fromTo(
           storyCanEl,
           { autoAlpha: 0, scale: 0.94, y: 24 },
-          { autoAlpha: 1, scale: 1, y: 0, ease: "none", duration: 0.85 },
+          { autoAlpha: 1, scale: isMobile ? 1 : 1.04, y: 0, ease: "none", duration: 0.85 },
           0.3,
         );
         tl.call(() => setActiveStage(0), undefined, 0.85);
@@ -242,8 +242,8 @@ export function useLaunchConductor(
           storyCanEl,
           {
             x: 0,
-            y: isMobile ? 0 : 36,
-            scale: isMobile ? 0.9 : 0.92,
+            y: 0,
+            scale: isMobile ? 0.92 : 1.02,
             ease: "none",
             duration: 0.45,
           },

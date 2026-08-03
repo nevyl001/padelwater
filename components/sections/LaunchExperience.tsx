@@ -192,12 +192,9 @@ export function LaunchExperience() {
               animated={animateCourt}
             />
 
-            {/* Can: mobile sits mid-lower (not glued to bottom); desktop stays centered */}
-            <div className="pointer-events-none absolute inset-x-0 top-[52%] z-[5] flex -translate-y-1/2 justify-center md:inset-0 md:top-auto md:translate-y-0 md:items-center md:pt-10">
-              <div
-                ref={storyCanRef}
-                className={cn(activeStage === 3 && "md:translate-y-[6%] md:scale-[0.94]")}
-              >
+            {/* Can: centered in the visible stage (below header); mobile keeps mid placement */}
+            <div className="pointer-events-none absolute inset-0 z-[5] flex items-center justify-center max-md:items-start max-md:pt-[42%] md:pt-[calc(var(--header-offset)*0.35)]">
+              <div ref={storyCanRef}>
                 <ProductCanStage
                   mode="inline"
                   tone={canTone}
