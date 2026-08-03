@@ -21,7 +21,7 @@ import { cn } from "@/lib/cn";
 function stageShellClass(layout: (typeof productStoryStages)[number]["layout"]) {
   switch (layout) {
     case "monument":
-      return "inset-0 flex flex-col justify-between px-[max(2rem,8%)] pb-24 pt-6 text-center";
+      return "inset-0 flex flex-col justify-between px-[max(2rem,8%)] pb-28 pt-10 text-center";
     case "backdrop":
       return "left-[max(2.5rem,calc((100vw-min(100vw,85rem))/2+1.5rem))] top-[18%] w-[min(26rem,34vw)] text-left";
     case "side":
@@ -168,10 +168,7 @@ export function LaunchExperienceDesktop() {
             />
 
             <div className="pointer-events-none absolute inset-0 z-[5] flex items-center justify-center pt-[calc(var(--header-offset)*0.35)]">
-              <div
-                ref={storyCanRef}
-                className={cn(activeStage === 3 && "scale-[0.8]")}
-              >
+              <div ref={storyCanRef}>
                 <ProductCanStage
                   mode="inline"
                   tone={canTone}
@@ -195,19 +192,20 @@ export function LaunchExperienceDesktop() {
                 >
                   {stage.layout === "monument" ? (
                     <>
-                      <div className="relative z-30 mx-auto w-full max-w-xl shrink-0">
+                      <div className="relative z-30 mx-auto w-full max-w-xl shrink-0 pb-2">
                         <p className="text-xs uppercase tracking-[0.22em] opacity-55">
                           {stage.eyebrow}
                         </p>
-                        <h2 className="mt-2 font-display text-[clamp(2.5rem,6vw,3.75rem)] font-bold uppercase leading-[0.92] tracking-[-0.03em]">
+                        <h2 className="mt-2 font-display text-[clamp(2.35rem,5.2vw,3.4rem)] font-bold uppercase leading-[0.92] tracking-[-0.03em]">
                           {stage.label}
                         </h2>
                       </div>
+                      {/* Reserved can lane — keeps 470 clear of the product */}
                       <div
                         aria-hidden
-                        className="min-h-[min(50svh,420px)] w-full flex-1"
+                        className="min-h-[min(42svh,360px)] w-full flex-1"
                       />
-                      <p className="relative z-30 mx-auto mb-4 max-w-md shrink-0 text-lg leading-relaxed opacity-85">
+                      <p className="relative z-30 mx-auto mb-6 max-w-md shrink-0 text-lg leading-relaxed opacity-85">
                         {stage.text}
                       </p>
                     </>

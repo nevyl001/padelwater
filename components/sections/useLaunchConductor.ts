@@ -265,8 +265,9 @@ export function useLaunchConductor(
           storyCanEl,
           {
             x: 0,
-            y: 0,
-            scale: isMobile ? 0.9 : 0.8,
+            // Desktop monument: sit lower and smaller so 470 never collides
+            y: isMobile ? 0 : 36,
+            scale: isMobile ? 0.9 : 0.72,
             ease: "none",
             duration: 0.45,
           },
