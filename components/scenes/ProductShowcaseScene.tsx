@@ -209,11 +209,11 @@ export function ProductShowcaseScene() {
           </h2>
         </div>
 
-        <div className="grid items-center gap-4 md:gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-14 xl:gap-20">
+        <div className="grid w-full min-w-0 items-center gap-4 md:gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-14 xl:gap-20">
           <div
             ref={panelRef}
             className={cn(
-              "order-2 lg:order-1",
+              "order-2 w-full min-w-0 lg:order-1",
               !prefersReducedMotion && "opacity-0",
             )}
           >
@@ -228,7 +228,7 @@ export function ProductShowcaseScene() {
               role="tablist"
               aria-label="Características del producto"
               id={tablistId}
-              className="-mx-1 mt-5 flex justify-center gap-2 overflow-x-auto px-1 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] md:mt-8 md:justify-start lg:mt-10 lg:flex-wrap lg:overflow-visible [&::-webkit-scrollbar]:hidden"
+              className="mx-auto mt-5 flex w-full max-w-md flex-wrap justify-center gap-2 md:mx-0 md:mt-8 md:max-w-none md:justify-start lg:mt-10"
             >
               {showcaseAttributes.map((attr, index) => {
                 const selected = attr.id === activeId;
@@ -244,7 +244,7 @@ export function ProductShowcaseScene() {
                     onClick={() => setActiveId(attr.id)}
                     onKeyDown={(e) => onTabKeyDown(e, index)}
                     className={cn(
-                      "shrink-0 rounded-sm border px-3 py-2 text-[0.6rem] uppercase tracking-[0.18em] transition-[color,background-color,border-color] duration-300 md:px-3.5 md:py-2.5 md:text-[0.62rem] md:tracking-[0.2em]",
+                      "rounded-sm border px-2.5 py-2 text-[0.55rem] uppercase tracking-[0.14em] transition-[color,background-color,border-color] duration-300 sm:px-3 sm:text-[0.58rem] sm:tracking-[0.16em] md:px-3.5 md:py-2.5 md:text-[0.62rem] md:tracking-[0.2em]",
                       selected
                         ? "border-pw-lime bg-pw-lime/12 text-pw-lime"
                         : "border-white/18 text-white/60 hover:border-white/40 hover:text-white/90",
@@ -256,11 +256,11 @@ export function ProductShowcaseScene() {
               })}
             </div>
 
-            <div className="mt-5 flex justify-center md:mt-8 lg:mt-10 lg:justify-start">
+            <div className="mt-5 flex w-full justify-center md:mt-8 lg:mt-10 lg:justify-start">
               <Button
                 variant="secondary"
                 onClick={() => setInfoOpen(true)}
-                className="border-white/35 text-pw-white hover:border-white hover:bg-white/5"
+                className="w-full max-w-xs border-white/35 text-pw-white hover:border-white hover:bg-white/5 sm:w-auto sm:max-w-none"
               >
                 Ver información del producto
               </Button>
@@ -270,7 +270,7 @@ export function ProductShowcaseScene() {
           <div
             ref={stageRef}
             className={cn(
-              "relative order-1 -mx-2 flex items-center justify-center md:mx-0 md:min-h-[min(68svh,540px)] lg:order-2",
+              "relative order-1 flex w-full min-w-0 items-center justify-center md:min-h-[min(68svh,540px)] lg:order-2",
               !prefersReducedMotion && "opacity-0",
             )}
           >
@@ -336,7 +336,7 @@ function AttributePanel({
       <h3 className="mt-3.5 font-display text-[clamp(1.85rem,3.5vw,2.75rem)] font-bold uppercase leading-[1.02] tracking-[-0.03em] text-pw-white">
         {attribute.title}
       </h3>
-      <p className="mt-4 max-w-sm text-base leading-relaxed text-white/72 md:mt-5 md:text-lg lg:max-w-md">
+      <p className="mx-auto mt-4 max-w-sm text-base leading-relaxed text-white/72 md:mt-5 md:text-lg lg:mx-0 lg:max-w-md">
         {attribute.text}
       </p>
     </div>
