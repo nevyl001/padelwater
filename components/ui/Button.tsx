@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { motion, useMotionValue, useSpring } from "motion/react";
-import { useCallback, useRef } from "react";
+import { motion } from "motion/react";
 import { cn } from "@/lib/cn";
-import { useMotionPreferences } from "@/components/motion/MotionPreferences";
+import { useMagnetic } from "@/components/motion/useMagnetic";
 
 type ButtonVariant = "primary" | "secondary" | "ghost" | "lime";
 type ButtonSize = "md" | "lg";
@@ -54,32 +53,12 @@ export function Button(props: ButtonProps) {
     size = "md",
     magnetic = false,
   } = props;
-  const { profile, layer } = useMotionPreferences();
-  const enableMagnetic =
-    magnetic && profile.enableMagnetic && layer === "fullMotion";
-
-  const nodeRef = useRef<HTMLElement | null>(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const springX = useSpring(x, { stiffness: 280, damping: 22, mass: 0.4 });
-  const springY = useSpring(y, { stiffness: 280, damping: 22, mass: 0.4 });
-
-  const onMove = useCallback(
-    (e: React.MouseEvent) => {
-      if (!enableMagnetic) return;
-      const node = nodeRef.current;
-      if (!node) return;
-      const rect = node.getBoundingClientRect();
-      x.set((e.clientX - (rect.left + rect.width / 2)) * 0.18);
-      y.set((e.clientY - (rect.top + rect.height / 2)) * 0.18);
-    },
-    [enableMagnetic, x, y],
-  );
-
-  const onLeave = useCallback(() => {
-    x.set(0);
-    y.set(0);
-  }, [x, y]);
+  const {
+    ref: nodeRef,
+    style: motionStyle,
+    onMouseMove,
+    onMouseLeave,
+  } = useMagnetic({ enabled: magnetic });
 
   const classes = cn(
     "inline-flex items-center justify-center gap-2 rounded-full font-medium transition-[background,border-color,filter] duration-300 ease-out",
@@ -87,10 +66,6 @@ export function Button(props: ButtonProps) {
     sizes[size],
     className,
   );
-
-  const motionStyle = enableMagnetic
-    ? { x: springX, y: springY }
-    : undefined;
 
   if ("href" in props && props.href) {
     if (props.external) {
@@ -104,8 +79,8 @@ export function Button(props: ButtonProps) {
           rel="noopener noreferrer"
           className={classes}
           style={motionStyle}
-          onMouseMove={onMove}
-          onMouseLeave={onLeave}
+          onMouseMove={onMouseMove}
+          onMouseLeave={onMouseLeave}
           whileTap={{ scale: 0.98 }}
         >
           {children}
@@ -118,8 +93,8 @@ export function Button(props: ButtonProps) {
         <Link
           href={props.href}
           className={classes}
-          onMouseMove={onMove}
-          onMouseLeave={onLeave}
+          onMouseMove={onMouseMove}
+          onMouseLeave={onMouseLeave}
           ref={(node) => {
             nodeRef.current = node;
           }}
@@ -140,8 +115,8 @@ export function Button(props: ButtonProps) {
       type={type ?? "button"}
       className={classes}
       style={motionStyle}
-      onMouseMove={onMove}
-      onMouseLeave={onLeave}
+      onMouseMove={onMouseMove}
+      onMouseLeave={onMouseLeave}
       whileTap={{ scale: 0.98 }}
       disabled={disabled}
       onClick={onClick}

@@ -125,31 +125,32 @@ export function CourtField({
 
     const project = (nx: number, depth: number) => {
       // nx: -1..1 across court, depth: 0 (far) .. 1 (near)
-      const vanishingY = h * 0.18;
-      const nearY = h * 0.98;
+      const vanishingY = h * 0.22;
+      const nearY = h * 0.96;
       const y = vanishingY + (nearY - vanishingY) * depth;
-      const halfFar = w * 0.16;
-      const halfNear = w * 0.48;
+      const halfFar = w * 0.14;
+      const halfNear = w * 0.46;
       const half = halfFar + (halfNear - halfFar) * depth;
       return { x: w * 0.5 + nx * half, y };
     };
 
-    const drawCourt = (time: number) => {
-      const pulse = animated ? 0.5 + 0.5 * Math.sin(time * 0.0007) : 0.65;
-      const drawProgress = animated
-        ? Math.min(1, (time - t0) / 1800)
-        : 1;
+    const strokePoly = (
+      points: Array<{ x: number; y: number }>,
+      close = false,
+    ) => {
+      if (!points.length) return;
+      ctx.beginPath();
+      ctx.moveTo(points[0].x, points[0].y);
+      for (let i = 1; i < points.length; i++) {
+        ctx.lineTo(points[i].x, points[i].y);
+      }
+      if (close) ctx.closePath();
+      ctx.stroke();
+    };
 
-      ctx.save();
-      ctx.globalAlpha = 0.55 * strength * pulse;
-      ctx.strokeStyle = palette.line;
-      ctx.lineWidth = 1.25;
-      ctx.lineJoin = "round";
-      ctx.setLineDash([]);
-
-      // Outer court trapezoid
-      const tl = project(-1, 0.08);
-      const tr = project(1, 0.08);
+    const fillCourtSurface = () => {
+      const tl = project(-1, 0.06);
+      const tr = project(1, 0.06);
       const br = project(1, 1);
       const bl = project(-1, 1);
       ctx.beginPath();
@@ -158,63 +159,127 @@ export function CourtField({
       ctx.lineTo(br.x, br.y);
       ctx.lineTo(bl.x, bl.y);
       ctx.closePath();
-      ctx.stroke();
+      const turf = ctx.createLinearGradient(0, tl.y, 0, br.y);
+      if (tone === "dark" || tone === "water") {
+        turf.addColorStop(0, "rgba(0,120,150,0.16)");
+        turf.addColorStop(1, "rgba(0,80,110,0.28)");
+      } else {
+        turf.addColorStop(0, "rgba(0,130,160,0.14)");
+        turf.addColorStop(1, "rgba(0,90,120,0.22)");
+      }
+      ctx.fillStyle = turf;
+      ctx.fill();
+    };
 
-      // Depth lines
-      for (const d of [0.28, 0.48, 0.68, 0.85]) {
-        const a = project(-1, d);
-        const b = project(1, d);
-        ctx.beginPath();
-        ctx.moveTo(a.x, a.y);
-        ctx.lineTo(b.x, b.y);
-        ctx.stroke();
+    const drawCourt = (time: number) => {
+      const pulse = animated ? 0.55 + 0.45 * Math.sin(time * 0.00055) : 0.7;
+      const drawProgress = animated
+        ? Math.min(1, (time - t0) / 1600)
+        : 1;
+
+      // Surface first so lines read as court markings, not abstract rays
+      ctx.save();
+      ctx.globalAlpha = 0.85 * strength * drawProgress;
+      fillCourtSurface();
+      ctx.restore();
+
+      ctx.save();
+      ctx.globalAlpha = 0.82 * strength * pulse * drawProgress;
+      ctx.strokeStyle =
+        tone === "dark" || tone === "water"
+          ? "rgba(255,255,255,0.55)"
+          : "rgba(255,255,255,0.92)";
+      ctx.lineWidth = Math.max(2, w * 0.0024);
+      ctx.lineJoin = "round";
+      ctx.lineCap = "round";
+      ctx.setLineDash([]);
+
+      // Outer boundary (padel court footprint)
+      strokePoly(
+        [project(-1, 0.06), project(1, 0.06), project(1, 1), project(-1, 1)],
+        true,
+      );
+
+      // Service lines (parallel to net) — classic padel layout
+      for (const d of [0.32, 0.68]) {
+        strokePoly([project(-1, d), project(1, d)]);
       }
 
-      // Center + service
-      const c0 = project(0, 0.08);
-      const c1 = project(0, 0.68);
-      ctx.beginPath();
-      ctx.moveTo(c0.x, c0.y);
-      ctx.lineTo(c1.x, c1.y);
-      ctx.stroke();
+      // Center line (service) — net to each service line
+      strokePoly([project(0, 0.32), project(0, 0.68)]);
 
-      for (const sx of [-0.5, 0.5]) {
-        const a = project(sx, 0.28);
-        const b = project(sx, 0.68);
-        ctx.beginPath();
-        ctx.moveTo(a.x, a.y);
-        ctx.lineTo(b.x, b.y);
-        ctx.stroke();
-      }
+      // Side corridors hint (glass / out-of-bounds feel)
+      ctx.globalAlpha = 0.35 * strength * drawProgress;
+      ctx.lineWidth = Math.max(1.2, w * 0.0015);
+      strokePoly([project(-1.08, 0.06), project(-1.08, 1)]);
+      strokePoly([project(1.08, 0.06), project(1.08, 1)]);
 
-      // Net glow bar
-      const nL = project(-0.72, 0.22);
-      const nR = project(0.72, 0.22);
-      const grad = ctx.createLinearGradient(nL.x, nL.y, nR.x, nR.y);
-      grad.addColorStop(0, "transparent");
-      grad.addColorStop(0.5, palette.glow);
-      grad.addColorStop(1, "transparent");
-      ctx.strokeStyle = grad;
-      ctx.lineWidth = 2.5;
-      ctx.globalAlpha = 0.75 * strength * drawProgress;
+      // Net posts + band (readable as red/white net across mid-court)
+      const netD = 0.5;
+      const nL = project(-1.02, netD);
+      const nR = project(1.02, netD);
+      const postH = Math.max(14, h * 0.035);
+
+      ctx.globalAlpha = 0.9 * strength * drawProgress;
+      ctx.strokeStyle = palette.accent;
+      ctx.lineWidth = Math.max(2.5, w * 0.003);
       ctx.beginPath();
       ctx.moveTo(nL.x, nL.y);
-      ctx.lineTo(nR.x, nR.y);
+      ctx.lineTo(nL.x, nL.y - postH);
+      ctx.moveTo(nR.x, nR.y);
+      ctx.lineTo(nR.x, nR.y - postH);
       ctx.stroke();
 
-      // Glass fence ticks at far end
-      ctx.globalAlpha = 0.35 * strength;
-      ctx.strokeStyle = palette.accent;
+      const netGrad = ctx.createLinearGradient(nL.x, nL.y, nR.x, nR.y);
+      netGrad.addColorStop(0, "transparent");
+      netGrad.addColorStop(0.12, palette.glow);
+      netGrad.addColorStop(0.5, "rgba(255,255,255,0.85)");
+      netGrad.addColorStop(0.88, palette.glow);
+      netGrad.addColorStop(1, "transparent");
+      ctx.strokeStyle = netGrad;
+      ctx.lineWidth = Math.max(3, w * 0.004);
+      ctx.beginPath();
+      ctx.moveTo(nL.x, nL.y - postH * 0.55);
+      ctx.lineTo(nR.x, nR.y - postH * 0.55);
+      ctx.stroke();
+
+      // Mesh ticks on the net
+      ctx.globalAlpha = 0.28 * strength;
+      ctx.strokeStyle = palette.line;
       ctx.lineWidth = 1;
-      for (let i = 0; i <= 12; i++) {
-        const nx = -1 + (i / 12) * 2;
-        const base = project(nx, 0.08);
-        const tip = project(nx * 0.92, 0.02);
+      for (let i = 1; i < 10; i++) {
+        const t = i / 10;
+        const x = nL.x + (nR.x - nL.x) * t;
+        const y = nL.y + (nR.y - nL.y) * t;
         ctx.beginPath();
-        ctx.moveTo(base.x, base.y);
-        ctx.lineTo(tip.x, tip.y);
+        ctx.moveTo(x, y - postH * 0.15);
+        ctx.lineTo(x, y - postH * 0.85);
         ctx.stroke();
       }
+
+      // Far glass wall — framed back board, not radiating ticks
+      ctx.globalAlpha = 0.4 * strength * drawProgress;
+      ctx.strokeStyle = palette.accent;
+      ctx.lineWidth = Math.max(1.4, w * 0.0018);
+      const glassY0 = project(0, 0.06).y;
+      const glassTop = glassY0 - Math.max(22, h * 0.05);
+      const gL = project(-1, 0.06);
+      const gR = project(1, 0.06);
+      strokePoly([
+        { x: gL.x, y: glassTop },
+        { x: gR.x, y: glassTop },
+        { x: gR.x, y: gR.y },
+        { x: gL.x, y: gL.y },
+      ], true);
+      // Vertical mullions
+      for (const nx of [-0.5, 0, 0.5]) {
+        const p = project(nx, 0.06);
+        ctx.beginPath();
+        ctx.moveTo(p.x, glassTop);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+      }
+
       ctx.restore();
     };
 

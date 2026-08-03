@@ -27,14 +27,14 @@ export const motionProfiles = {
     enableParallax: true,
     enableMagnetic: true,
     enablePointerHero: true,
-    storyVh: 300,
+    storyVh: 400,
     storyStages: 4,
   },
   mobileMotion: {
     enableParallax: true,
     enableMagnetic: false,
     enablePointerHero: false,
-    storyVh: 220,
+    storyVh: 360,
     storyStages: 4,
   },
   reducedMotion: {

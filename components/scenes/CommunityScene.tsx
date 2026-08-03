@@ -1,33 +1,35 @@
 import { communitySection } from "@/data/site-content";
 import { Container } from "@/components/ui/Container";
-import { Reveal } from "@/components/motion/Reveal";
+import { TextReveal } from "@/components/motion/TextReveal";
 
 /**
- * Community section without stock photography.
- * When lifestyle images arrive, add them under public/brand/lifestyle
- * and render a slow marquee that respects prefers-reduced-motion.
+ * Community statement — standalone (not orchestrated with neighboring
+ * scenes), so it uses MaskReveal's "auto" mode directly: no dedicated
+ * timeline hook needed, just the shared reveal system triggered on
+ * scroll-into-view.
  */
-export function CommunitySection() {
+export function CommunityScene() {
   const band = "La cancha se comparte · La energía también · ";
 
   return (
     <section
+      data-scene="community"
       className="relative overflow-hidden bg-pw-navy section-pad text-pw-white"
       aria-label="Comunidad"
     >
       <Container className="relative z-10 max-w-4xl text-center">
-        <Reveal>
-          <h2 className="text-editorial">
-            {communitySection.titleLines.map((line) => (
-              <span key={line} className="block">
-                {line}
-              </span>
-            ))}
-          </h2>
-          <p className="mx-auto mt-8 max-w-2xl text-body-lg text-white/70">
-            {communitySection.text}
-          </p>
-        </Reveal>
+        <TextReveal
+          as="h2"
+          variant="editorial"
+          lines={communitySection.titleLines}
+        />
+        <TextReveal
+          as="p"
+          variant="bodyLg"
+          text={communitySection.text}
+          splitBy="words"
+          className="mx-auto mt-8 max-w-2xl text-white/70"
+        />
       </Container>
 
       <div

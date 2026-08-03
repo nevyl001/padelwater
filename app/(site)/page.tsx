@@ -1,13 +1,14 @@
-import { LaunchExperience } from "@/components/sections/LaunchExperience";
+import { HeroScene } from "@/components/scenes/HeroScene";
+import { ProductStoryScene } from "@/components/scenes/ProductStoryScene";
 import { BrandStatement } from "@/components/sections/BrandStatement";
 import { BenefitsSection } from "@/components/sections/BenefitsSection";
 import { CoconutSection } from "@/components/sections/CoconutSection";
-import { ConsumptionMoments } from "@/components/sections/ConsumptionMoments";
-import { CommunitySection } from "@/components/sections/CommunitySection";
-import { ProductDetails } from "@/components/sections/ProductDetails";
+import { CourtScene } from "@/components/scenes/CourtScene";
+import { CommunityScene } from "@/components/scenes/CommunityScene";
+import { ProductShowcaseScene } from "@/components/scenes/ProductShowcaseScene";
 import { AvailabilitySection } from "@/components/sections/AvailabilitySection";
 import { FAQSection } from "@/components/sections/FAQSection";
-import { FinalCTA } from "@/components/sections/FinalCTA";
+import { FinalScene } from "@/components/scenes/FinalScene";
 import { faqItems } from "@/data/faq";
 import { product } from "@/data/product";
 import { siteConfig } from "@/lib/config";
@@ -70,18 +71,23 @@ export default function HomePage() {
     <>
       <JsonLd />
       <main>
-        {/* Escenas 1–2: Hero + Product Story (motion rebuild) */}
-        <LaunchExperience />
-        {/* Escenas 3–6: intactas hasta revisión visual de 1–2 */}
+        {/* Escena 1: Hero */}
+        <HeroScene />
+        {/* Escena 2: Product Story */}
+        <ProductStoryScene />
         <BrandStatement />
         <BenefitsSection />
         <CoconutSection />
-        <ConsumptionMoments />
-        <CommunitySection />
-        <ProductDetails />
+        {/* Escena 4: Court */}
+        <CourtScene />
+        {/* Escena 5: Community */}
+        <CommunityScene />
+        {/* Escena 3: Product Showcase */}
+        <ProductShowcaseScene />
         <AvailabilitySection />
         <FAQSection />
-        <FinalCTA />
+        {/* Escena 6: Final */}
+        <FinalScene />
       </main>
     </>
   );
