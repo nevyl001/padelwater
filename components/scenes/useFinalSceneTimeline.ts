@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, type RefObject } from "react";
+import { durations, gsapEasings, staggers } from "@/lib/motion";
 
 type FinalSceneRefs = {
   rootRef: RefObject<HTMLElement | null>;
@@ -42,20 +43,25 @@ export function useFinalSceneTimeline(refs: FinalSceneRefs, flags: FinalSceneFla
         const ctaUnits = ctaEl.querySelectorAll("[data-mask-unit]");
 
         const tl = gsap.timeline({
-          defaults: { ease: "expo.out" },
+          defaults: { ease: gsapEasings.outExpo },
           scrollTrigger: { trigger: rootEl, start: "top 70%", once: true },
         });
 
         tl.fromTo(
           headlineUnits,
           { yPercent: 110, opacity: 0 },
-          { yPercent: 0, opacity: 1, duration: 0.7, stagger: 0.05 },
+          {
+            yPercent: 0,
+            opacity: 1,
+            duration: durations.reveal,
+            stagger: staggers.soft,
+          },
           0,
         ).fromTo(
           ctaUnits,
           { yPercent: 110, opacity: 0 },
-          { yPercent: 0, opacity: 1, duration: 0.5 },
-          0.35,
+          { yPercent: 0, opacity: 1, duration: durations.mid },
+          0.32,
         );
       }, rootEl);
 

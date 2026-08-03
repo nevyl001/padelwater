@@ -20,24 +20,24 @@ export function ConsumptionMomentsScene() {
     <section
       id="momentos"
       data-scene="consumption-moments"
-      className="relative bg-pw-ice py-12 md:py-14"
+      className="relative bg-pw-ice py-16 md:py-24"
       aria-label="Momentos de consumo"
     >
       <Container>
         <Reveal>
-          <SectionLabel className="tracking-[0.26em]">Momento de consumo</SectionLabel>
-          <h2 className="mt-3.5 max-w-2xl text-section text-pw-navy">
+          <SectionLabel>Momento de consumo</SectionLabel>
+          <h2 className="mt-3.5 max-w-2xl text-section text-pw-navy md:mt-4">
             Antes. Durante. Después.
           </h2>
         </Reveal>
 
-        <div className="relative mt-9 md:mt-11">
+        <div className="relative mt-10 md:mt-12">
           <div
             aria-hidden
             className="pointer-events-none absolute left-[1.125rem] right-[1.125rem] top-[1.125rem] hidden h-px bg-pw-navy/12 md:block"
           />
 
-          <ol className="grid gap-8 md:grid-cols-3 md:gap-10">
+          <ol className="grid gap-9 md:grid-cols-3 md:gap-10 lg:gap-14">
             {consumptionMoments.map((moment, index) => (
               <Reveal key={moment.id} delay={index * 60}>
                 <li className="relative">
@@ -50,11 +50,11 @@ export function ConsumptionMomentsScene() {
                     >
                       {String(index + 1).padStart(2, "0")}
                     </span>
-                    <p className="text-[0.68rem] uppercase tracking-[0.24em] text-pw-navy/55">
+                    <p className="text-[0.68rem] font-medium uppercase tracking-[0.28em] text-pw-navy/55">
                       {moment.label}
                     </p>
                   </div>
-                  <p className="max-w-[18rem] text-[0.98rem] leading-relaxed text-pw-navy/80 md:text-base">
+                  <p className="max-w-[18rem] text-base leading-relaxed text-pw-navy/80">
                     {moment.text}
                   </p>
                 </li>

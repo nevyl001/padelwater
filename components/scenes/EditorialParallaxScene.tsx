@@ -164,9 +164,9 @@ export function EditorialParallaxScene() {
         </p>
       </div>
 
-      <Container className="relative z-10 py-16 text-center md:min-h-[92svh] md:py-28 md:text-left lg:grid lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:gap-16">
+      <Container className="relative z-10 py-16 text-center md:min-h-[88svh] md:py-24 md:text-left lg:grid lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:gap-16 xl:gap-20">
         <div ref={midRef} className="relative mx-auto max-w-xl md:mx-0">
-          <p className="text-[0.68rem] uppercase tracking-[0.32em] text-pw-lime/90">
+          <p className="text-[0.68rem] uppercase tracking-[0.28em] text-pw-lime/90">
             En la cancha
           </p>
           <h2 className="mt-4 text-editorial text-pw-white md:mt-5">

@@ -85,21 +85,19 @@ export function useHeroSceneTimeline(refs: HeroSceneRefs, flags: HeroSceneFlags)
 
         const intro = gsap.timeline({ defaults: { ease: gsapEasings.outExpo } });
 
-        // 1) Atmosphere first
         if (aurora) {
-          intro.to(aurora, { opacity: 1, duration: 1.0 }, 0);
+          intro.to(aurora, { opacity: 1, duration: durations.heroIntro }, 0);
         }
         if (court) {
-          intro.to(court, { opacity: 1, duration: 1.1 }, 0.1);
+          intro.to(court, { opacity: 1, duration: durations.heroIntro }, 0.08);
         }
 
-        // 2) Title reveal via masks
         intro
           .fromTo(
             eyebrowUnits,
             { yPercent: 110, opacity: 0 },
-            { yPercent: 0, opacity: 1, duration: 0.55 },
-            0.4,
+            { yPercent: 0, opacity: 1, duration: durations.mid },
+            0.38,
           )
           .fromTo(
             titleUnits,
@@ -107,13 +105,12 @@ export function useHeroSceneTimeline(refs: HeroSceneRefs, flags: HeroSceneFlags)
             {
               yPercent: 0,
               opacity: 1,
-              duration: 0.8,
+              duration: durations.reveal,
               stagger: staggers.lines,
             },
-            0.52,
+            0.5,
           );
 
-        // 3) Product enters with depth + soft settle (no bounce)
         intro.to(
           canEl,
           {
@@ -123,25 +120,29 @@ export function useHeroSceneTimeline(refs: HeroSceneRefs, flags: HeroSceneFlags)
             rotateX: 0,
             duration: durations.heroIntro,
           },
-          0.78,
+          0.72,
         );
 
         if (glow) {
-          intro.to(glow, { opacity: 1, scale: 1, duration: 0.8 }, 0.95);
+          intro.to(glow, { opacity: 1, scale: 1, duration: durations.slow }, 0.9);
         }
         if (reflection) {
-          intro.to(reflection, { opacity: 1, duration: 0.4 }, 1.15);
+          intro.to(reflection, { opacity: 1, duration: durations.base }, 1.1);
         }
         if (sheen) {
           intro.fromTo(
             sheen,
             { x: "-130%", opacity: 0 },
-            { x: "230%", opacity: 1, duration: 0.65, ease: "power2.inOut" },
-            1.2,
+            {
+              x: "230%",
+              opacity: 1,
+              duration: durations.sheen,
+              ease: gsapEasings.inOut,
+            },
+            1.15,
           );
         }
 
-        // 4) Copy then CTA — coordinated, not simultaneous
         intro
           .fromTo(
             descriptionUnits,
@@ -149,26 +150,31 @@ export function useHeroSceneTimeline(refs: HeroSceneRefs, flags: HeroSceneFlags)
             {
               yPercent: 0,
               opacity: 1,
-              duration: 0.55,
+              duration: durations.mid,
               stagger: staggers.words,
             },
-            1.25,
+            1.2,
           )
           .fromTo(
             ctaUnits,
             { yPercent: 110, opacity: 0 },
-            { yPercent: 0, opacity: 1, duration: 0.55 },
-            1.48,
+            { yPercent: 0, opacity: 1, duration: durations.mid },
+            1.42,
           );
 
         if (scrollHintEl) {
-          intro.to(scrollHintEl, { opacity: 1, y: 0, duration: 0.55 }, 1.7);
+          intro.to(scrollHintEl, { opacity: 1, y: 0, duration: durations.mid }, 1.62);
         }
 
-        // Soft pointer follow (desktop) — refs/quickTo, not React state
         if (enablePointerHero) {
-          const qx = gsap.quickTo(canEl, "x", { duration: 0.7, ease: "power3" });
-          const qy = gsap.quickTo(canEl, "y", { duration: 0.7, ease: "power3" });
+          const qx = gsap.quickTo(canEl, "x", {
+            duration: durations.pointer,
+            ease: gsapEasings.outPower,
+          });
+          const qy = gsap.quickTo(canEl, "y", {
+            duration: durations.pointer,
+            ease: gsapEasings.outPower,
+          });
           const onMove = (e: PointerEvent) => {
             const rect = rootEl.getBoundingClientRect();
             if (e.clientY < rect.top || e.clientY > rect.bottom) return;
@@ -179,7 +185,6 @@ export function useHeroSceneTimeline(refs: HeroSceneRefs, flags: HeroSceneFlags)
           offPointer = () => window.removeEventListener("pointermove", onMove);
         }
 
-        // Scroll bridge: stage scales / lifts into next scene
         gsap.to(stageEl, {
           scale: scales.heroScrollOut,
           y: -distances.scrollBridgeY,

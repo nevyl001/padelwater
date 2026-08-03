@@ -36,7 +36,7 @@ export function ScrollIndicator({
       transition={
         prefersReducedMotion
           ? undefined
-          : { duration: 1.8, repeat: Infinity, ease: "easeInOut" }
+          : { duration: 2, repeat: Infinity, ease: "easeInOut" }
       }
     >
       {reinforced ? (

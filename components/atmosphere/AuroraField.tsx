@@ -30,8 +30,8 @@ export function AuroraField({
       className={cn(
         "pointer-events-none absolute inset-0 overflow-hidden",
         tone === "navy" && "bg-pw-navy-deep",
-        tone === "water" && "bg-[#045066]",
-        tone === "deep" && "bg-[#020b16]",
+        tone === "water" && "bg-pw-water",
+        tone === "deep" && "bg-pw-navy-deep",
         className,
       )}
     >

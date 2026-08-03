@@ -17,6 +17,7 @@ import { product } from "@/data/product";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { ProductCanStage } from "@/components/product/ProductCanStage";
+import { ProductGlow } from "@/components/product/ProductGlow";
 import { ProductInformationPanel } from "@/components/product/ProductInformationPanel";
 import { AuroraField } from "@/components/atmosphere/AuroraField";
 import { OrbitalRings } from "@/components/atmosphere/OrbitalRings";
@@ -71,7 +72,7 @@ export function ProductShowcaseScene() {
       curY += (targetY - curY) * 0.065;
       root.style.setProperty("--px", `${(curX * 100).toFixed(2)}%`);
       root.style.setProperty("--py", `${(curY * 100).toFixed(2)}%`);
-      glow.style.transform = `translate3d(${((curX - 0.5) * 28).toFixed(2)}px, ${((curY - 0.5) * 18).toFixed(2)}px, 0)`;
+      glow.style.transform = `translate3d(${((curX - 0.5) * 22).toFixed(2)}px, ${((curY - 0.5) * 14).toFixed(2)}px, 0)`;
       if (can) {
         const dx = (curX - 0.5) * distances.showcasePointerX;
         const dy = (curY - 0.5) * distances.showcasePointerY;
@@ -186,22 +187,21 @@ export function ProductShowcaseScene() {
         className="pointer-events-none absolute inset-0 opacity-90"
         style={{
           background:
-            "radial-gradient(ellipse 50% 42% at var(--px) var(--py), rgba(0,169,203,0.32), transparent 62%)",
+            "radial-gradient(ellipse 48% 40% at var(--px) var(--py), rgba(0,169,203,0.28), transparent 64%)",
         }}
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-45"
+        className="pointer-events-none absolute inset-0 opacity-40"
         style={{
           background:
-            "radial-gradient(ellipse 36% 30% at calc(var(--px) + 6%) calc(var(--py) + 8%), rgba(183,243,51,0.14), transparent 58%)",
+            "radial-gradient(ellipse 32% 28% at calc(var(--px) + 5%) calc(var(--py) + 10%), rgba(183,243,51,0.12), transparent 60%)",
         }}
       />
 
-      <Container className="relative z-10 py-8 md:py-24 lg:py-32">
-        {/* Mobile: compact eyebrow only. Desktop: full brand header. */}
-        <div className="mb-3 flex flex-col gap-1.5 text-center md:mb-14 md:gap-3 md:text-left">
-          <p className="text-[0.65rem] uppercase tracking-[0.3em] text-pw-lime md:text-[0.68rem]">
+      <Container className="relative z-10 py-12 sm:py-16 md:py-24 lg:py-28 xl:py-32">
+        <div className="mb-5 flex flex-col gap-1.5 text-center sm:mb-7 md:mb-12 md:gap-3 md:text-left lg:mb-14">
+          <p className="text-[0.68rem] font-medium uppercase tracking-[0.28em] text-pw-lime">
             Producto
           </p>
           <h2 className="sr-only md:not-sr-only md:block md:text-editorial md:text-pw-white">
@@ -209,7 +209,7 @@ export function ProductShowcaseScene() {
           </h2>
         </div>
 
-        <div className="grid w-full min-w-0 items-center gap-4 md:gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-14 xl:gap-20">
+        <div className="mx-auto grid w-full max-w-[90rem] min-w-0 items-center gap-6 sm:gap-8 md:gap-10 lg:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] lg:gap-14 xl:gap-16 2xl:gap-20">
           <div
             ref={panelRef}
             className={cn(
@@ -228,7 +228,7 @@ export function ProductShowcaseScene() {
               role="tablist"
               aria-label="Características del producto"
               id={tablistId}
-              className="mx-auto mt-5 flex w-full max-w-md flex-wrap justify-center gap-2 md:mx-0 md:mt-8 md:max-w-none md:justify-start lg:mt-10"
+              className="mx-auto mt-6 flex w-full max-w-md flex-wrap justify-center gap-2 sm:mt-7 md:mx-0 md:mt-8 md:max-w-none md:justify-start lg:mt-9"
             >
               {showcaseAttributes.map((attr, index) => {
                 const selected = attr.id === activeId;
@@ -244,7 +244,7 @@ export function ProductShowcaseScene() {
                     onClick={() => setActiveId(attr.id)}
                     onKeyDown={(e) => onTabKeyDown(e, index)}
                     className={cn(
-                      "rounded-sm border px-2.5 py-2 text-[0.55rem] uppercase tracking-[0.14em] transition-[color,background-color,border-color] duration-300 sm:px-3 sm:text-[0.58rem] sm:tracking-[0.16em] md:px-3.5 md:py-2.5 md:text-[0.62rem] md:tracking-[0.2em]",
+                      "rounded-[var(--radius-sm)] border px-2.5 py-2 text-[0.58rem] font-medium uppercase tracking-[0.16em] transition-[color,background-color,border-color] duration-300 sm:px-3 sm:text-[0.6rem] sm:tracking-[0.18em] md:px-3.5 md:py-2.5 md:text-[0.62rem] md:tracking-[0.2em]",
                       selected
                         ? "border-pw-lime bg-pw-lime/12 text-pw-lime"
                         : "border-white/18 text-white/60 hover:border-white/40 hover:text-white/90",
@@ -256,11 +256,11 @@ export function ProductShowcaseScene() {
               })}
             </div>
 
-            <div className="mt-5 flex w-full justify-center md:mt-8 lg:mt-10 lg:justify-start">
+            <div className="mt-6 flex w-full justify-center sm:mt-7 md:mt-8 lg:mt-9 lg:justify-start">
               <Button
                 variant="secondary"
                 onClick={() => setInfoOpen(true)}
-                className="w-full max-w-xs border-white/35 text-pw-white hover:border-white hover:bg-white/5 sm:w-auto sm:max-w-none"
+                className="w-full max-w-xs sm:w-auto sm:max-w-none"
               >
                 Ver información del producto
               </Button>
@@ -270,15 +270,16 @@ export function ProductShowcaseScene() {
           <div
             ref={stageRef}
             className={cn(
-              "relative order-1 flex w-full min-w-0 items-center justify-center md:min-h-[min(68svh,540px)] lg:order-2",
+              "relative order-1 mx-auto flex w-full min-w-0 max-w-[34rem] items-center justify-center md:min-h-[min(64svh,520px)] lg:order-2 lg:max-w-none xl:max-w-[40rem]",
               !prefersReducedMotion && "opacity-0",
             )}
           >
             <div
               ref={glowRef}
-              aria-hidden
-              className="pointer-events-none absolute left-1/2 top-[48%] h-[70%] w-[70%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(0,169,203,0.55),transparent_70%)] blur-2xl md:h-[58%] md:w-[58%]"
-            />
+              className="pointer-events-none absolute inset-0 flex items-center justify-center"
+            >
+              <ProductGlow className="bottom-auto top-[58%] h-40 w-[72%] -translate-y-1/2 opacity-80 md:h-44 md:w-[62%]" />
+            </div>
 
             <OrbitalRings
               animated={!prefersReducedMotion && !isMobile}
@@ -330,13 +331,13 @@ function AttributePanel({
         !reduced && "animate-showcase-panel",
       )}
     >
-      <p className="text-[0.68rem] uppercase tracking-[0.3em] text-pw-cyan">
+      <p className="text-[0.68rem] font-medium uppercase tracking-[0.28em] text-pw-cyan">
         {attribute.eyebrow}
       </p>
-      <h3 className="mt-3.5 font-display text-[clamp(1.85rem,3.5vw,2.75rem)] font-bold uppercase leading-[1.02] tracking-[-0.03em] text-pw-white">
+      <h3 className="mt-3.5 text-section text-pw-white sm:mt-4">
         {attribute.title}
       </h3>
-      <p className="mx-auto mt-4 max-w-sm text-base leading-relaxed text-white/72 md:mt-5 md:text-lg lg:mx-0 lg:max-w-md">
+      <p className="mx-auto mt-4 max-w-sm text-base leading-relaxed text-white/72 sm:mt-5 md:text-lg lg:mx-0 lg:max-w-md">
         {attribute.text}
       </p>
     </div>
@@ -351,12 +352,12 @@ function FloatingLabels({ attribute }: { attribute: ShowcaseAttribute }) {
     >
       <span
         key={attribute.id}
-        className="absolute left-[5%] top-[16%] text-[0.58rem] uppercase tracking-[0.32em] text-white/40 animate-showcase-panel"
+        className="absolute left-[5%] top-[16%] text-[0.58rem] font-medium uppercase tracking-[0.28em] text-white/40 animate-showcase-panel"
       >
         {attribute.label}
       </span>
       {attribute.id === "formato" ? (
-        <span className="absolute bottom-[20%] right-[7%] text-right text-[0.58rem] uppercase tracking-[0.24em] text-pw-cyan/55">
+        <span className="absolute bottom-[20%] right-[7%] text-right text-[0.58rem] font-medium uppercase tracking-[0.24em] text-pw-cyan/55">
           {product.volume}
         </span>
       ) : null}

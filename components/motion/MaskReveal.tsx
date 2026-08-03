@@ -35,8 +35,8 @@ export type MaskRevealProps = {
 };
 
 const UNIT_DEFAULTS: Record<MaskSplit, { duration: number; stagger: number }> = {
-  lines: { duration: 0.7, stagger: 0.08 },
-  words: { duration: 0.55, stagger: 0.045 },
+  lines: { duration: 0.7, stagger: 0.09 },
+  words: { duration: 0.5, stagger: 0.028 },
   chars: { duration: 0.4, stagger: 0.015 },
   block: { duration: 0.6, stagger: 0 },
 };

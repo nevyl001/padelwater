@@ -54,9 +54,9 @@ export function useProductShowcaseSceneTimeline(
         const sheen = canEl.querySelector("[data-highlight-sheen]");
 
         prepareMediaExpansion(gsap, canEl);
-        gsap.set(panelEl, { opacity: 0, y: 28 });
+        gsap.set(panelEl, { opacity: 0, y: 24 });
         gsap.set(stageEl, { opacity: 0 });
-        if (orbits) gsap.set(orbits, { opacity: 0, scale: 0.92 });
+        if (orbits) gsap.set(orbits, { opacity: 0, scale: 0.94 });
         if (reflection) gsap.set(reflection, { opacity: 0 });
 
         const tl = gsap.timeline({
@@ -64,40 +64,48 @@ export function useProductShowcaseSceneTimeline(
           scrollTrigger: { trigger: rootEl, start: "top 72%", once: true },
         });
 
-        tl.to(stageEl, { opacity: 1, duration: 0.4 }, 0);
+        tl.to(stageEl, { opacity: 1, duration: durations.base }, 0);
 
         if (orbits) {
-          tl.to(orbits, { opacity: 1, scale: 1, duration: 0.9 }, 0.05);
+          tl.to(
+            orbits,
+            { opacity: 1, scale: 1, duration: durations.cinematic },
+            0.06,
+          );
         }
 
         applyMediaExpansion(tl, canEl, {
-          from: { rotateX: -6, scale: 0.9, y: 32, opacity: 0 },
+          from: { rotateX: -5, scale: 0.92, y: 28, opacity: 0 },
           to: { rotateX: 0, scale: 1, y: 0, opacity: 1 },
           duration: durations.cinematic,
-          position: 0.12,
+          position: 0.1,
         });
 
         if (reflection) {
-          tl.to(reflection, { opacity: 1, duration: 0.3 }, 0.55);
+          tl.to(reflection, { opacity: 1, duration: durations.base }, 0.52);
         }
         if (sheen) {
           tl.fromTo(
             sheen,
             { x: "-130%", opacity: 0 },
-            { x: "230%", opacity: 1, duration: 0.55, ease: "power2.inOut" },
-            0.6,
+            {
+              x: "230%",
+              opacity: 1,
+              duration: durations.sheen,
+              ease: gsapEasings.inOut,
+            },
+            0.58,
           );
         }
 
         tl.to(
           panelEl,
-          { opacity: 1, y: 0, duration: 0.7 },
-          0.35,
+          { opacity: 1, y: 0, duration: durations.reveal },
+          0.32,
         );
 
-        // Soft parallax of stage while section is in view
         gsap.to(stageEl, {
-          y: -16,
+          y: -14,
           ease: gsapEasings.none,
           scrollTrigger: {
             trigger: rootEl,

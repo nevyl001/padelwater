@@ -31,7 +31,7 @@ export function FinalScene() {
     <section
       ref={rootRef}
       data-scene="final"
-      className="relative overflow-hidden bg-pw-navy-deep py-20 text-pw-white grain md:py-24"
+      className="relative overflow-hidden bg-pw-navy-deep py-20 text-pw-white grain md:py-28"
       aria-label="Llamado a la acción"
     >
       <AuroraField

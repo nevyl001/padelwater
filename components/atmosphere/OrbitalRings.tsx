@@ -30,7 +30,7 @@ export function OrbitalRings({
     >
       <svg
         viewBox="0 0 400 400"
-        className="h-[min(90vw,380px)] w-[min(90vw,380px)] overflow-visible md:h-[min(88vw,520px)] md:w-[min(88vw,520px)]"
+        className="h-[min(88vw,360px)] w-[min(88vw,360px)] overflow-visible md:h-[min(72vw,500px)] md:w-[min(72vw,500px)] xl:h-[min(58vw,560px)] xl:w-[min(58vw,560px)]"
       >
         <defs>
           <linearGradient id="orbit-cyan" x1="0%" y1="0%" x2="100%" y2="100%">

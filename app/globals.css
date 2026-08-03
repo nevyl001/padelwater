@@ -4,6 +4,7 @@
   --pw-navy: #071a38;
   --pw-navy-deep: #031126;
   --pw-lime: #b7f333;
+  --pw-lime-hover: #c8f85a;
   --pw-cyan: #00a9cb;
   --pw-ice: #eef8f7;
   --pw-white: #ffffff;
@@ -38,6 +39,7 @@
   --color-pw-navy: var(--pw-navy);
   --color-pw-navy-deep: var(--pw-navy-deep);
   --color-pw-lime: var(--pw-lime);
+  --color-pw-lime-hover: var(--pw-lime-hover);
   --color-pw-cyan: var(--pw-cyan);
   --color-pw-ice: var(--pw-ice);
   --color-pw-white: var(--pw-white);
@@ -57,15 +59,6 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-  }
-
-  html.lenis,
-  html.lenis body {
-    height: auto;
-  }
-
-  .lenis.lenis-smooth {
-    scroll-behavior: auto !important;
   }
 
   body {
@@ -123,7 +116,7 @@
   }
 
   .container-pw {
-    width: min(100% - 4rem, var(--container-max));
+    width: min(100% - 2.5rem, var(--container-max));
     margin-inline: auto;
   }
 
@@ -154,21 +147,31 @@
     padding-block: var(--space-section-mobile);
   }
 
-  @media (min-width: 768px) {
-    .section-pad {
-      padding-block: var(--space-section-desktop);
+  @media (min-width: 480px) {
+    .container-pw {
+      width: min(100% - 3.5rem, var(--container-max));
     }
   }
 
   @media (min-width: 768px) {
+    .section-pad {
+      padding-block: var(--space-section-desktop);
+    }
+
+    .container-pw {
+      width: min(100% - 6rem, var(--container-max));
+    }
+  }
+
+  @media (min-width: 1024px) {
     .container-pw {
       width: min(100% - 8rem, var(--container-max));
     }
   }
 
-  @media (min-width: 1280px) {
+  @media (min-width: 1536px) {
     .container-pw {
-      width: min(100% - 10rem, var(--container-max));
+      width: min(100% - 12rem, var(--container-max));
     }
   }
 
@@ -186,17 +189,7 @@
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
-  @keyframes court-ambient {
-    0%,
-    100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.92;
-    }
-  }
-
-  /* Aurora — transform-only drifts (GPU). Durations from lib/motion.ts conceptually. */
+  /* Aurora — transform-only drifts (GPU). */
   @keyframes aurora-drift-a {
     0%,
     100% {
@@ -256,11 +249,11 @@
   }
 
   .animate-aurora-drift-b {
-    animation: aurora-drift-b 22s ease-in-out infinite;
+    animation: aurora-drift-b 20s ease-in-out infinite;
   }
 
   .animate-aurora-drift-c {
-    animation: aurora-drift-c 26s ease-in-out infinite;
+    animation: aurora-drift-c 22s ease-in-out infinite;
   }
 
   .animate-orbit-slow {
@@ -272,7 +265,7 @@
   }
 
   .animate-scroll-line {
-    animation: scroll-line-pulse 2.2s ease-in-out infinite;
+    animation: scroll-line-pulse 2s ease-in-out infinite;
     transform-origin: top center;
   }
 
@@ -380,7 +373,7 @@
   }
 
   .animate-showcase-panel {
-    animation: showcase-panel-in 0.48s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: showcase-panel-in 0.42s var(--ease-out-expo) both;
   }
 
   @media (prefers-reduced-motion: reduce) {

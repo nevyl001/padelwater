@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect } from "react";
 import { product } from "@/data/product";
-import { useFocusTrap } from "@/components/ui/Accordion";
+import { useFocusTrap } from "@/lib/useFocusTrap";
 import { durations, easings } from "@/lib/motion";
 
 type ProductInformationPanelProps = {

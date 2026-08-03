@@ -6,23 +6,23 @@ import { Container } from "@/components/ui/Container";
 export function Footer() {
   return (
     <footer className="border-t border-white/10 bg-pw-navy-deep text-pw-white">
-      <Container className="section-pad !py-16 md:!py-20">
-        <div className="grid gap-12 md:grid-cols-[1.2fr_1fr_1fr]">
+      <Container className="section-pad">
+        <div className="grid gap-12 md:grid-cols-[1.2fr_1fr_1fr] lg:gap-16">
           <div>
             <Wordmark tone="light" />
-            <p className="mt-4 max-w-sm text-sm text-white/60">
+            <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/60">
               {siteConfig.tagline}
             </p>
           </div>
 
           <div>
-            <p className="mb-4 text-xs uppercase tracking-[0.2em] text-white/45">
+            <p className="mb-4 text-[0.68rem] font-medium uppercase tracking-[0.28em] text-white/45">
               Navegación
             </p>
             <ul className="space-y-3 text-sm text-white/75">
               {navigation.map((item) => (
                 <li key={item.href}>
-                  <a href={item.href} className="hover:text-white">
+                  <a href={`/${item.href}`} className="hover:text-white">
                     {item.label}
                   </a>
                 </li>
@@ -31,7 +31,7 @@ export function Footer() {
           </div>
 
           <div>
-            <p className="mb-4 text-xs uppercase tracking-[0.2em] text-white/45">
+            <p className="mb-4 text-[0.68rem] font-medium uppercase tracking-[0.28em] text-white/45">
               Contacto
             </p>
             <ul className="space-y-3 text-sm text-white/75">

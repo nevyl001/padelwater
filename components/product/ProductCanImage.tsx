@@ -18,10 +18,9 @@ type ProductCanImageProps = {
 };
 
 const sizeClass = {
-  hero: "aspect-[2/5] h-[min(30svh,240px)] w-auto sm:h-[min(42svh,320px)] md:h-[min(60svh,480px)]",
-  /** Mobile-first product stage — fills the frame elegantly */
+  hero: "aspect-[2/5] h-[min(36svh,280px)] w-auto sm:h-[min(42svh,340px)] md:h-[min(58svh,480px)]",
   showcase:
-    "aspect-[2/5] h-[min(56svh,400px)] w-auto sm:h-[min(52svh,400px)] md:h-[min(60svh,480px)]",
+    "aspect-[2/5] h-[min(54svh,380px)] w-auto sm:h-[min(50svh,400px)] md:h-[min(58svh,480px)] xl:h-[min(60svh,520px)]",
   story:
     "aspect-[2/5] h-[min(54svh,460px)] w-auto max-md:h-[min(46svh,340px)]",
   inline: "aspect-[2/5] w-full max-w-[240px]",

@@ -8,6 +8,8 @@ import { Wordmark } from "@/components/ui/Wordmark";
 import { WhatsAppLink } from "@/components/ui/WhatsAppLink";
 import { MobileMenu } from "@/components/layout/MobileMenu";
 import { cn } from "@/lib/cn";
+import { durations, easings } from "@/lib/motion";
+import { useMotionPreferences } from "@/components/motion/MotionPreferences";
 
 export function Header() {
   const pathname = usePathname();
@@ -15,6 +17,7 @@ export function Header() {
   const [scrollY, setScrollY] = useState(0);
   const [viewportH, setViewportH] = useState(900);
   const [menuOpen, setMenuOpen] = useState(false);
+  const { prefersReducedMotion } = useMotionPreferences();
 
   useEffect(() => {
     const onScroll = () => setScrollY(window.scrollY);
@@ -42,9 +45,12 @@ export function Header() {
             ? "border-b border-pw-navy/10 bg-pw-ice/85 pb-3 backdrop-blur-md"
             : "border-b border-transparent bg-transparent pb-4",
         )}
-        initial={{ y: -16, opacity: 0 }}
+        initial={prefersReducedMotion ? false : { y: -16, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        transition={{
+          duration: prefersReducedMotion ? 0 : durations.mid,
+          ease: easings.outExpo,
+        }}
       >
         <div className="container-pw flex min-h-12 items-center justify-between gap-6 md:min-h-14">
           <Wordmark tone={tone} />

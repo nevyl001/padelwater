@@ -32,12 +32,12 @@ type ButtonAsLink = BaseProps & {
 export type ButtonProps = ButtonAsButton | ButtonAsLink;
 
 const variants: Record<ButtonVariant, string> = {
-  primary: "bg-pw-lime text-pw-navy-deep hover:bg-[#c8f85a]",
+  primary: "bg-pw-lime text-pw-navy-deep hover:bg-pw-lime-hover",
   secondary:
     "bg-transparent text-pw-white border border-white/35 hover:border-white hover:bg-white/5",
   ghost:
     "bg-transparent text-pw-ink border border-pw-ink/15 hover:border-pw-ink/40",
-  lime: "bg-pw-lime text-pw-navy-deep hover:brightness-105",
+  lime: "bg-pw-lime text-pw-navy-deep hover:bg-pw-lime-hover",
 };
 
 const sizes: Record<ButtonSize, string> = {

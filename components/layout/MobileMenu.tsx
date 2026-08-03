@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { navigation, headerCta } from "@/data/site-content";
 import { Wordmark } from "@/components/ui/Wordmark";
 import { WhatsAppLink } from "@/components/ui/WhatsAppLink";
-import { useFocusTrap } from "@/components/ui/Accordion";
+import { useFocusTrap } from "@/lib/useFocusTrap";
 import { durations, easings } from "@/lib/motion";
 
 type MobileMenuProps = {
