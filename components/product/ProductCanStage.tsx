@@ -35,10 +35,10 @@ export const ProductCanStage = forwardRef<HTMLDivElement, ProductCanStageProps>(
           ref={ref}
           aria-hidden
           className={cn(
-            size === "hero" && "aspect-[3/7] h-[min(58svh,440px)] w-auto",
+            size === "hero" && "aspect-[2/5] h-[min(58svh,440px)] w-auto",
             size === "story" &&
-              "aspect-[3/7] h-[min(54svh,460px)] w-auto max-md:h-[min(46svh,340px)]",
-            size === "inline" && "aspect-[3/7] w-full max-w-[240px]",
+              "aspect-[2/5] h-[min(54svh,460px)] w-auto max-md:h-[min(46svh,340px)]",
+            size === "inline" && "aspect-[2/5] w-full max-w-[240px]",
             className,
           )}
           data-can-anchor

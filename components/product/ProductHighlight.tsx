@@ -11,7 +11,7 @@ export function ProductHighlight({ className }: { className?: string }) {
       aria-hidden
       data-product-highlight
       className={cn(
-        "pointer-events-none absolute inset-0 overflow-hidden rounded-[1.25rem]",
+        "pointer-events-none absolute inset-0 overflow-hidden rounded-[40%/8%]",
         className,
       )}
     >

@@ -18,7 +18,7 @@ type ProductStorySceneFlags = {
   storyVh: number;
 };
 
-// Can stays centered in every stage — no lateral drift into the copy
+// Stages 0–2: centered. Monument (470): stay put — CSS docks the can to the right.
 const desktopCanStates: Array<{ x?: number; y?: number; scale?: number }> = [
   { x: 0, scale: 1 },
   { x: 0, scale: 1 },

@@ -23,8 +23,7 @@ type Stage = (typeof productStoryStages)[number];
 function desktopShellClass(layout: Stage["layout"]) {
   switch (layout) {
     case "monument":
-      // Title only — lives in the top safe zone; body is rendered separately
-      return "inset-x-0 top-0 h-[20%] px-[max(2rem,8%)] pt-6 text-center";
+      return "left-[max(2rem,calc((100vw-min(100vw,85rem))/2+2rem))] top-[26%] w-[min(28rem,38vw)] text-left";
     case "backdrop":
       return "left-[max(2.5rem,calc((100vw-min(100vw,85rem))/2+1.5rem))] top-[22%] w-[min(26rem,34vw)] text-left";
     case "side":
@@ -38,7 +37,7 @@ function desktopShellClass(layout: Stage["layout"]) {
 
 /**
  * Product story — 4-stage pin/scrub.
- * Can is locked to a clipped middle band so it can never cover title or body.
+ * Monument (470): copy left + can right. Stable DOM so GSAP keeps the can.
  */
 export function ProductStoryScene() {
   const rootRef = useRef<HTMLElement>(null);
@@ -59,8 +58,7 @@ export function ProductStoryScene() {
   const tone = productStoryStages[activeStage]?.tone ?? "navy";
   const canTone = canToneFromStage(tone);
   const progressTone = tone === "lime-soft" ? "dark" : "light";
-  const monument = productStoryStages.find((s) => s.layout === "monument");
-  const monumentIndex = productStoryStages.findIndex((s) => s.layout === "monument");
+  const isMonument = activeStage === 3;
 
   return (
     <>
@@ -84,9 +82,23 @@ export function ProductStoryScene() {
             <CourtField tone={courtTone[tone]} intensity="medium" animated={animateCourt} />
 
             {isMobile ? (
-              <>
-                {/* TOP — copy only */}
-                <div className="relative z-20 h-[5.75rem] shrink-0 overflow-hidden px-5 pt-2">
+              <div
+                className={cn(
+                  "relative z-10 flex min-h-0 flex-1 overflow-hidden px-5",
+                  isMonument
+                    ? "flex-row items-center gap-3 pb-14 pt-4"
+                    : "flex-col pb-3 pt-2",
+                )}
+              >
+                {/* Stages — left column on monument, top band otherwise */}
+                <div
+                  className={cn(
+                    "relative z-20 overflow-hidden",
+                    isMonument
+                      ? "min-w-0 flex-1"
+                      : "h-[5.75rem] w-full shrink-0",
+                  )}
+                >
                   {productStoryStages.map((stage, index) => (
                     <div
                       key={stage.id}
@@ -95,30 +107,64 @@ export function ProductStoryScene() {
                       }}
                       data-story-stage
                       className={cn(
-                        "absolute inset-x-5 top-2 text-center",
-                        index === 0 ? "opacity-100" : "opacity-0",
+                        isMonument
+                          ? cn(
+                              "text-left",
+                              stage.layout === "monument"
+                                ? "relative"
+                                : "pointer-events-none absolute inset-0 opacity-0",
+                            )
+                          : cn(
+                              "absolute inset-x-0 top-0 text-center",
+                              index === 0 ? "opacity-100" : "opacity-0",
+                            ),
                       )}
                     >
                       <p className="text-[0.58rem] uppercase tracking-[0.22em] opacity-55">
                         {String(index + 1).padStart(2, "0")} · {stage.eyebrow}
                       </p>
                       <MaskReveal as="div" mode="manual" splitBy="block">
-                        <h2 className="mt-1 font-display text-[clamp(1.45rem,6.5vw,2rem)] font-bold uppercase leading-[1.02] tracking-[-0.03em]">
+                        <h2
+                          className={cn(
+                            "mt-1 font-display font-bold uppercase tracking-[-0.03em]",
+                            isMonument && stage.layout === "monument"
+                              ? "text-[clamp(1.8rem,9vw,2.4rem)] leading-[0.95]"
+                              : "text-[clamp(1.45rem,6.5vw,2rem)] leading-[1.02]",
+                          )}
+                        >
                           {stage.label}
                         </h2>
                       </MaskReveal>
-                      {stage.layout !== "monument" ? (
-                        <p className="mx-auto mt-1 line-clamp-2 max-w-[17rem] text-[0.75rem] leading-snug opacity-80">
-                          {stage.text}
-                        </p>
-                      ) : null}
+                      <p
+                        className={cn(
+                          "leading-snug opacity-80",
+                          isMonument && stage.layout === "monument"
+                            ? "mt-3 max-w-[14rem] text-[0.78rem]"
+                            : "mx-auto mt-1 line-clamp-2 max-w-[17rem] text-[0.75rem]",
+                        )}
+                      >
+                        {stage.text}
+                      </p>
                     </div>
                   ))}
                 </div>
 
-                {/* MIDDLE — can always visible, width-sized, centered */}
-                <div className="relative z-10 flex min-h-0 flex-1 items-center justify-center overflow-hidden px-5 py-3">
-                  <div ref={canRef} className="w-[min(158px,40vw)] shrink-0">
+                {/* Can — right on monument, centered otherwise. Same node always. */}
+                <div
+                  className={cn(
+                    "relative z-10 flex items-center overflow-hidden",
+                    isMonument
+                      ? "w-[min(128px,34vw)] shrink-0 justify-end"
+                      : "min-h-0 w-full flex-1 justify-center py-3",
+                  )}
+                >
+                  <div
+                    ref={canRef}
+                    className={cn(
+                      "shrink-0",
+                      isMonument ? "w-full" : "w-[min(158px,40vw)]",
+                    )}
+                  >
                     <ProductCanStage
                       mode="inline"
                       tone={canTone}
@@ -129,47 +175,51 @@ export function ProductStoryScene() {
                   </div>
                 </div>
 
-                {/* BOTTOM — monument body + chrome */}
-                <div className="relative z-20 flex h-[6.75rem] shrink-0 flex-col justify-start overflow-hidden px-5 pb-3 pt-1">
-                  {monument ? (
-                    <p
-                      className={cn(
-                        "text-center text-[0.78rem] leading-snug transition-opacity duration-300",
-                        activeStage === monumentIndex
-                          ? "opacity-85"
-                          : "pointer-events-none opacity-0",
-                      )}
-                    >
-                      {monument.text}
-                    </p>
-                  ) : null}
-                  <div className="mt-auto">
-                    <SectionProgress
-                      total={productStoryStages.length}
-                      active={activeStage}
-                      tone={progressTone}
-                      className="justify-center"
-                    />
-                    <p
-                      ref={holdHintRef as React.Ref<HTMLParagraphElement>}
-                      className="mt-1.5 text-center text-[0.55rem] uppercase tracking-[0.28em]"
-                    >
-                      Sigue explorando
-                    </p>
-                  </div>
+                <div
+                  className={cn(
+                    "z-30",
+                    isMonument
+                      ? "absolute inset-x-0 bottom-3 px-5"
+                      : "relative flex h-[4.25rem] w-full shrink-0 flex-col justify-end",
+                  )}
+                >
+                  <SectionProgress
+                    total={productStoryStages.length}
+                    active={activeStage}
+                    tone={progressTone}
+                    className="justify-center"
+                  />
+                  <p
+                    ref={holdHintRef as React.Ref<HTMLParagraphElement>}
+                    className="mt-1.5 text-center text-[0.55rem] uppercase tracking-[0.28em]"
+                  >
+                    Sigue explorando
+                  </p>
                 </div>
-              </>
+              </div>
             ) : (
               <>
-                {/* DESKTOP: can always centered in the middle band */}
-                <div className="pointer-events-none absolute inset-x-0 top-[20%] bottom-[24%] z-[5] flex items-center justify-center overflow-hidden px-8">
-                  <div ref={canRef} className="w-[min(220px,20vw)] shrink-0">
+                <div
+                  className={cn(
+                    "pointer-events-none absolute inset-y-0 z-[5] flex items-center overflow-hidden transition-[inset] duration-300",
+                    isMonument
+                      ? "right-0 w-[46%] justify-center pr-[max(2rem,6%)]"
+                      : "inset-x-0 justify-center px-8",
+                  )}
+                >
+                  <div
+                    ref={canRef}
+                    className={cn(
+                      "shrink-0",
+                      isMonument ? "w-[min(200px,18vw)]" : "w-[min(220px,20vw)]",
+                    )}
+                  >
                     <ProductCanStage
                       mode="inline"
                       tone={canTone}
                       size="inline"
                       quiet
-                      showReflection={activeStage !== monumentIndex}
+                      showReflection={!isMonument}
                     />
                   </div>
                 </div>
@@ -189,15 +239,18 @@ export function ProductStoryScene() {
                       )}
                     >
                       {stage.layout === "monument" ? (
-                        <div className="mx-auto w-full max-w-xl">
+                        <div className="max-w-xl">
                           <p className="text-xs uppercase tracking-[0.22em] opacity-55">
                             {stage.eyebrow}
                           </p>
                           <MaskReveal as="div" mode="manual" splitBy="block">
-                            <h2 className="mt-2 font-display text-[clamp(2.1rem,4.5vw,3.1rem)] font-bold uppercase leading-[0.92] tracking-[-0.03em]">
+                            <h2 className="mt-2 font-display text-[clamp(2.4rem,5vw,3.5rem)] font-bold uppercase leading-[0.92] tracking-[-0.03em]">
                               {stage.label}
                             </h2>
                           </MaskReveal>
+                          <p className="mt-5 max-w-sm text-lg leading-relaxed opacity-85">
+                            {stage.text}
+                          </p>
                         </div>
                       ) : (
                         <div>
@@ -242,20 +295,7 @@ export function ProductStoryScene() {
                     </div>
                   ))}
 
-                  {/* Bottom safe zone — monument body never shares pixels with the can */}
-                  <div className="absolute inset-x-0 bottom-0 z-30 flex h-[24%] flex-col items-center justify-end overflow-hidden px-[max(2rem,8%)] pb-8">
-                    {monument ? (
-                      <p
-                        className={cn(
-                          "mb-6 max-w-md text-center text-lg leading-relaxed transition-opacity duration-300",
-                          activeStage === monumentIndex
-                            ? "opacity-85"
-                            : "pointer-events-none opacity-0",
-                        )}
-                      >
-                        {monument.text}
-                      </p>
-                    ) : null}
+                  <div className="absolute inset-x-0 bottom-0 z-30 flex flex-col items-center px-[max(2rem,8%)] pb-8">
                     <SectionProgress
                       total={productStoryStages.length}
                       active={activeStage}
