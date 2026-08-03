@@ -243,7 +243,8 @@ export function useLaunchConductor(
           {
             x: 0,
             y: 0,
-            scale: isMobile ? 0.92 : 1.02,
+            // Monument beat: keep the can between title and body bands
+            scale: isMobile ? 0.86 : 0.8,
             ease: "none",
             duration: 0.45,
           },
