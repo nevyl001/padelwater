@@ -28,8 +28,10 @@ function StageCopy({
       <p className="text-xs uppercase tracking-[0.24em] opacity-60">
         {String(index + 1).padStart(2, "0")}
       </p>
-      <h2 className="mt-3 text-editorial">{label}</h2>
-      <p className="mt-4 text-base leading-relaxed opacity-80 md:mt-5 md:text-body-lg">
+      <h2 className="mt-3 text-[clamp(2rem,4vw,3.5rem)] font-display font-bold uppercase leading-[1.05] tracking-[-0.02em]">
+        {label}
+      </h2>
+      <p className="mt-4 max-w-sm text-base leading-relaxed opacity-80 md:text-lg">
         {text}
       </p>
     </>
@@ -40,11 +42,14 @@ export function ProductStory() {
   const rootRef = useRef<HTMLElement>(null);
   const pinRef = useRef<HTMLDivElement>(null);
   const canRef = useRef<HTMLDivElement>(null);
-  const { profile, prefersReducedMotion, ready } = useMotionPreferences();
+  const { prefersReducedMotion, ready } = useMotionPreferences();
   const [active, setActive] = useState(0);
   const [desktopStory, setDesktopStory] = useState(false);
 
   const currentTone = productStoryStages[active]?.tone ?? "navy";
+  const stageCount = productStoryStages.length;
+  /** One viewport per stage + one extra so the last stage holds before unpin */
+  const storyLengthVh = (stageCount + 1) * 100;
 
   useEffect(() => {
     const root = rootRef.current;
@@ -65,64 +70,59 @@ export function ProductStory() {
       mm.add("(min-width: 768px)", () => {
         setDesktopStory(true);
 
-        const positions = [
-          { xPercent: 0, scale: 1 },
-          { xPercent: -6, scale: 1.04 },
-          { xPercent: 6, scale: 0.98 },
-          { xPercent: 0, scale: 1.06 },
-        ];
-
         const texts = gsap.utils.toArray<HTMLElement>(
-          root!.querySelectorAll("[data-stage-desktop]"),
+          pin!.querySelectorAll("[data-stage-desktop]"),
         );
 
-        gsap.set(can, {
-          xPercent: positions[0].xPercent,
-          scale: positions[0].scale,
-        });
-        gsap.set(texts, { opacity: 0, y: 24 });
-        if (texts[0]) gsap.set(texts[0], { opacity: 1, y: 0 });
-
-        const stageCount = productStoryStages.length;
+        gsap.set(can, { x: 0, scale: 1, transformOrigin: "50% 50%" });
+        gsap.set(texts, { autoAlpha: 0, y: 28 });
+        if (texts[0]) gsap.set(texts[0], { autoAlpha: 1, y: 0 });
 
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: root,
             start: "top top",
-            end: () => `+=${profile.storyVh * (window.innerHeight / 100)}`,
+            end: () => `+=${storyLengthVh * (window.innerHeight / 100)}`,
             pin: pin,
-            scrub: 0.65,
+            scrub: 0.55,
             anticipatePin: 1,
+            invalidateOnRefresh: true,
             onUpdate: (self) => {
-              const idx = Math.min(
-                stageCount - 1,
-                Math.floor(self.progress * stageCount),
-              );
+              // Map progress across stages; last stage keeps the final slice
+              const raw = self.progress * stageCount;
+              const idx = Math.min(stageCount - 1, Math.floor(raw));
               setActive(idx);
             },
           },
         });
 
+        // Equal segments: enter stage i, hold, then crossfade to next
         for (let i = 1; i < texts.length; i += 1) {
-          const pos = positions[i];
+          const at = i;
           tl.to(
-            can,
-            {
-              xPercent: pos.xPercent,
-              scale: pos.scale,
-              duration: 1,
-              ease: "none",
-            },
-            i,
+            texts[i - 1],
+            { autoAlpha: 0, y: -20, duration: 0.35, ease: "none" },
+            at,
           )
-            .to(texts[i - 1], { opacity: 0, y: -18, duration: 0.45 }, i)
             .fromTo(
               texts[i],
-              { opacity: 0, y: 24 },
-              { opacity: 1, y: 0, duration: 0.45 },
-              i + 0.15,
+              { autoAlpha: 0, y: 24 },
+              { autoAlpha: 1, y: 0, duration: 0.35, ease: "none" },
+              at + 0.05,
+            )
+            .to(
+              can,
+              {
+                scale: i % 2 === 0 ? 1.03 : 0.98,
+                duration: 1,
+                ease: "none",
+              },
+              at,
             );
         }
+
+        // Hold on last stage (empty tween absorbs remaining scroll)
+        tl.to({}, { duration: 1.15 }, stageCount);
 
         return () => {
           tl.scrollTrigger?.kill();
@@ -130,13 +130,13 @@ export function ProductStory() {
           setDesktopStory(false);
           setActive(0);
           gsap.set(can, { clearProps: "transform" });
+          gsap.set(texts, { clearProps: "all" });
         };
       });
 
       mm.add("(max-width: 767px)", () => {
         setDesktopStory(false);
         setActive(0);
-        gsap.set(can, { clearProps: "transform" });
       });
 
       reverted = () => {
@@ -149,7 +149,7 @@ export function ProductStory() {
 
     void run();
     return () => reverted?.();
-  }, [prefersReducedMotion, profile.storyVh, ready]);
+  }, [prefersReducedMotion, ready, stageCount, storyLengthVh]);
 
   return (
     <section
@@ -159,7 +159,7 @@ export function ProductStory() {
       aria-label="Experiencia de producto"
       style={
         desktopStory && !prefersReducedMotion
-          ? { height: `${profile.storyVh}vh` }
+          ? { height: `${storyLengthVh}vh` }
           : undefined
       }
     >
@@ -167,37 +167,21 @@ export function ProductStory() {
       <div
         ref={pinRef}
         className={cn(
-          "relative hidden overflow-hidden transition-colors duration-500 md:flex md:min-h-[100svh] md:items-center",
+          "relative hidden transition-colors duration-500 md:block",
           prefersReducedMotion && "md:hidden",
           toneClasses[currentTone],
         )}
       >
-        <Container className="relative z-10 w-full">
-          <div className="relative flex min-h-[28rem] items-center justify-center">
-            <div className="absolute left-0 top-1/2 z-20 w-full max-w-sm -translate-y-1/2 text-left xl:max-w-md">
-              <div className="relative min-h-[14rem]">
-                {productStoryStages.map((stage, index) => (
-                  <div
-                    key={stage.id}
-                    data-stage-desktop
-                    className="absolute inset-x-0 top-0"
-                  >
-                    <StageCopy
-                      index={index}
-                      label={stage.label}
-                      text={stage.text}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="relative z-10 flex w-full justify-center">
+        <div className="relative h-svh overflow-hidden pt-[var(--header-height)]">
+          <Container className="relative h-full">
+            {/* Centered can — constrained so it never clips under the header */}
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
               <div
                 ref={canRef}
-                className="w-full max-w-[260px]"
+                className="flex justify-center"
               >
                 <ProductCan
+                  fitHeight
                   className="max-w-none"
                   tone={
                     currentTone === "ice" || currentTone === "lime-soft"
@@ -208,25 +192,39 @@ export function ProductStory() {
                 />
               </div>
             </div>
-          </div>
-        </Container>
+
+            {/* Stage copy — left, never overlapping the can center */}
+            <div className="relative z-20 flex h-full max-w-[min(100%,22rem)] items-center xl:max-w-md">
+              <div className="relative w-full min-h-[12rem]">
+                {productStoryStages.map((stage, index) => (
+                  <div
+                    key={stage.id}
+                    data-stage-desktop
+                    className={cn(
+                      "absolute inset-x-0 top-1/2 w-full -translate-y-1/2",
+                      index === 0 ? "opacity-100" : "opacity-0",
+                    )}
+                  >
+                    <StageCopy
+                      index={index}
+                      label={stage.label}
+                      text={stage.text}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Container>
+        </div>
       </div>
 
-      {/* Mobile + reduced motion: vertical stack, no pin, nothing clipped */}
-      <div
-        className={cn(
-          "md:hidden",
-          prefersReducedMotion && "md:block",
-        )}
-      >
-        <div className="space-y-0">
+      {/* Mobile + reduced motion */}
+      <div className={cn("md:hidden", prefersReducedMotion && "md:block")}>
+        <div>
           {productStoryStages.map((stage, index) => (
             <div
               key={stage.id}
-              className={cn(
-                "section-pad",
-                toneClasses[stage.tone],
-              )}
+              className={cn("section-pad", toneClasses[stage.tone])}
             >
               <Container>
                 <div className="mx-auto flex max-w-md flex-col items-center gap-8 text-center">

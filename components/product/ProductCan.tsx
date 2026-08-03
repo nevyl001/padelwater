@@ -8,6 +8,7 @@ type ProductCanProps = {
   priority?: boolean;
   tone?: "navy" | "ice" | "water" | "lime";
   showReflection?: boolean;
+  fitHeight?: boolean;
 };
 
 /**
@@ -20,11 +21,18 @@ export function ProductCan({
   priority = false,
   tone = "navy",
   showReflection = true,
+  fitHeight = false,
 }: ProductCanProps) {
   const image = src ?? product.media.hero ?? product.media.front;
 
   return (
-    <div className={cn("relative mx-auto w-full max-w-[280px]", className)}>
+    <div
+      className={cn(
+        "relative mx-auto w-full",
+        fitHeight ? "max-w-none" : "max-w-[280px]",
+        className,
+      )}
+    >
       <MediaSlot
         src={image}
         alt={`${product.name} ${product.flavorLabel}, ${product.volume}`}
@@ -32,6 +40,7 @@ export function ProductCan({
         priority={priority}
         tone={tone}
         label="Lata 470 ml"
+        fitHeight={fitHeight}
         className="shadow-[var(--shadow-can)]"
       />
       {showReflection ? <ProductReflection /> : null}

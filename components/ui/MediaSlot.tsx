@@ -11,6 +11,8 @@ type MediaSlotProps = {
   priority?: boolean;
   label?: string;
   tone?: "navy" | "ice" | "water" | "lime";
+  /** Constrain height for sticky/viewport scenes */
+  fitHeight?: boolean;
 };
 
 const aspects = {
@@ -40,12 +42,15 @@ export function MediaSlot({
   priority = false,
   label = "Producto",
   tone = "navy",
+  fitHeight = false,
 }: MediaSlotProps) {
   return (
     <div
       className={cn(
         "relative overflow-hidden rounded-sm border",
-        aspects[aspect],
+        fitHeight
+          ? "mx-auto aspect-[3/7] h-[min(58svh,440px)] w-auto"
+          : aspects[aspect],
         tones[tone],
         className,
       )}
