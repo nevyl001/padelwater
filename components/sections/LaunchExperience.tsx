@@ -51,7 +51,9 @@ export function LaunchExperience() {
     tone === "lime-soft" ? "ice" : tone === "water" ? "water" : "navy";
 
   useEffect(() => {
-    if (!canUseConductor) return;
+    if (!ready || prefersReducedMotion || isMobile) {
+      return;
+    }
 
     const root = rootRef.current;
     const hero = heroRef.current;
@@ -330,7 +332,8 @@ export function LaunchExperience() {
       revert?.();
       setConductorOn(false);
     };
-  }, [canUseConductor, layer]);
+    // Keep a fixed-length dependency list for Fast Refresh / React hooks rules.
+  }, [ready, prefersReducedMotion, isMobile, layer]);
 
   return (
     <div ref={rootRef} data-launch-experience>
