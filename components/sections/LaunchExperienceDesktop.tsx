@@ -21,7 +21,7 @@ import { cn } from "@/lib/cn";
 function stageShellClass(layout: (typeof productStoryStages)[number]["layout"]) {
   switch (layout) {
     case "monument":
-      return "inset-0 flex flex-col justify-between px-[max(2rem,8%)] pb-28 pt-10 text-center";
+      return "inset-0 flex flex-col justify-between px-[max(2rem,8%)] pb-36 pt-10 text-center";
     case "backdrop":
       return "left-[max(2.5rem,calc((100vw-min(100vw,85rem))/2+1.5rem))] top-[18%] w-[min(26rem,34vw)] text-left";
     case "side":
@@ -174,7 +174,12 @@ export function LaunchExperienceDesktop() {
                   tone={canTone}
                   size="story"
                   quiet
-                  showReflection
+                  showReflection={activeStage !== 3}
+                  className={
+                    activeStage === 3
+                      ? "[&_[data-product-can-image]]:!shadow-[0_12px_28px_rgba(3,17,38,0.18)]"
+                      : undefined
+                  }
                 />
               </div>
             </div>
@@ -203,9 +208,9 @@ export function LaunchExperienceDesktop() {
                       {/* Reserved can lane — keeps 470 clear of the product */}
                       <div
                         aria-hidden
-                        className="min-h-[min(42svh,360px)] w-full flex-1"
+                        className="min-h-[min(40svh,340px)] w-full flex-1"
                       />
-                      <p className="relative z-30 mx-auto mb-6 max-w-md shrink-0 text-lg leading-relaxed opacity-85">
+                      <p className="relative z-30 mx-auto mb-10 mt-8 max-w-md shrink-0 pt-4 text-lg leading-relaxed opacity-85">
                         {stage.text}
                       </p>
                     </>

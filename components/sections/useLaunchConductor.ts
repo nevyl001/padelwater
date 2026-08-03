@@ -265,9 +265,9 @@ export function useLaunchConductor(
           storyCanEl,
           {
             x: 0,
-            // Desktop monument: sit lower and smaller so 470 never collides
-            y: isMobile ? 0 : 36,
-            scale: isMobile ? 0.9 : 0.72,
+            // Keep can clear of 470 above and body copy + shadow below
+            y: isMobile ? 0 : 12,
+            scale: isMobile ? 0.9 : 0.66,
             ease: "none",
             duration: 0.45,
           },
