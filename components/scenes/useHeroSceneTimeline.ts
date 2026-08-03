@@ -73,24 +73,24 @@ export function useHeroSceneTimeline(refs: HeroSceneRefs, flags: HeroSceneFlags)
         gsap.set(canEl, {
           opacity: 0,
           scale: scales.heroCanEnter,
-          y: 36,
-          rotateX: 6,
+          y: 28,
+          rotateX: 4,
           transformPerspective: 900,
         });
         if (reflection) gsap.set(reflection, { opacity: 0 });
-        if (glow) gsap.set(glow, { opacity: 0, scale: 0.85 });
+        if (glow) gsap.set(glow, { opacity: 0, scale: 0.9 });
         if (aurora) gsap.set(aurora, { opacity: 0 });
         if (court) gsap.set(court, { opacity: 0 });
-        if (scrollHintEl) gsap.set(scrollHintEl, { opacity: 0, y: 8 });
+        if (scrollHintEl) gsap.set(scrollHintEl, { opacity: 0, y: 6 });
 
         const intro = gsap.timeline({ defaults: { ease: gsapEasings.outExpo } });
 
         // 1) Atmosphere first
         if (aurora) {
-          intro.to(aurora, { opacity: 1, duration: 0.9 }, 0);
+          intro.to(aurora, { opacity: 1, duration: 1.0 }, 0);
         }
         if (court) {
-          intro.to(court, { opacity: 1, duration: 1.0 }, 0.12);
+          intro.to(court, { opacity: 1, duration: 1.1 }, 0.1);
         }
 
         // 2) Title reveal via masks
@@ -99,7 +99,7 @@ export function useHeroSceneTimeline(refs: HeroSceneRefs, flags: HeroSceneFlags)
             eyebrowUnits,
             { yPercent: 110, opacity: 0 },
             { yPercent: 0, opacity: 1, duration: 0.55 },
-            0.45,
+            0.4,
           )
           .fromTo(
             titleUnits,
@@ -107,43 +107,37 @@ export function useHeroSceneTimeline(refs: HeroSceneRefs, flags: HeroSceneFlags)
             {
               yPercent: 0,
               opacity: 1,
-              duration: 0.75,
+              duration: 0.8,
               stagger: staggers.lines,
             },
-            0.58,
+            0.52,
           );
 
-        // 3) Product enters with depth + settle
-        intro
-          .to(
-            canEl,
-            {
-              opacity: 1,
-              scale: scales.heroCanRest,
-              y: 0,
-              rotateX: 0,
-              duration: durations.heroIntro,
-            },
-            0.85,
-          )
-          .to(
-            canEl,
-            { y: -4, duration: 0.35, ease: gsapEasings.outPower, yoyo: true, repeat: 1 },
-            "-=0.35",
-          );
+        // 3) Product enters with depth + soft settle (no bounce)
+        intro.to(
+          canEl,
+          {
+            opacity: 1,
+            scale: scales.heroCanRest,
+            y: 0,
+            rotateX: 0,
+            duration: durations.heroIntro,
+          },
+          0.78,
+        );
 
         if (glow) {
-          intro.to(glow, { opacity: 1, scale: 1, duration: 0.7 }, 1.0);
+          intro.to(glow, { opacity: 1, scale: 1, duration: 0.8 }, 0.95);
         }
         if (reflection) {
-          intro.to(reflection, { opacity: 1, duration: 0.35 }, 1.25);
+          intro.to(reflection, { opacity: 1, duration: 0.4 }, 1.15);
         }
         if (sheen) {
           intro.fromTo(
             sheen,
             { x: "-130%", opacity: 0 },
-            { x: "230%", opacity: 1, duration: 0.55, ease: "power2.inOut" },
-            1.3,
+            { x: "230%", opacity: 1, duration: 0.65, ease: "power2.inOut" },
+            1.2,
           );
         }
 
@@ -155,26 +149,26 @@ export function useHeroSceneTimeline(refs: HeroSceneRefs, flags: HeroSceneFlags)
             {
               yPercent: 0,
               opacity: 1,
-              duration: 0.5,
+              duration: 0.55,
               stagger: staggers.words,
             },
-            1.35,
+            1.25,
           )
           .fromTo(
             ctaUnits,
             { yPercent: 110, opacity: 0 },
             { yPercent: 0, opacity: 1, duration: 0.55 },
-            1.55,
+            1.48,
           );
 
         if (scrollHintEl) {
-          intro.to(scrollHintEl, { opacity: 1, y: 0, duration: 0.5 }, 1.75);
+          intro.to(scrollHintEl, { opacity: 1, y: 0, duration: 0.55 }, 1.7);
         }
 
         // Soft pointer follow (desktop) — refs/quickTo, not React state
         if (enablePointerHero) {
-          const qx = gsap.quickTo(canEl, "x", { duration: 0.55, ease: "power3" });
-          const qy = gsap.quickTo(canEl, "y", { duration: 0.55, ease: "power3" });
+          const qx = gsap.quickTo(canEl, "x", { duration: 0.7, ease: "power3" });
+          const qy = gsap.quickTo(canEl, "y", { duration: 0.7, ease: "power3" });
           const onMove = (e: PointerEvent) => {
             const rect = rootEl.getBoundingClientRect();
             if (e.clientY < rect.top || e.clientY > rect.bottom) return;
@@ -200,7 +194,7 @@ export function useHeroSceneTimeline(refs: HeroSceneRefs, flags: HeroSceneFlags)
 
         gsap.to([eyebrowEl, titleEl, descriptionEl, ctaEl], {
           opacity: 0,
-          y: -28,
+          y: -20,
           ease: gsapEasings.none,
           scrollTrigger: {
             trigger: rootEl,

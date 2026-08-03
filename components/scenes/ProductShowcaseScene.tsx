@@ -22,13 +22,11 @@ import { AuroraField } from "@/components/atmosphere/AuroraField";
 import { OrbitalRings } from "@/components/atmosphere/OrbitalRings";
 import { useMotionPreferences } from "@/components/motion/MotionPreferences";
 import { useProductShowcaseSceneTimeline } from "@/components/scenes/useProductShowcaseSceneTimeline";
-import { distances, durations } from "@/lib/motion";
+import { distances, durations, easings } from "@/lib/motion";
 import { cn } from "@/lib/cn";
 
 /**
- * Immersive interactive showcase — product as protagonist with orbital
- * frame, pointer lighting (refs/rAF), and real attribute states only.
- * Can swap ProductCanStage asset later without rewriting this scene.
+ * Immersive product stage — the site's star piece.
  */
 export function ProductShowcaseScene() {
   const [infoOpen, setInfoOpen] = useState(false);
@@ -53,7 +51,6 @@ export function ProductShowcaseScene() {
     { ready, prefersReducedMotion },
   );
 
-  // Pointer ambient light via CSS vars — never React state per frame
   useEffect(() => {
     if (!enablePointer) return;
     const root = rootRef.current;
@@ -70,11 +67,11 @@ export function ProductShowcaseScene() {
 
     const tick = () => {
       if (!running) return;
-      curX += (targetX - curX) * 0.08;
-      curY += (targetY - curY) * 0.08;
+      curX += (targetX - curX) * 0.065;
+      curY += (targetY - curY) * 0.065;
       root.style.setProperty("--px", `${(curX * 100).toFixed(2)}%`);
       root.style.setProperty("--py", `${(curY * 100).toFixed(2)}%`);
-      glow.style.transform = `translate3d(${((curX - 0.5) * 40).toFixed(2)}px, ${((curY - 0.5) * 28).toFixed(2)}px, 0)`;
+      glow.style.transform = `translate3d(${((curX - 0.5) * 28).toFixed(2)}px, ${((curY - 0.5) * 18).toFixed(2)}px, 0)`;
       if (can) {
         const dx = (curX - 0.5) * distances.showcasePointerX;
         const dy = (curY - 0.5) * distances.showcasePointerY;
@@ -93,8 +90,15 @@ export function ProductShowcaseScene() {
     const io = new IntersectionObserver(
       ([entry]) => {
         running = entry.isIntersecting;
-        if (running) raf = requestAnimationFrame(tick);
-        else cancelAnimationFrame(raf);
+        if (running) {
+          glow.style.willChange = "transform";
+          if (can) can.style.willChange = "transform";
+          raf = requestAnimationFrame(tick);
+        } else {
+          cancelAnimationFrame(raf);
+          glow.style.willChange = "auto";
+          if (can) can.style.willChange = "auto";
+        }
       },
       { threshold: 0.05 },
     );
@@ -107,7 +111,11 @@ export function ProductShowcaseScene() {
       cancelAnimationFrame(raf);
       io.disconnect();
       window.removeEventListener("pointermove", onMove);
-      if (can) can.style.transform = "";
+      glow.style.willChange = "auto";
+      if (can) {
+        can.style.transform = "";
+        can.style.willChange = "auto";
+      }
     };
   }, [enablePointer]);
 
@@ -132,7 +140,6 @@ export function ProductShowcaseScene() {
     }
   };
 
-  // Touch swipe between attributes
   useEffect(() => {
     const stage = stageRef.current;
     if (!stage) return;
@@ -156,6 +163,7 @@ export function ProductShowcaseScene() {
   }, [activeIndex, selectByIndex]);
 
   const animateAurora = ready && profile.enableAurora && !prefersReducedMotion;
+  const easeCss = `cubic-bezier(${easings.outExpo.join(",")})`;
 
   return (
     <section
@@ -166,44 +174,39 @@ export function ProductShowcaseScene() {
       aria-label="El producto"
       style={
         {
-          ["--px" as string]: "50%",
-          ["--py" as string]: "45%",
+          ["--px" as string]: "52%",
+          ["--py" as string]: "46%",
         } as CSSProperties
       }
     >
       <AuroraField tone="deep" animated={animateAurora} intensity="medium" />
 
-      {/* Pointer-reactive wash */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-80 transition-[opacity] duration-500"
+        className="pointer-events-none absolute inset-0 opacity-90"
         style={{
           background:
-            "radial-gradient(ellipse 55% 45% at var(--px) var(--py), rgba(0,169,203,0.28), transparent 60%)",
+            "radial-gradient(ellipse 50% 42% at var(--px) var(--py), rgba(0,169,203,0.32), transparent 62%)",
         }}
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-50"
+        className="pointer-events-none absolute inset-0 opacity-45"
         style={{
           background:
-            "radial-gradient(ellipse 40% 35% at calc(var(--px) + 8%) calc(var(--py) + 10%), rgba(183,243,51,0.12), transparent 55%)",
+            "radial-gradient(ellipse 36% 30% at calc(var(--px) + 6%) calc(var(--py) + 8%), rgba(183,243,51,0.14), transparent 58%)",
         }}
       />
 
-      <Container className="relative z-10 py-16 md:py-24 lg:py-28">
-        <div className="mb-8 flex flex-col gap-3 text-center md:mb-12 md:text-left">
-          <p className="text-[0.7rem] uppercase tracking-[0.28em] text-pw-lime/85">
+      <Container className="relative z-10 py-10 md:py-24 lg:py-32">
+        <div className="mb-5 flex flex-col gap-2 text-center md:mb-14 md:gap-3 md:text-left">
+          <p className="text-[0.68rem] uppercase tracking-[0.3em] text-pw-lime">
             Producto
           </p>
           <h2 className="text-editorial text-pw-white">{product.name}</h2>
-          <p className="mx-auto max-w-lg text-white/60 md:mx-0">
-            Características del producto, tal como las confirma el empaque.
-          </p>
         </div>
 
-        <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] xl:gap-16">
-          {/* Editorial detail panel */}
+        <div className="grid items-center gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-14 xl:gap-20">
           <div
             ref={panelRef}
             className={cn(
@@ -215,13 +218,14 @@ export function ProductShowcaseScene() {
               attribute={active}
               panelId={`${tablistId}-panel`}
               key={active.id}
+              reduced={prefersReducedMotion}
             />
 
             <div
               role="tablist"
               aria-label="Características del producto"
               id={tablistId}
-              className="mt-8 flex flex-wrap gap-2 justify-center lg:justify-start"
+              className="-mx-1 mt-6 flex gap-2 overflow-x-auto px-1 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] justify-start md:mt-8 lg:mt-10 lg:flex-wrap lg:overflow-visible [&::-webkit-scrollbar]:hidden"
             >
               {showcaseAttributes.map((attr, index) => {
                 const selected = attr.id === activeId;
@@ -237,10 +241,10 @@ export function ProductShowcaseScene() {
                     onClick={() => setActiveId(attr.id)}
                     onKeyDown={(e) => onTabKeyDown(e, index)}
                     className={cn(
-                      "rounded-sm border px-3 py-2 text-[0.65rem] uppercase tracking-[0.18em] transition-colors duration-300",
+                      "shrink-0 rounded-sm border px-3.5 py-2.5 text-[0.62rem] uppercase tracking-[0.2em] transition-[color,background-color,border-color] duration-300",
                       selected
-                        ? "border-pw-lime bg-pw-lime/15 text-pw-lime"
-                        : "border-white/15 text-white/55 hover:border-white/35 hover:text-white/85",
+                        ? "border-pw-lime bg-pw-lime/12 text-pw-lime"
+                        : "border-white/18 text-white/60 hover:border-white/40 hover:text-white/90",
                     )}
                   >
                     {attr.label}
@@ -249,29 +253,28 @@ export function ProductShowcaseScene() {
               })}
             </div>
 
-            <div className="mt-8 flex justify-center lg:justify-start">
+            <div className="mt-6 flex justify-center md:mt-8 lg:mt-10 lg:justify-start">
               <Button
                 variant="secondary"
                 onClick={() => setInfoOpen(true)}
-                className="border-white/30 text-pw-white hover:border-white hover:bg-white/5"
+                className="border-white/35 text-pw-white hover:border-white hover:bg-white/5"
               >
                 Ver información del producto
               </Button>
             </div>
           </div>
 
-          {/* Immersive stage */}
           <div
             ref={stageRef}
             className={cn(
-              "relative order-1 flex min-h-[min(70svh,520px)] items-center justify-center lg:order-2",
+              "relative order-1 flex items-center justify-center py-1 md:min-h-[min(68svh,540px)] md:py-0 lg:order-2",
               !prefersReducedMotion && "opacity-0",
             )}
           >
             <div
               ref={glowRef}
               aria-hidden
-              className="pointer-events-none absolute left-1/2 top-1/2 h-[55%] w-[55%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(0,169,203,0.45),transparent_68%)] blur-2xl will-change-transform"
+              className="pointer-events-none absolute left-1/2 top-[48%] h-[58%] w-[58%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(0,169,203,0.5),transparent_70%)] blur-2xl"
             />
 
             <OrbitalRings
@@ -279,22 +282,21 @@ export function ProductShowcaseScene() {
               activeIndex={activeIndex}
             />
 
-            {/* Editorial floating labels around the can */}
             <FloatingLabels attribute={active} />
 
             <div
               ref={canRef}
-              className="relative z-10 will-change-transform"
+              className="relative z-10"
               style={{
                 transition: prefersReducedMotion
                   ? undefined
-                  : `opacity ${durations.showcaseSwap}s ease`,
+                  : `filter ${durations.showcaseSwap}s ${easeCss}`,
               }}
             >
               <ProductCanStage
                 mode="inline"
                 tone={active.canTone}
-                size="hero"
+                size="showcase"
                 quiet
               />
             </div>
@@ -310,40 +312,53 @@ export function ProductShowcaseScene() {
 function AttributePanel({
   attribute,
   panelId,
+  reduced,
 }: {
   attribute: ShowcaseAttribute;
   panelId: string;
+  reduced: boolean;
 }) {
   return (
     <div
       role="tabpanel"
       id={panelId}
-      className="mx-auto max-w-md text-center lg:mx-0 lg:text-left"
+      className={cn(
+        "mx-auto max-w-md text-center lg:mx-0 lg:max-w-none lg:text-left",
+        !reduced && "animate-showcase-panel",
+      )}
     >
-      <p className="text-[0.7rem] uppercase tracking-[0.28em] text-pw-cyan">
+      <p className="text-[0.68rem] uppercase tracking-[0.3em] text-pw-cyan">
         {attribute.eyebrow}
       </p>
-      <h3 className="mt-3 font-display text-3xl font-bold uppercase tracking-[-0.02em] text-pw-white md:text-4xl">
+      <h3 className="mt-3.5 font-display text-[clamp(1.85rem,3.5vw,2.75rem)] font-bold uppercase leading-[1.02] tracking-[-0.03em] text-pw-white">
         {attribute.title}
       </h3>
-      <p className="mt-4 text-lg text-white/70">{attribute.text}</p>
+      <p className="mt-4 max-w-sm text-base leading-relaxed text-white/72 md:mt-5 md:text-lg lg:max-w-md">
+        {attribute.text}
+      </p>
     </div>
   );
 }
 
 function FloatingLabels({ attribute }: { attribute: ShowcaseAttribute }) {
   return (
-    <div aria-hidden className="pointer-events-none absolute inset-0 z-20 hidden md:block">
-      <span className="absolute left-[6%] top-[18%] text-[0.6rem] uppercase tracking-[0.3em] text-white/35">
+    <div
+      aria-hidden
+      className="pointer-events-none absolute inset-0 z-20 hidden md:block"
+    >
+      <span
+        key={attribute.id}
+        className="absolute left-[5%] top-[16%] text-[0.58rem] uppercase tracking-[0.32em] text-white/40 animate-showcase-panel"
+      >
         {attribute.label}
       </span>
       {attribute.id === "formato" ? (
-        <span className="absolute bottom-[22%] right-[8%] max-w-[9rem] text-right text-[0.6rem] uppercase tracking-[0.22em] text-pw-cyan/50">
+        <span className="absolute bottom-[20%] right-[7%] text-right text-[0.58rem] uppercase tracking-[0.24em] text-pw-cyan/55">
           {product.volume}
         </span>
       ) : null}
-      <span className="absolute right-[10%] top-[28%] h-8 w-px bg-gradient-to-b from-pw-lime/60 to-transparent" />
-      <span className="absolute left-[12%] bottom-[28%] h-px w-12 bg-gradient-to-r from-pw-cyan/50 to-transparent" />
+      <span className="absolute right-[9%] top-[26%] h-10 w-px bg-gradient-to-b from-pw-lime/55 to-transparent" />
+      <span className="absolute bottom-[26%] left-[10%] h-px w-14 bg-gradient-to-r from-pw-cyan/45 to-transparent" />
     </div>
   );
 }

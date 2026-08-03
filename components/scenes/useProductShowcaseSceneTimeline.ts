@@ -97,7 +97,7 @@ export function useProductShowcaseSceneTimeline(
 
         // Soft parallax of stage while section is in view
         gsap.to(stageEl, {
-          y: -24,
+          y: -16,
           ease: gsapEasings.none,
           scrollTrigger: {
             trigger: rootEl,

@@ -11,7 +11,7 @@ import { useMotionPreferences } from "@/components/motion/MotionPreferences";
 import { useFinalSceneTimeline } from "@/components/scenes/useFinalSceneTimeline";
 
 /**
- * Compact closing CTA — aurora + one message + one action. No product stage.
+ * Compact closing CTA — one line, one action, aurora only.
  */
 export function FinalScene() {
   const rootRef = useRef<HTMLElement>(null);
@@ -31,25 +31,32 @@ export function FinalScene() {
     <section
       ref={rootRef}
       data-scene="final"
-      className="relative overflow-hidden bg-pw-navy-deep py-16 text-pw-white grain md:py-20"
+      className="relative overflow-hidden bg-pw-navy-deep py-20 text-pw-white grain md:py-24"
       aria-label="Llamado a la acción"
     >
       <AuroraField
         tone="deep"
         animated={animateAurora}
         intensity="soft"
-        className="opacity-90"
+        className="opacity-95"
       />
 
-      <Container className="relative z-10 max-w-2xl text-center md:text-left">
+      <Container className="relative z-10 max-w-3xl text-center">
         <TextReveal
           ref={headlineRef}
           as="h2"
           variant="editorial"
           mode="manual"
           lines={[finalCta.title]}
+          className="mx-auto"
         />
-        <MaskReveal ref={ctaRef} as="div" mode="manual" splitBy="block" className="mt-8">
+        <MaskReveal
+          ref={ctaRef}
+          as="div"
+          mode="manual"
+          splitBy="block"
+          className="mt-9 flex justify-center md:mt-10"
+        >
           <WhatsAppLink size="lg" magnetic>
             {finalCta.button}
           </WhatsAppLink>

@@ -20,39 +20,39 @@ export const durations = {
   base: 0.35,
   mid: 0.5,
   slow: 0.6,
-  cinematic: 0.75,
+  cinematic: 0.85,
   story: 1.2,
-  heroIntro: 1.4,
+  heroIntro: 1.15,
   auroraCycle: 18,
-  showcaseSwap: 0.55,
+  showcaseSwap: 0.42,
 } as const;
 
 export const staggers = {
-  lines: 0.08,
-  words: 0.03,
+  lines: 0.09,
+  words: 0.028,
   cards: 0.1,
   orbits: 0.12,
 } as const;
 
 /** Pixel / unit distances for pointer & parallax (desktop fullMotion). */
 export const distances = {
-  heroPointerX: 18,
-  heroPointerY: 12,
-  showcasePointerX: 22,
-  showcasePointerY: 14,
-  parallaxBg: 48,
-  parallaxMid: 28,
-  parallaxFg: 14,
-  scrollBridgeY: 48,
+  heroPointerX: 12,
+  heroPointerY: 8,
+  showcasePointerX: 14,
+  showcasePointerY: 10,
+  parallaxBg: 40,
+  parallaxMid: 22,
+  parallaxFg: 12,
+  scrollBridgeY: 36,
 } as const;
 
 export const scales = {
-  heroCanEnter: 0.9,
+  heroCanEnter: 0.94,
   heroCanRest: 1,
-  heroScrollOut: 0.92,
+  heroScrollOut: 0.96,
   showcaseCan: 1,
-  showcaseCanHover: 1.02,
-  editorialTitle: 1.08,
+  showcaseCanHover: 1.015,
+  editorialTitle: 1.05,
 } as const;
 
 export function resolveMotionLayer(options: {

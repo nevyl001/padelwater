@@ -9,8 +9,8 @@ import { distances, gsapEasings, scales } from "@/lib/motion";
 import { cn } from "@/lib/cn";
 
 /**
- * Brand attitude — typography + court atmosphere.
- * No full can, no product specs. Fragment/crop accent only.
+ * Artistic brand attitude — typography as the image on desktop;
+ * clean stacked composition on mobile (no overlapping ghost type / balls).
  */
 export function EditorialParallaxScene() {
   const rootRef = useRef<HTMLElement>(null);
@@ -19,7 +19,7 @@ export function EditorialParallaxScene() {
   const fgRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
 
-  const { ready, prefersReducedMotion, profile } = useMotionPreferences();
+  const { ready, prefersReducedMotion, profile, isMobile } = useMotionPreferences();
   const strength = profile.parallaxStrength;
 
   useEffect(() => {
@@ -63,7 +63,7 @@ export function EditorialParallaxScene() {
 
         gsap.fromTo(
           midEl,
-          { y: distances.parallaxMid * strength * 0.6 },
+          { y: distances.parallaxMid * strength * 0.55 },
           {
             y: -distances.parallaxMid * strength,
             ease: gsapEasings.none,
@@ -78,9 +78,9 @@ export function EditorialParallaxScene() {
 
         gsap.fromTo(
           titleEl,
-          { y: 40 * strength, scale: scales.editorialTitle },
+          { y: 32 * strength, scale: scales.editorialTitle },
           {
-            y: -30 * strength,
+            y: -24 * strength,
             scale: 1,
             ease: gsapEasings.none,
             scrollTrigger: {
@@ -96,7 +96,7 @@ export function EditorialParallaxScene() {
           fgEl,
           { y: distances.parallaxFg },
           {
-            y: -distances.parallaxFg * 1.4 * strength,
+            y: -distances.parallaxFg * 1.3 * strength,
             ease: gsapEasings.none,
             scrollTrigger: {
               trigger: rootEl,
@@ -132,53 +132,67 @@ export function EditorialParallaxScene() {
       className="relative overflow-hidden bg-pw-navy text-pw-white"
       aria-label="Actitud de marca"
     >
-      <div ref={bgRef} className="absolute inset-0 will-change-transform">
-        <CourtField tone="dark" intensity="soft" animated={animateCourt} />
-        <div className="absolute inset-0 bg-gradient-to-b from-pw-navy-deep/50 via-transparent to-pw-navy-deep/85" />
+      <div ref={bgRef} className="absolute inset-0">
+        <CourtField
+          tone="dark"
+          intensity="soft"
+          animated={animateCourt}
+          showBalls={!isMobile}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-pw-navy-deep/60 via-pw-navy/25 to-pw-navy-deep/90" />
       </div>
 
+      {/* Ghost type — desktop only */}
       <div
         ref={titleRef}
-        className="pointer-events-none absolute inset-0 z-[1] flex items-center justify-center will-change-transform"
+        className="pointer-events-none absolute inset-0 z-[1] hidden items-center justify-center md:flex"
       >
         <p
           className={cn(
-            "max-w-[16ch] text-center font-display font-bold uppercase leading-[0.9]",
-            "text-[clamp(2.5rem,10vw,7.5rem)] tracking-[-0.04em] text-white/[0.08]",
+            "max-w-[14ch] text-center font-display font-bold uppercase leading-[0.88]",
+            "text-[clamp(3rem,12vw,9rem)] tracking-[-0.045em] text-white/[0.06]",
           )}
         >
           {brandStatement.lines[0]}
         </p>
       </div>
 
-      <Container className="relative z-10 grid min-h-[85svh] items-center gap-12 py-20 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.7fr)] lg:py-24">
-        <div ref={midRef} className="relative will-change-transform">
-          <p className="text-[0.7rem] uppercase tracking-[0.28em] text-pw-lime/80">
+      <Container className="relative z-10 grid min-h-0 items-center gap-10 py-16 md:min-h-[92svh] md:gap-14 md:py-28 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16">
+        <div ref={midRef} className="relative max-w-xl">
+          <p className="text-[0.68rem] uppercase tracking-[0.32em] text-pw-lime/85">
             En la cancha
           </p>
-          <h2 className="mt-4 max-w-lg text-editorial text-pw-white">
+          <h2 className="mt-4 text-editorial text-pw-white md:mt-5">
             {communitySection.titleLines[0]}
-            <br />
-            {communitySection.titleLines[1]}
+            <span className="mt-1 block text-white/90">
+              {communitySection.titleLines[1]}
+            </span>
           </h2>
-          <p className="mt-6 max-w-md text-lg text-white/65 md:text-xl">
+          <p className="mt-5 max-w-md text-base leading-relaxed text-white/72 md:mt-7 md:text-lg">
             {communitySection.text}
+          </p>
+
+          {/* Mobile brand line — readable, no overlap */}
+          <p className="mt-8 max-w-[20ch] border-t border-white/15 pt-6 font-display text-lg font-bold uppercase leading-[1.15] tracking-[-0.02em] text-white/55 md:hidden">
+            {brandStatement.lines[0]}{" "}
+            <span className="text-white/40">{brandStatement.lines[1]}</span>
           </p>
         </div>
 
-        {/* Typographic / ball accent — not a product showcase */}
         <div
           ref={fgRef}
-          className="relative flex min-h-[220px] items-center justify-center will-change-transform lg:justify-end"
+          className="relative hidden min-h-[240px] items-center justify-end md:flex"
         >
           <div
             aria-hidden
-            className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(0,169,203,0.2),transparent_65%)] blur-2xl"
+            className="absolute right-0 top-1/2 h-64 w-64 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(0,169,203,0.22),transparent_68%)] blur-2xl"
           />
-          <p className="relative max-w-[12ch] text-right font-display text-[clamp(1.75rem,4vw,3rem)] font-bold uppercase leading-[1.05] tracking-[-0.03em] text-white/25">
-            {brandStatement.lines[1]}
-          </p>
-          <PadelBallDecoration className="absolute -left-2 bottom-8 md:left-4" />
+          <div className="relative">
+            <p className="max-w-[11ch] text-right font-display text-[clamp(1.35rem,2.8vw,2.15rem)] font-bold uppercase leading-[1.08] tracking-[-0.03em] text-white/30">
+              {brandStatement.lines[1]}
+            </p>
+            <PadelBallDecoration className="absolute -right-6 top-[-1.5rem]" />
+          </div>
         </div>
       </Container>
     </section>
@@ -190,7 +204,7 @@ function PadelBallDecoration({ className }: { className?: string }) {
     <svg
       aria-hidden
       viewBox="0 0 64 64"
-      className={cn("h-12 w-12 drop-shadow-lg md:h-14 md:w-14", className)}
+      className={cn("h-12 w-12 drop-shadow-lg", className)}
     >
       <circle cx="32" cy="32" r="28" fill="#B7F333" />
       <path

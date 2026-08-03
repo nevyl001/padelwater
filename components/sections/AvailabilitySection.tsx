@@ -14,21 +14,21 @@ export function AvailabilitySection() {
   return (
     <section
       id="donde"
-      className="bg-pw-ice py-16 anchor-offset md:py-20"
+      className="bg-pw-ice py-14 anchor-offset md:py-16"
       aria-label="Disponibilidad"
     >
-      <Container className="max-w-3xl">
+      <Container className="max-w-2xl">
         <Reveal>
           <SectionLabel>{availability.eyebrow}</SectionLabel>
-          <h2 className="mt-4 text-editorial text-pw-navy">
+          <h2 className="mt-3.5 text-section text-pw-navy">
             {availability.title}
           </h2>
-          <p className="mt-6 max-w-xl text-body-lg text-pw-muted">
+          <p className="mt-5 max-w-lg text-base leading-relaxed text-pw-navy/70 md:text-lg">
             {availability.description}
           </p>
 
           {availability.mode === "coming_soon" ? (
-            <div className="mt-10">
+            <div className="mt-8">
               <WhatsAppLink
                 message={siteConfig.whatsapp.availabilityMessage}
                 size="lg"

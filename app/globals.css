@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "./marquee.css";
 
 :root {
   --pw-navy: #071a38;
@@ -116,9 +115,9 @@
 
   .text-hero {
     font-family: var(--font-display), ui-sans-serif, sans-serif;
-    font-size: clamp(2rem, 4vw, 3.75rem);
-    line-height: 1.05;
-    letter-spacing: -0.02em;
+    font-size: clamp(2.15rem, 4.2vw, 4.25rem);
+    line-height: 1.02;
+    letter-spacing: -0.025em;
     text-transform: uppercase;
     font-weight: 700;
   }
@@ -130,18 +129,18 @@
 
   .text-editorial {
     font-family: var(--font-display), ui-sans-serif, sans-serif;
-    font-size: clamp(2.25rem, 5vw, 4.5rem);
-    line-height: 1.02;
-    letter-spacing: -0.025em;
+    font-size: clamp(2.35rem, 5.2vw, 5rem);
+    line-height: 1.0;
+    letter-spacing: -0.03em;
     text-transform: uppercase;
     font-weight: 700;
   }
 
   .text-section {
     font-family: var(--font-display), ui-sans-serif, sans-serif;
-    font-size: clamp(2rem, 4vw, 4rem);
-    line-height: 1;
-    letter-spacing: -0.02em;
+    font-size: clamp(1.85rem, 3.6vw, 3.25rem);
+    line-height: 1.02;
+    letter-spacing: -0.025em;
     text-transform: uppercase;
     font-weight: 700;
   }
@@ -319,6 +318,21 @@
     transform-box: fill-box;
     transform-origin: center;
     animation: flavor-wave 14s ease-in-out infinite;
+  }
+
+  @keyframes showcase-panel-in {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 10px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  .animate-showcase-panel {
+    animation: showcase-panel-in 0.48s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
   @media (prefers-reduced-motion: reduce) {

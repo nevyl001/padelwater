@@ -92,10 +92,23 @@ export function ProductInformationPanel({
               <button
                 type="button"
                 onClick={onClose}
-                className="grid h-10 w-10 place-items-center rounded-full border border-pw-ink/15 text-lg"
+                className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-pw-navy/25 bg-pw-ice text-pw-navy transition-colors hover:border-pw-navy/45 hover:bg-pw-lime/30"
                 aria-label="Cerrar"
               >
-                ×
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 14 14"
+                  fill="none"
+                  aria-hidden
+                >
+                  <path
+                    d="M2 2L12 12M12 2L2 12"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                  />
+                </svg>
               </button>
             </div>
 

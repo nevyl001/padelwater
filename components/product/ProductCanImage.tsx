@@ -10,7 +10,7 @@ type ProductCanImageProps = {
   src?: string | null;
   priority?: boolean;
   tone?: "navy" | "ice" | "water" | "lime";
-  size?: "hero" | "story" | "inline";
+  size?: "hero" | "story" | "inline" | "showcase";
   quiet?: boolean;
   label?: string;
   /** Only the hero should pass this in development. */
@@ -18,7 +18,10 @@ type ProductCanImageProps = {
 };
 
 const sizeClass = {
-  hero: "aspect-[2/5] h-[min(28svh,220px)] w-auto sm:h-[min(40svh,300px)] md:h-[min(58svh,440px)]",
+  hero: "aspect-[2/5] h-[min(30svh,240px)] w-auto sm:h-[min(42svh,320px)] md:h-[min(60svh,480px)]",
+  /** Larger presence on mobile showcase — avoids tiny can + empty air */
+  showcase:
+    "aspect-[2/5] h-[min(46svh,340px)] w-auto sm:h-[min(50svh,380px)] md:h-[min(60svh,480px)]",
   story:
     "aspect-[2/5] h-[min(54svh,460px)] w-auto max-md:h-[min(46svh,340px)]",
   inline: "aspect-[2/5] w-full max-w-[240px]",

@@ -8,6 +8,8 @@ type CourtFieldProps = {
   tone?: "dark" | "light" | "water" | "lime";
   intensity?: "soft" | "medium";
   animated?: boolean;
+  /** When false, only soft court lines render (no floating balls). */
+  showBalls?: boolean;
 };
 
 type Palette = {
@@ -56,6 +58,7 @@ export function CourtField({
   tone = "dark",
   intensity = "medium",
   animated = true,
+  showBalls = true,
 }: CourtFieldProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const linesRef = useRef<HTMLCanvasElement>(null);
@@ -65,11 +68,15 @@ export function CourtField({
     const wrap = wrapRef.current;
     const linesCanvas = linesRef.current;
     const ballsCanvas = ballsRef.current;
-    if (!wrap || !linesCanvas || !ballsCanvas) return;
+    if (!wrap || !linesCanvas) return;
+    if (showBalls && !ballsCanvas) return;
 
     const linesCtx = linesCanvas.getContext("2d", { alpha: true });
-    const ballsCtx = ballsCanvas.getContext("2d", { alpha: true });
-    if (!linesCtx || !ballsCtx) return;
+    const ballsCtx = showBalls
+      ? ballsCanvas?.getContext("2d", { alpha: true })
+      : null;
+    if (!linesCtx) return;
+    if (showBalls && !ballsCtx) return;
 
     const palette = palettes[tone];
     const strength = intensity === "soft" ? 0.65 : 1;
@@ -82,7 +89,7 @@ export function CourtField({
 
     const mobileInit =
       typeof window !== "undefined" && window.innerWidth < 768;
-    const particleCount = mobileInit ? 5 : 7;
+    const particleCount = mobileInit ? 3 : 5;
     const particles: Particle[] = Array.from({ length: particleCount }, (_, i) => ({
       // Stay in the lower-right floor of the court — never the copy column
       u: 0.58 + Math.random() * 0.34,
@@ -107,7 +114,7 @@ export function CourtField({
       w = Math.max(1, Math.floor(rect.width));
       h = Math.max(1, Math.floor(rect.height));
       sizeCanvas(linesCanvas, linesCtx);
-      sizeCanvas(ballsCanvas, ballsCtx);
+      if (ballsCanvas && ballsCtx) sizeCanvas(ballsCanvas, ballsCtx);
     };
 
     const isMobileView = () => w < 768;
@@ -260,6 +267,7 @@ export function CourtField({
     };
 
     const drawBalls = (time: number) => {
+      if (!ballsCtx) return;
       const ctx = ballsCtx;
       ctx.clearRect(0, 0, w, h);
 
@@ -308,7 +316,7 @@ export function CourtField({
     const frame = (now: number) => {
       if (!running) return;
       drawCourt(now);
-      drawBalls(now);
+      if (showBalls) drawBalls(now);
       if (animated) raf = requestAnimationFrame(frame);
     };
 
@@ -326,7 +334,7 @@ export function CourtField({
       cancelAnimationFrame(raf);
       ro.disconnect();
     };
-  }, [tone, intensity, animated]);
+  }, [tone, intensity, animated, showBalls]);
 
   return (
     <>
@@ -344,13 +352,14 @@ export function CourtField({
           className="absolute inset-0 h-full w-full origin-center scale-[1.04] opacity-80 blur-[2.5px] max-md:opacity-70 max-md:blur-[3px]"
         />
       </div>
-      {/* Above the can, always under copy (text must stay z-20+) */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 z-[12] overflow-hidden md:z-[6]"
-      >
-        <canvas ref={ballsRef} className="absolute inset-0 h-full w-full" />
-      </div>
+      {showBalls ? (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 z-[12] overflow-hidden md:z-[6]"
+        >
+          <canvas ref={ballsRef} className="absolute inset-0 h-full w-full" />
+        </div>
+      ) : null}
     </>
   );
 }

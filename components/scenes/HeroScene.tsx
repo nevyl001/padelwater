@@ -17,9 +17,8 @@ import { useHeroSceneTimeline } from "@/components/scenes/useHeroSceneTimeline";
 import { cn } from "@/lib/cn";
 
 /**
- * Opening scene — cinematic entry sequence, pointer depth on the can,
- * and a scroll bridge into Product Story.
- * Mobile: title → can → copy/CTA (designed stack, not a shrunk desktop).
+ * Opening scene — cinematic entry, natural pointer depth, scroll bridge.
+ * Mobile: title → can → copy/CTA (designed stack).
  */
 export function HeroScene() {
   const rootRef = useRef<HTMLElement>(null);
@@ -65,22 +64,23 @@ export function HeroScene() {
         tone="deep"
         intensity="soft"
         animated={animateAurora}
-        className="opacity-90"
+        className="opacity-85"
       />
-      <CourtField tone="dark" intensity="medium" animated={animateCourt} />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_70%_35%,rgba(0,169,203,0.14),transparent_42%),radial-gradient(ellipse_at_20%_70%,rgba(183,243,51,0.08),transparent_40%)]" />
+      <CourtField tone="dark" intensity="soft" animated={animateCourt} />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_72%_38%,rgba(0,169,203,0.16),transparent_44%),radial-gradient(ellipse_at_18%_72%,rgba(183,243,51,0.07),transparent_42%)]" />
 
       <div
         ref={stageRef}
-        className="relative z-20 flex w-full flex-1 origin-center will-change-transform"
+        className="relative z-20 flex w-full flex-1 origin-center"
         style={{ transformOrigin: "50% 45%" }}
       >
-        <Container className="relative flex w-full flex-1 items-center pb-12 pt-[calc(var(--header-offset)+0.5rem)] md:pb-24 md:pt-[calc(var(--header-offset)+2.5rem)]">
-          <div className="grid w-full items-center gap-3 text-center sm:gap-6 md:gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] lg:gap-16 lg:text-left xl:gap-20">
-            {/* Title block */}
-            <div className="relative z-20 order-1 mx-auto w-full max-w-md lg:mx-0 lg:max-w-[34rem] lg:pl-4 xl:pl-8">
+        <Container className="relative flex w-full flex-1 items-center pb-14 pt-[calc(var(--header-offset)+0.75rem)] md:pb-24 md:pt-[calc(var(--header-offset)+2.75rem)]">
+          <div className="grid w-full items-center gap-4 text-center sm:gap-7 md:gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.95fr)] lg:gap-16 lg:text-left xl:gap-24">
+            <div className="relative z-20 order-1 mx-auto w-full max-w-md lg:mx-0 lg:max-w-[36rem] lg:pl-2 xl:pl-6">
               <MaskReveal ref={eyebrowRef} as="div" mode="manual" splitBy="block">
-                <SectionLabel tone="lime">{heroContent.eyebrow}</SectionLabel>
+                <SectionLabel tone="lime" className="tracking-[0.28em]">
+                  {heroContent.eyebrow}
+                </SectionLabel>
               </MaskReveal>
 
               <TextReveal
@@ -88,13 +88,12 @@ export function HeroScene() {
                 variant="hero"
                 mode="manual"
                 lines={heroContent.titleLines}
-                className="mt-3 md:mt-5"
+                className="mt-4 md:mt-6"
               />
             </div>
 
-            {/* Product — center of mobile narrative */}
-            <div className="relative z-10 order-2 flex min-h-[min(28svh,220px)] items-center justify-center [perspective:900px] sm:min-h-[min(36svh,300px)] md:min-h-[min(58svh,460px)] lg:order-2 lg:row-span-2">
-              <ProductGlow />
+            <div className="relative z-10 order-2 flex min-h-[min(30svh,240px)] items-center justify-center [perspective:1000px] sm:min-h-[min(38svh,320px)] md:min-h-[min(60svh,500px)] lg:order-2 lg:row-span-2">
+              <ProductGlow className="bottom-[8%] h-28 w-[62%] opacity-90" />
               <div
                 ref={canRef}
                 className={cn(
@@ -112,23 +111,32 @@ export function HeroScene() {
               </div>
             </div>
 
-            {/* Copy + CTA */}
-            <div className="relative z-20 order-3 mx-auto w-full max-w-md lg:mx-0 lg:max-w-[34rem] lg:pl-4 xl:pl-8">
+            <div className="relative z-20 order-3 mx-auto w-full max-w-md lg:mx-0 lg:max-w-[36rem] lg:pl-2 xl:pl-6">
               <TextReveal
                 ref={descriptionRef}
                 variant="body"
                 mode="manual"
                 text={heroContent.description}
                 splitBy="words"
-                className="mx-auto max-w-md text-sm leading-snug text-white/70 sm:text-base md:text-lg md:leading-normal lg:mx-0"
+                className="mx-auto max-w-md text-[0.95rem] leading-relaxed text-white/75 sm:text-base md:mt-1 md:text-lg md:leading-[1.55] lg:mx-0"
               />
 
-              <MaskReveal ref={ctaRef} as="div" mode="manual" splitBy="block" className="mt-4 md:mt-9">
-                <div className="flex flex-wrap justify-center gap-2.5 sm:gap-3 lg:justify-start">
+              <MaskReveal
+                ref={ctaRef}
+                as="div"
+                mode="manual"
+                splitBy="block"
+                className="mt-6 md:mt-10"
+              >
+                <div className="flex flex-col items-center gap-3 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-3.5 lg:justify-start">
                   <Button href={heroContent.primaryHref} size="lg" magnetic>
                     {heroContent.primaryCta}
                   </Button>
-                  <Button href={heroContent.secondaryHref} variant="secondary" size="lg">
+                  <Button
+                    href={heroContent.secondaryHref}
+                    variant="secondary"
+                    size="lg"
+                  >
                     {heroContent.secondaryCta}
                   </Button>
                 </div>
@@ -141,7 +149,7 @@ export function HeroScene() {
       <div
         ref={scrollHintRef}
         className={cn(
-          "absolute inset-x-0 bottom-3 z-20 flex justify-center md:bottom-6",
+          "absolute inset-x-0 bottom-4 z-20 flex justify-center md:bottom-7",
           !prefersReducedMotion && "opacity-0",
         )}
       >
