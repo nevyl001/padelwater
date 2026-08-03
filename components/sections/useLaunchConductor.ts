@@ -178,8 +178,8 @@ export function useLaunchConductor(
         );
         tl.fromTo(
           storyCanEl,
-          { autoAlpha: 0, scale: 0.9, y: 40 },
-          { autoAlpha: 1, scale: 1.06, y: 0, ease: "none", duration: 0.9 },
+          { autoAlpha: 0, scale: 0.94, y: 28 },
+          { autoAlpha: 1, scale: 1, y: 0, ease: "none", duration: 0.9 },
           0.35,
         );
         tl.call(() => setActiveStage(0), undefined, 0.9);
@@ -198,7 +198,7 @@ export function useLaunchConductor(
         );
         tl.to(
           storyCanEl,
-          { x: 110, scale: 1, ease: "none", duration: 0.5 },
+          { x: 100, scale: 1, ease: "none", duration: 0.5 },
           s1,
         );
         tl.call(() => setActiveStage(1), undefined, s1 + 0.15);
@@ -218,7 +218,7 @@ export function useLaunchConductor(
         );
         tl.to(
           storyCanEl,
-          { x: -90, scale: 1.08, ease: "none", duration: 0.5 },
+          { x: -80, scale: 1.02, ease: "none", duration: 0.5 },
           s2,
         );
         tl.call(() => setActiveStage(2), undefined, s2 + 0.15);
@@ -238,7 +238,7 @@ export function useLaunchConductor(
         );
         tl.to(
           storyCanEl,
-          { x: 0, y: 12, scale: 1.04, ease: "none", duration: 0.5 },
+          { x: 0, y: 8, scale: 1, ease: "none", duration: 0.5 },
           s3,
         );
         tl.call(() => setActiveStage(3), undefined, s3 + 0.15);

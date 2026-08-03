@@ -9,7 +9,10 @@ type ProductCanImageProps = {
   src?: string | null;
   priority?: boolean;
   tone?: "navy" | "ice" | "water" | "lime";
-  fitHeight?: boolean;
+  /** Visual scale. Story must stay short so stage copy never piles on the can. */
+  size?: "hero" | "story" | "inline";
+  /** Minimal face — brand only, no giant volume (avoids fighting stage headlines). */
+  quiet?: boolean;
   label?: string;
 };
 
@@ -40,16 +43,23 @@ const shell = {
   },
 } as const;
 
+const sizeClass = {
+  hero: "aspect-[3/7] h-[min(58svh,440px)] w-auto",
+  story: "aspect-[3/7] h-[min(36svh,300px)] w-auto",
+  inline: "aspect-[3/7] w-full max-w-[220px]",
+} as const;
+
 /**
  * Front product visual. Without final photography, shows an editorial
- * brand silhouette (colors + typography from packaging) — never a fake photo.
+ * brand silhouette — never a fake photo.
  */
 export function ProductCanImage({
   className,
   src,
   priority = false,
   tone = "navy",
-  fitHeight = false,
+  size = "inline",
+  quiet = false,
   label = "Fotografía final pendiente",
 }: ProductCanImageProps) {
   const image = resolveCanImage(src ?? product.media.front ?? product.media.hero);
@@ -58,10 +68,8 @@ export function ProductCanImage({
   return (
     <div
       className={cn(
-        "relative mx-auto overflow-hidden rounded-[1.6rem] border shadow-[var(--shadow-can)]",
-        fitHeight
-          ? "aspect-[3/7] h-[min(62svh,480px)] w-auto"
-          : "aspect-[3/7] w-full max-w-[280px]",
+        "relative mx-auto overflow-hidden rounded-[1.5rem] border shadow-[var(--shadow-can)]",
+        sizeClass[size],
         t.rim,
         className,
       )}
@@ -83,38 +91,38 @@ export function ProductCanImage({
             t.ink,
           )}
         >
-          {/* Lime shoulder — packaging cue */}
-          <div className="relative h-[14%] shrink-0 bg-pw-lime">
+          <div className="relative h-[12%] shrink-0 bg-pw-lime">
             <div className="absolute inset-x-[18%] top-1/2 h-px -translate-y-1/2 bg-pw-navy/20" />
           </div>
 
-          <div className="relative flex flex-1 flex-col items-center px-4 pb-6 pt-5">
-            <p className="font-display text-[0.55rem] uppercase tracking-[0.28em] text-pw-cyan md:text-[0.62rem]">
-              Pádel
-            </p>
-            <p className="mt-0.5 font-display text-[0.7rem] font-bold uppercase tracking-[0.18em] md:text-[0.8rem]">
-              Water
-            </p>
-
-            <div className="my-auto flex flex-col items-center gap-2">
-              <p className="font-display text-[clamp(1.35rem,3.5vw,1.85rem)] font-bold uppercase leading-none tracking-[-0.03em]">
-                {product.volume}
+          <div className="relative flex flex-1 flex-col items-center justify-center gap-3 px-4 pb-5 pt-4">
+            <div className="text-center">
+              <p className="font-display text-[0.5rem] uppercase tracking-[0.28em] text-pw-cyan md:text-[0.55rem]">
+                Pádel
               </p>
-              <p className={cn("text-[0.58rem] uppercase tracking-[0.22em]", t.muted)}>
-                {product.flavorLabel}
-              </p>
-              <div className="mt-2 h-px w-10 bg-current/25" />
-              <p className={cn("max-w-[7.5rem] text-center text-[0.52rem] uppercase leading-relaxed tracking-[0.14em]", t.muted)}>
-                {product.feature}
+              <p className="mt-0.5 font-display text-[0.65rem] font-bold uppercase tracking-[0.16em] md:text-[0.72rem]">
+                Water
               </p>
             </div>
 
-            <p className={cn("mt-auto text-[0.48rem] uppercase tracking-[0.2em]", t.muted)}>
+            {!quiet ? (
+              <div className="flex flex-col items-center gap-1.5">
+                <p className="font-display text-[clamp(1.1rem,2.8vw,1.55rem)] font-bold uppercase leading-none tracking-[-0.03em]">
+                  {product.volume}
+                </p>
+                <p className={cn("text-[0.52rem] uppercase tracking-[0.2em]", t.muted)}>
+                  {product.flavorLabel}
+                </p>
+              </div>
+            ) : (
+              <div className="h-px w-8 bg-current/20" />
+            )}
+
+            <p className={cn("mt-auto text-[0.42rem] uppercase tracking-[0.18em]", t.muted)}>
               {label}
             </p>
           </div>
 
-          {/* Specular edge */}
           <div
             aria-hidden
             className="pointer-events-none absolute inset-y-0 left-[12%] w-px bg-gradient-to-b from-transparent via-white/35 to-transparent"

@@ -26,7 +26,7 @@ export function ProductCan({
         src={src}
         priority={priority}
         tone={tone}
-        fitHeight={fitHeight}
+        size={fitHeight ? "hero" : "inline"}
         className="max-w-none"
       />
       {showReflection ? <ProductReflection /> : null}

@@ -9,23 +9,20 @@ import { ProductHighlight } from "@/components/product/ProductHighlight";
 type ProductCanStageProps = {
   className?: string;
   tone?: "navy" | "ice" | "water" | "lime";
-  fitHeight?: boolean;
+  size?: "hero" | "story" | "inline";
+  quiet?: boolean;
   showReflection?: boolean;
   priority?: boolean;
-  /** When true, stage is the live conductor (fixed). When false, inline fallback. */
   mode?: "fixed" | "inline" | "ghost";
 };
 
-/**
- * Single visual conductor for the can across hero → product story.
- * `fixed` = desktop motion stage; `inline` = SSR/mobile/reduced; `ghost` = invisible spacer.
- */
 export const ProductCanStage = forwardRef<HTMLDivElement, ProductCanStageProps>(
   function ProductCanStage(
     {
       className,
       tone = "navy",
-      fitHeight = false,
+      size = "inline",
+      quiet = false,
       showReflection = true,
       priority = false,
       mode = "inline",
@@ -38,9 +35,9 @@ export const ProductCanStage = forwardRef<HTMLDivElement, ProductCanStageProps>(
           ref={ref}
           aria-hidden
           className={cn(
-            fitHeight
-              ? "aspect-[3/7] h-[min(58svh,440px)] w-auto"
-              : "aspect-[3/7] w-full max-w-[260px]",
+            size === "hero" && "aspect-[3/7] h-[min(58svh,440px)] w-auto",
+            size === "story" && "aspect-[3/7] h-[min(36svh,300px)] w-auto",
+            size === "inline" && "aspect-[3/7] w-full max-w-[220px]",
             className,
           )}
           data-can-anchor
@@ -62,7 +59,8 @@ export const ProductCanStage = forwardRef<HTMLDivElement, ProductCanStageProps>(
         <div className="relative">
           <ProductCanImage
             tone={tone}
-            fitHeight={fitHeight}
+            size={size}
+            quiet={quiet}
             priority={priority}
           />
           <ProductHighlight />

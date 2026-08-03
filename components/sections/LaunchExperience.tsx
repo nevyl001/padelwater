@@ -36,13 +36,13 @@ const courtTone = {
 function stageShellClass(layout: (typeof productStoryStages)[number]["layout"]) {
   switch (layout) {
     case "monument":
-      return "inset-0 flex flex-col items-center px-[max(2rem,6%)] pt-6 pb-24 text-center";
+      return "inset-x-0 top-0 bottom-0 grid grid-rows-[auto_1fr_auto] px-[max(2rem,8%)] pt-4 pb-20 text-center";
     case "backdrop":
-      return "left-[max(2.5rem,calc((100vw-min(100vw,85rem))/2+1.5rem))] right-auto top-[22%] w-[min(26rem,36vw)] text-left";
+      return "left-[max(2.5rem,calc((100vw-min(100vw,85rem))/2+1.5rem))] right-auto top-[20%] w-[min(26rem,34vw)] text-left";
     case "side":
-      return "left-[max(2.5rem,calc((100vw-min(100vw,85rem))/2+1.5rem))] right-auto top-1/2 w-[min(22rem,30vw)] -translate-y-1/2 text-left";
+      return "left-[max(2.5rem,calc((100vw-min(100vw,85rem))/2+1.5rem))] right-auto top-1/2 w-[min(22rem,28vw)] -translate-y-1/2 text-left";
     case "open":
-      return "left-auto right-[max(2.5rem,calc((100vw-min(100vw,85rem))/2+1.5rem))] top-[28%] w-[min(22rem,30vw)] text-right";
+      return "left-auto right-[max(2.5rem,calc((100vw-min(100vw,85rem))/2+1.5rem))] top-[26%] w-[min(22rem,28vw)] text-right";
     default:
       return "left-1/2 top-1/2 w-[min(28rem,88%)] -translate-x-1/2 -translate-y-1/2 text-center";
   }
@@ -147,7 +147,7 @@ export function LaunchExperience() {
                 className="pointer-events-none absolute bottom-[10%] left-1/2 h-24 w-[55%] -translate-x-1/2 rounded-[100%] bg-pw-cyan/25 blur-3xl"
               />
               <div ref={heroCanRef} className="relative z-10">
-                <ProductCanStage mode="inline" tone="navy" fitHeight priority />
+                <ProductCanStage mode="inline" tone="navy" size="hero" priority />
               </div>
             </div>
           </div>
@@ -188,13 +188,14 @@ export function LaunchExperience() {
               animated={animateCourt}
             />
 
-            {/* Story can — below copy so text never reads through the can */}
-            <div className="pointer-events-none absolute inset-0 z-[5] flex items-center justify-center">
-              <div ref={storyCanRef} className="translate-y-4">
+            {/* Story can — shorter + quiet face so stage type never stacks on it */}
+            <div className="pointer-events-none absolute inset-0 z-[5] flex items-center justify-center pt-10">
+              <div ref={storyCanRef}>
                 <ProductCanStage
                   mode="inline"
                   tone={canTone}
-                  fitHeight
+                  size="story"
+                  quiet
                   showReflection
                 />
               </div>
@@ -209,16 +210,16 @@ export function LaunchExperience() {
                 >
                   {stage.layout === "monument" ? (
                     <>
-                      <div className="relative z-10 w-full max-w-2xl shrink-0">
+                      <div className="mx-auto w-full max-w-xl justify-self-center">
                         <p className="text-xs uppercase tracking-[0.22em] opacity-55">
                           {stage.eyebrow}
                         </p>
-                        <h2 className="mt-3 font-display text-[clamp(3rem,7vw,5.25rem)] font-bold uppercase leading-[0.9] tracking-[-0.03em]">
+                        <h2 className="mt-2 font-display text-[clamp(2.75rem,6vw,4.5rem)] font-bold uppercase leading-[0.92] tracking-[-0.03em]">
                           {stage.label}
                         </h2>
                       </div>
-                      <div className="min-h-[min(48svh,360px)] w-full shrink-0" />
-                      <p className="relative z-10 mx-auto max-w-md text-base leading-relaxed opacity-85 md:text-lg">
+                      <div aria-hidden className="min-h-[min(38svh,320px)]" />
+                      <p className="mx-auto max-w-md justify-self-center text-base leading-relaxed opacity-85 md:text-lg">
                         {stage.text}
                       </p>
                     </>
@@ -312,6 +313,8 @@ export function LaunchExperience() {
                   <div className="w-full max-w-[200px]">
                     <ProductCanStage
                       mode="inline"
+                      size="inline"
+                      quiet={index === 3}
                       tone={
                         stage.tone === "lime-soft"
                           ? "ice"
