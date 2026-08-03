@@ -41,13 +41,13 @@ export function HeroSection() {
         const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
         tl.fromTo(
           content.querySelectorAll("[data-hero-item]"),
-          { y: 28, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.85, stagger: 0.1 },
+          { y: 20, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.75, stagger: 0.08 },
         ).fromTo(
           can,
-          { y: 48, scale: 0.94, opacity: 0 },
-          { y: 0, scale: 1, opacity: 1, duration: 1 },
-          "-=0.55",
+          { y: 32, scale: 0.96, opacity: 0 },
+          { y: 0, scale: 1, opacity: 1, duration: 0.9 },
+          "-=0.45",
         );
       }, root);
 
@@ -59,8 +59,8 @@ export function HeroSection() {
           const px = (e.clientX - rect.left) / rect.width - 0.5;
           const py = (e.clientY - rect.top) / rect.height - 0.5;
           gsap.to(can, {
-            x: px * 18,
-            y: py * 10,
+            x: px * 12,
+            y: py * 8,
             duration: 0.8,
             ease: "power2.out",
             overwrite: "auto",
@@ -93,54 +93,61 @@ export function HeroSection() {
       aria-label="Presentación Pádel Water"
     >
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_70%_40%,rgba(0,169,203,0.18),transparent_55%),radial-gradient(ellipse_at_20%_80%,rgba(183,243,51,0.08),transparent_45%)]" />
-      <DotPattern className="bottom-[-10%] right-[-5%] h-[42%] w-[42%] opacity-70" />
+      <DotPattern className="bottom-[-8%] right-[-4%] h-[36%] w-[36%] opacity-50" />
 
-      <Container className="relative z-10 grid flex-1 items-center gap-12 py-28 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)] lg:gap-16 lg:py-24 xl:gap-20">
-        <div ref={contentRef} className="max-w-2xl lg:pl-2 xl:pl-4">
-          <div data-hero-item>
-            <SectionLabel tone="lime">{heroContent.eyebrow}</SectionLabel>
-          </div>
-          <h1
-            data-hero-item
-            className="mt-5 text-hero text-pw-white"
+      <Container className="relative z-10 flex w-full flex-1 items-center py-[calc(var(--header-height)+3rem)] pb-24 lg:py-[calc(var(--header-height)+4rem)]">
+        <div className="grid w-full items-center gap-14 lg:grid-cols-2 lg:gap-12 xl:gap-16">
+          <div
+            ref={contentRef}
+            className="mx-auto w-full max-w-lg text-center lg:mx-0 lg:max-w-xl lg:text-left"
           >
-            {heroContent.titleLines.map((line) => (
-              <span
-                key={line}
-                className="block sm:whitespace-nowrap"
-              >
-                {line}
-              </span>
-            ))}
-          </h1>
-          <p
-            data-hero-item
-            className="mt-6 max-w-md text-body-lg text-white/70"
-          >
-            {heroContent.description}
-          </p>
-          <div data-hero-item className="mt-9 flex flex-wrap gap-3">
-            <Button href={heroContent.primaryHref} size="lg" magnetic>
-              {heroContent.primaryCta}
-            </Button>
-            <Button
-              href={heroContent.secondaryHref}
-              variant="secondary"
-              size="lg"
+            <div data-hero-item>
+              <SectionLabel tone="lime">{heroContent.eyebrow}</SectionLabel>
+            </div>
+            <h1
+              data-hero-item
+              className="mt-4 text-hero text-pw-white"
             >
-              {heroContent.secondaryCta}
-            </Button>
+              {heroContent.titleLines.map((line) => (
+                <span key={line} className="block">
+                  {line}
+                </span>
+              ))}
+            </h1>
+            <p
+              data-hero-item
+              className="mx-auto mt-5 max-w-md text-base leading-relaxed text-white/65 md:text-lg lg:mx-0"
+            >
+              {heroContent.description}
+            </p>
+            <div
+              data-hero-item
+              className="mt-8 flex flex-wrap justify-center gap-3 lg:justify-start"
+            >
+              <Button href={heroContent.primaryHref} size="lg" magnetic>
+                {heroContent.primaryCta}
+              </Button>
+              <Button
+                href={heroContent.secondaryHref}
+                variant="secondary"
+                size="lg"
+              >
+                {heroContent.secondaryCta}
+              </Button>
+            </div>
           </div>
-        </div>
 
-        <div
-          ref={canRef}
-          className={cn(
-            "relative mx-auto w-full max-w-[300px] lg:max-w-[340px]",
-            prefersReducedMotion ? "opacity-100" : "opacity-0",
-          )}
-        >
-          <ProductCan priority tone="navy" className="max-w-none" />
+          <div className="flex w-full items-center justify-center">
+            <div
+              ref={canRef}
+              className={cn(
+                "w-full max-w-[220px] sm:max-w-[240px] lg:max-w-[260px]",
+                prefersReducedMotion ? "opacity-100" : "opacity-0",
+              )}
+            >
+              <ProductCan priority tone="navy" className="max-w-none" />
+            </div>
+          </div>
         </div>
       </Container>
 
