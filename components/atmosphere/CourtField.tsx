@@ -82,11 +82,12 @@ export function CourtField({
 
     const mobileInit =
       typeof window !== "undefined" && window.innerWidth < 768;
-    const particleCount = mobileInit ? 6 : 9;
+    const particleCount = mobileInit ? 7 : 9;
     const particles: Particle[] = Array.from({ length: particleCount }, (_, i) => ({
-      u: 0.18 + Math.random() * 0.64,
+      // Bias toward the sides so balls frame the can instead of hiding under it
+      u: i % 2 === 0 ? 0.08 + Math.random() * 0.28 : 0.64 + Math.random() * 0.28,
       speed: 0.018 + Math.random() * 0.028,
-      size: 4.5 + Math.random() * 3.2,
+      size: 5.2 + Math.random() * 3.6,
       life: Math.random(),
       phase: i * 0.47,
       spin: (Math.random() > 0.5 ? 1 : -1) * (0.0012 + Math.random() * 0.002),
@@ -266,15 +267,15 @@ export function CourtField({
         const travel = animated
           ? (p.life + time * 0.00009 * p.speed) % 1
           : (p.life + 0.4) % 1;
-        const depth = 0.38 + travel * 0.55;
-        const sway = Math.sin(time * 0.0007 + p.phase) * 0.05;
-        const nx = (p.u * 2 - 1) * 0.55 + sway;
+        const depth = 0.55 + travel * 0.42;
+        const sway = Math.sin(time * 0.0007 + p.phase) * 0.04;
+        const nx = (p.u * 2 - 1) * 0.72 + sway;
         const pos = project(nx, depth);
         const alpha =
           (animated
-            ? 0.55 + 0.4 * Math.sin(travel * Math.PI)
-            : 0.85) * strength;
-        const r = p.size * (0.95 + depth * 1.15) * (isMobileView() ? 1.15 : 1);
+            ? 0.7 + 0.3 * Math.sin(travel * Math.PI)
+            : 0.92) * strength;
+        const r = p.size * (1.05 + depth * 1.2) * (isMobileView() ? 1.25 : 1);
         const rotation = animated ? time * p.spin + p.phase : p.phase;
 
         // Glow behind the ball so it pops on dark/teal scenes
@@ -323,23 +324,28 @@ export function CourtField({
   }, [tone, intensity, animated]);
 
   return (
-    <div
-      ref={wrapRef}
-      aria-hidden
-      data-court-field
-      className={cn(
-        "pointer-events-none absolute inset-0 overflow-hidden",
-        className,
-      )}
-    >
-      <canvas
-        ref={linesRef}
-        className="absolute inset-0 h-full w-full origin-center scale-[1.04] opacity-80 blur-[2.5px] max-md:opacity-70 max-md:blur-[3px]"
-      />
-      <canvas
-        ref={ballsRef}
-        className="absolute inset-0 h-full w-full"
-      />
-    </div>
+    <>
+      <div
+        ref={wrapRef}
+        aria-hidden
+        data-court-field
+        className={cn(
+          "pointer-events-none absolute inset-0 z-0 overflow-hidden",
+          className,
+        )}
+      >
+        <canvas
+          ref={linesRef}
+          className="absolute inset-0 h-full w-full origin-center scale-[1.04] opacity-80 blur-[2.5px] max-md:opacity-70 max-md:blur-[3px]"
+        />
+      </div>
+      {/* Mobile: balls above the can; desktop: stay with the court atmosphere */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-[18] overflow-hidden md:z-0"
+      >
+        <canvas ref={ballsRef} className="absolute inset-0 h-full w-full" />
+      </div>
+    </>
   );
 }
