@@ -61,10 +61,16 @@ type Particle = {
   size: number;
   life: number;
   phase: number;
+  spin: number;
 };
 
+const BALL_FILL = "#d4f000";
+const BALL_SHADE = "#a8c400";
+const BALL_SEAM = "rgba(255,255,255,0.88)";
+const BALL_EDGE = "rgba(7,26,56,0.22)";
+
 /**
- * Live canvas atmosphere: perspective court, energy particles, glow washes.
+ * Live canvas atmosphere: perspective court, floating padel balls, glow washes.
  * Falls back to a static frame when `animated` is false.
  */
 export function CourtField({
@@ -94,14 +100,15 @@ export function CourtField({
     const t0 = performance.now();
 
     const particleCount =
-      typeof window !== "undefined" && window.innerWidth < 768 ? 16 : 28;
+      typeof window !== "undefined" && window.innerWidth < 768 ? 8 : 14;
     const particles: Particle[] = Array.from({ length: particleCount }, (_, i) => ({
       u: Math.random(),
       v: 0.15 + Math.random() * 0.75,
-      speed: 0.04 + Math.random() * 0.08,
-      size: 1.2 + Math.random() * 2.4,
+      speed: 0.035 + Math.random() * 0.06,
+      size: 3.2 + Math.random() * 2.8,
       life: Math.random(),
       phase: i * 0.37,
+      spin: (Math.random() > 0.5 ? 1 : -1) * (0.001 + Math.random() * 0.0025),
     }));
 
     const resize = () => {
@@ -231,44 +238,112 @@ export function CourtField({
       ctx.fillRect(0, 0, w, h);
     };
 
+    const drawPadelBall = (
+      x: number,
+      y: number,
+      r: number,
+      rotation: number,
+      alpha: number,
+    ) => {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(rotation);
+      ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
+
+      // soft contact shadow
+      ctx.beginPath();
+      ctx.fillStyle = "rgba(3,17,38,0.22)";
+      ctx.ellipse(r * 0.15, r * 0.85, r * 0.85, r * 0.28, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // ball body
+      const body = ctx.createRadialGradient(-r * 0.35, -r * 0.4, r * 0.1, 0, 0, r);
+      body.addColorStop(0, "#e8ff66");
+      body.addColorStop(0.55, BALL_FILL);
+      body.addColorStop(1, BALL_SHADE);
+      ctx.beginPath();
+      ctx.fillStyle = body;
+      ctx.arc(0, 0, r, 0, Math.PI * 2);
+      ctx.fill();
+
+      // edge
+      ctx.beginPath();
+      ctx.strokeStyle = BALL_EDGE;
+      ctx.lineWidth = Math.max(0.6, r * 0.08);
+      ctx.arc(0, 0, r - ctx.lineWidth * 0.3, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // classic curved seam (tennis/padel)
+      ctx.beginPath();
+      ctx.strokeStyle = BALL_SEAM;
+      ctx.lineWidth = Math.max(0.8, r * 0.12);
+      ctx.lineCap = "round";
+      ctx.moveTo(-r * 0.15, -r * 0.92);
+      ctx.bezierCurveTo(
+        r * 0.95,
+        -r * 0.35,
+        r * 0.95,
+        r * 0.35,
+        -r * 0.15,
+        r * 0.92,
+      );
+      ctx.moveTo(r * 0.15, -r * 0.92);
+      ctx.bezierCurveTo(
+        -r * 0.95,
+        -r * 0.35,
+        -r * 0.95,
+        r * 0.35,
+        r * 0.15,
+        r * 0.92,
+      );
+      ctx.stroke();
+
+      ctx.restore();
+    };
+
     const drawParticles = (time: number) => {
-      if (!animated) return;
       ctx.save();
       for (const p of particles) {
-        const travel = (p.life + time * 0.00012 * p.speed) % 1;
-        const depth = 0.12 + travel * 0.82;
-        const sway =
-          Math.sin(time * 0.0012 + p.phase) * 0.08 +
-          Math.sin(time * 0.0004 + p.phase * 2) * 0.04;
-        const nx = (p.u * 2 - 1) * 0.75 + sway;
+        const travel = animated
+          ? (p.life + time * 0.0001 * p.speed) % 1
+          : (p.life + 0.35) % 1;
+        const depth = 0.18 + travel * 0.72;
+        const sway = animated
+          ? Math.sin(time * 0.001 + p.phase) * 0.07 +
+            Math.sin(time * 0.00035 + p.phase * 2) * 0.035
+          : Math.sin(p.phase) * 0.03;
+        const nx = (p.u * 2 - 1) * 0.72 + sway;
         const pos = project(nx, depth);
         const alpha =
-          Math.sin(travel * Math.PI) * 0.85 * strength *
-          (0.55 + 0.45 * Math.sin(time * 0.002 + p.phase));
-        const r = p.size * (0.6 + depth * 1.1);
+          (animated
+            ? Math.sin(travel * Math.PI) *
+              (0.55 + 0.45 * Math.sin(time * 0.0018 + p.phase))
+            : 0.7) *
+          0.92 *
+          strength;
+        const r = p.size * (0.85 + depth * 1.35);
+        const rotation = animated
+          ? time * p.spin + p.phase
+          : p.phase;
 
-        ctx.beginPath();
-        ctx.fillStyle = palette.particle;
-        ctx.globalAlpha = Math.max(0, alpha);
-        ctx.arc(pos.x, pos.y, r, 0, Math.PI * 2);
-        ctx.fill();
-
-        // soft bloom
+        // tiny bloom behind the ball
         const bloom = ctx.createRadialGradient(
           pos.x,
           pos.y,
           0,
           pos.x,
           pos.y,
-          r * 5,
+          r * 3.2,
         );
         bloom.addColorStop(0, palette.glow);
         bloom.addColorStop(1, "transparent");
-        ctx.globalAlpha = Math.max(0, alpha * 0.35);
+        ctx.globalAlpha = Math.max(0, alpha * 0.22);
         ctx.fillStyle = bloom;
         ctx.beginPath();
-        ctx.arc(pos.x, pos.y, r * 5, 0, Math.PI * 2);
+        ctx.arc(pos.x, pos.y, r * 3.2, 0, Math.PI * 2);
         ctx.fill();
+
+        drawPadelBall(pos.x, pos.y, r, rotation, alpha);
       }
       ctx.restore();
     };
