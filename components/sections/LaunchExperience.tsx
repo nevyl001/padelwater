@@ -34,17 +34,30 @@ const courtTone = {
 };
 
 function stageShellClass(layout: (typeof productStoryStages)[number]["layout"]) {
+  // Mobile: always full-viewport bands (copy top / can middle). Desktop: editorial side layouts.
+  const mobileBands =
+    "inset-0 flex flex-col px-5 pt-1 pb-14 text-center";
+
   switch (layout) {
     case "monument":
-      return "inset-x-0 top-0 bottom-0 flex flex-col px-6 pt-3 pb-[4.5rem] text-center sm:px-[max(2rem,8%)] sm:pt-5 sm:pb-24";
+      return cn(mobileBands, "sm:px-[max(2rem,8%)] sm:pt-4 sm:pb-20");
     case "backdrop":
-      return "inset-x-6 top-[12%] text-center md:inset-x-auto md:left-[max(2.5rem,calc((100vw-min(100vw,85rem))/2+1.5rem))] md:right-auto md:top-[20%] md:w-[min(26rem,34vw)] md:text-left";
+      return cn(
+        mobileBands,
+        "md:inset-auto md:left-[max(2.5rem,calc((100vw-min(100vw,85rem))/2+1.5rem))] md:top-[18%] md:bottom-auto md:right-auto md:block md:w-[min(26rem,34vw)] md:px-0 md:pb-0 md:pt-0 md:text-left",
+      );
     case "side":
-      return "inset-x-6 top-[10%] text-center md:inset-x-auto md:left-[max(2.5rem,calc((100vw-min(100vw,85rem))/2+1.5rem))] md:right-auto md:top-1/2 md:w-[min(22rem,28vw)] md:-translate-y-1/2 md:text-left";
+      return cn(
+        mobileBands,
+        "md:inset-auto md:left-[max(2.5rem,calc((100vw-min(100vw,85rem))/2+1.5rem))] md:top-[16%] md:bottom-auto md:right-auto md:block md:w-[min(22rem,28vw)] md:px-0 md:pb-0 md:pt-0 md:text-left",
+      );
     case "open":
-      return "inset-x-6 top-[10%] text-center md:inset-x-auto md:left-auto md:right-[max(2.5rem,calc((100vw-min(100vw,85rem))/2+1.5rem))] md:top-[26%] md:w-[min(22rem,28vw)] md:text-right";
+      return cn(
+        mobileBands,
+        "md:inset-auto md:left-auto md:right-[max(2.5rem,calc((100vw-min(100vw,85rem))/2+1.5rem))] md:top-[18%] md:bottom-auto md:block md:w-[min(22rem,28vw)] md:px-0 md:pb-0 md:pt-0 md:text-right",
+      );
     default:
-      return "left-1/2 top-1/2 w-[min(28rem,88%)] -translate-x-1/2 -translate-y-1/2 text-center";
+      return mobileBands;
   }
 }
 
@@ -188,14 +201,11 @@ export function LaunchExperience() {
               animated={animateCourt}
             />
 
-            {/* Story can — shorter + quiet face so stage type never stacks on it */}
-            <div className="pointer-events-none absolute inset-0 z-[5] flex items-center justify-center pt-6 md:pt-10">
+            {/* Can sits in the lower band on mobile so copy never stacks on it */}
+            <div className="pointer-events-none absolute inset-0 z-[5] flex justify-center max-md:items-end max-md:pb-[14%] md:items-center md:pt-10">
               <div
                 ref={storyCanRef}
-                className={cn(
-                  "transition-transform duration-300",
-                  activeStage === 3 && "translate-y-[6%] scale-[0.94]",
-                )}
+                className={cn(activeStage === 3 && "md:translate-y-[6%] md:scale-[0.94]")}
               >
                 <ProductCanStage
                   mode="inline"
@@ -218,71 +228,69 @@ export function LaunchExperience() {
                     index === 0 ? "opacity-100" : "opacity-0",
                   )}
                 >
-                  {stage.layout === "monument" ? (
-                    <>
-                      <div className="relative z-30 mx-auto w-full max-w-xl shrink-0">
-                        <p className="text-xs uppercase tracking-[0.22em] opacity-55">
-                          {stage.eyebrow}
+                  <div className="relative z-30 mx-auto w-full max-w-md shrink-0 md:mx-0 md:max-w-none">
+                    <p className="text-[0.65rem] uppercase tracking-[0.22em] opacity-55 md:text-xs">
+                      {stage.eyebrow}
+                    </p>
+                    <h2
+                      className={cn(
+                        "mt-2 font-display font-bold uppercase tracking-[-0.02em]",
+                        stage.layout === "monument" &&
+                          "text-[clamp(2.2rem,9vw,4rem)] leading-[0.92]",
+                        stage.layout === "backdrop" &&
+                          "text-[clamp(2rem,8vw,4rem)] leading-[0.95]",
+                        (stage.layout === "side" || stage.layout === "open") &&
+                          "text-[clamp(1.9rem,7.5vw,3.25rem)] leading-[1.02]",
+                      )}
+                    >
+                      {stage.label}
+                    </h2>
+                    {/* On mobile, all body copy stays in the top band (except monument bottom line) */}
+                    {stage.layout !== "monument" ? (
+                      <>
+                        <p
+                          className={cn(
+                            "mt-3 text-[0.95rem] leading-relaxed opacity-80 md:mt-4 md:text-base md:text-lg",
+                            "mx-auto max-w-[20rem] md:mx-0 md:max-w-sm",
+                            stage.layout === "open" && "md:ml-auto",
+                          )}
+                        >
+                          {stage.text}
                         </p>
-                        <h2 className="mt-2 font-display text-[clamp(2.35rem,7vw,4rem)] font-bold uppercase leading-[0.92] tracking-[-0.03em]">
-                          {stage.label}
-                        </h2>
-                      </div>
-                      {/* Spacer reserved for the can — keeps title/body clear */}
-                      <div
-                        aria-hidden
-                        className="relative z-0 min-h-[min(40svh,300px)] w-full flex-1 sm:min-h-[min(44svh,340px)]"
-                      />
-                      <p className="relative z-30 mx-auto max-w-sm shrink-0 text-base leading-relaxed opacity-85 md:max-w-md md:text-lg">
-                        {stage.text}
-                      </p>
-                    </>
+                        {stage.layout === "side" ? (
+                          <ul className="mt-4 space-y-2 text-sm opacity-75 md:mt-8 md:space-y-3">
+                            <li className="flex items-center justify-center gap-3 md:justify-start">
+                              <span className="h-px w-8 bg-current/40" />
+                              {product.feature}
+                            </li>
+                            <li className="flex items-center justify-center gap-3 md:justify-start">
+                              <span className="h-px w-8 bg-current/40" />
+                              {product.flavorLabel}
+                            </li>
+                          </ul>
+                        ) : null}
+                      </>
+                    ) : null}
+                  </div>
+
+                  <div
+                    aria-hidden
+                    className="relative z-0 min-h-[min(36svh,280px)] w-full flex-1 md:hidden"
+                  />
+
+                  {stage.layout === "monument" ? (
+                    <p className="relative z-30 mx-auto max-w-[20rem] shrink-0 text-[0.95rem] leading-relaxed opacity-85 md:max-w-md md:text-base md:text-lg">
+                      {stage.text}
+                    </p>
                   ) : (
-                    <>
-                      <p className="text-xs uppercase tracking-[0.22em] opacity-55">
-                        {stage.eyebrow}
-                      </p>
-                      <h2
-                        className={cn(
-                          "mt-3 font-display font-bold uppercase tracking-[-0.02em]",
-                          stage.layout === "backdrop" &&
-                            "text-[clamp(2.5rem,5vw,4rem)] leading-[0.95]",
-                          (stage.layout === "side" ||
-                            stage.layout === "open") &&
-                            "text-[clamp(2.1rem,4vw,3.25rem)] leading-[1.02]",
-                        )}
-                      >
-                        {stage.label}
-                      </h2>
-                      <p
-                        className={cn(
-                          "mt-4 text-base leading-relaxed opacity-80 md:text-lg",
-                          "mx-auto max-w-sm md:mx-0",
-                          stage.layout === "open" && "md:ml-auto",
-                        )}
-                      >
-                        {stage.text}
-                      </p>
-                      {stage.layout === "side" ? (
-                        <ul className="mt-6 space-y-2 text-sm opacity-75 md:mt-8 md:space-y-3">
-                          <li className="flex items-center justify-center gap-3 md:justify-start">
-                            <span className="h-px w-8 bg-current/40" />
-                            {product.feature}
-                          </li>
-                          <li className="flex items-center justify-center gap-3 md:justify-start">
-                            <span className="h-px w-8 bg-current/40" />
-                            {product.flavorLabel}
-                          </li>
-                        </ul>
-                      ) : null}
-                    </>
+                    <div aria-hidden className="hidden flex-1 md:hidden" />
                   )}
                 </div>
               ))}
 
               <p
                 data-hold-hint
-                className="absolute bottom-8 left-1/2 z-30 -translate-x-1/2 text-[0.65rem] uppercase tracking-[0.28em]"
+                className="absolute bottom-6 left-1/2 z-30 -translate-x-1/2 text-[0.65rem] uppercase tracking-[0.28em] md:bottom-8"
               >
                 Sigue explorando
               </p>
