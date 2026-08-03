@@ -13,16 +13,36 @@ type ProductCanImageProps = {
   label?: string;
 };
 
-const tones = {
-  navy: "border-white/15 bg-gradient-to-b from-[#0a2548] to-[#031126]",
-  ice: "border-pw-navy/10 bg-gradient-to-b from-white to-[#e8f4f3]",
-  water: "border-white/20 bg-gradient-to-b from-[#0c8fb0]/40 to-[#064d63]/50",
-  lime: "border-pw-navy/10 bg-gradient-to-b from-[#eef8c8] to-[#d4ec8a]",
+const shell = {
+  navy: {
+    body: "from-[#0c2a52] via-[#071a38] to-[#031126]",
+    rim: "border-white/20",
+    ink: "text-white",
+    muted: "text-white/55",
+  },
+  ice: {
+    body: "from-white via-[#f2faf8] to-[#d9ecea]",
+    rim: "border-pw-navy/15",
+    ink: "text-pw-navy",
+    muted: "text-pw-navy/55",
+  },
+  water: {
+    body: "from-[#0ea3c4] via-[#087a9a] to-[#045066]",
+    rim: "border-white/25",
+    ink: "text-white",
+    muted: "text-white/60",
+  },
+  lime: {
+    body: "from-[#eef8c8] via-[#d8f08a] to-[#b7f333]",
+    rim: "border-pw-navy/15",
+    ink: "text-pw-navy",
+    muted: "text-pw-navy/55",
+  },
 } as const;
 
 /**
- * Front product visual. When assets are not ready, shows an editorial
- * silhouette placeholder — never a fake photoreal can.
+ * Front product visual. Without final photography, shows an editorial
+ * brand silhouette (colors + typography from packaging) — never a fake photo.
  */
 export function ProductCanImage({
   className,
@@ -30,24 +50,25 @@ export function ProductCanImage({
   priority = false,
   tone = "navy",
   fitHeight = false,
-  label = "Producto final pendiente",
+  label = "Fotografía final pendiente",
 }: ProductCanImageProps) {
   const image = resolveCanImage(src ?? product.media.front ?? product.media.hero);
+  const t = shell[tone];
 
   return (
     <div
       className={cn(
-        "relative mx-auto overflow-hidden rounded-[1.25rem] border shadow-[var(--shadow-can)]",
+        "relative mx-auto overflow-hidden rounded-[1.6rem] border shadow-[var(--shadow-can)]",
         fitHeight
-          ? "aspect-[3/7] h-[min(58svh,440px)] w-auto"
+          ? "aspect-[3/7] h-[min(62svh,480px)] w-auto"
           : "aspect-[3/7] w-full max-w-[280px]",
-        tones[tone],
+        t.rim,
         className,
       )}
       data-product-can-image
     >
       {image ? (
-        // eslint-disable-next-line @next/next/no-img-element -- path may be null until assets land; next/image when ready
+        // eslint-disable-next-line @next/next/no-img-element -- path may be null until assets land
         <img
           src={image}
           alt={`${product.name} ${product.flavorLabel}, ${product.volume}`}
@@ -55,19 +76,54 @@ export function ProductCanImage({
           fetchPriority={priority ? "high" : "auto"}
         />
       ) : (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-5">
-          <div
-            aria-hidden
-            className="h-[68%] w-[44%] rounded-[1.75rem] border border-dashed border-current/30 bg-current/[0.03]"
-          />
-          <div className="space-y-1 text-center">
-            <p className="font-display text-[0.7rem] uppercase tracking-[0.22em] text-current/55">
-              {product.volume}
+        <div
+          className={cn(
+            "absolute inset-0 flex flex-col bg-gradient-to-b",
+            t.body,
+            t.ink,
+          )}
+        >
+          {/* Lime shoulder — packaging cue */}
+          <div className="relative h-[14%] shrink-0 bg-pw-lime">
+            <div className="absolute inset-x-[18%] top-1/2 h-px -translate-y-1/2 bg-pw-navy/20" />
+          </div>
+
+          <div className="relative flex flex-1 flex-col items-center px-4 pb-6 pt-5">
+            <p className="font-display text-[0.55rem] uppercase tracking-[0.28em] text-pw-cyan md:text-[0.62rem]">
+              Pádel
             </p>
-            <p className="max-w-[9rem] text-[0.6rem] uppercase tracking-[0.16em] text-current/40">
+            <p className="mt-0.5 font-display text-[0.7rem] font-bold uppercase tracking-[0.18em] md:text-[0.8rem]">
+              Water
+            </p>
+
+            <div className="my-auto flex flex-col items-center gap-2">
+              <p className="font-display text-[clamp(1.35rem,3.5vw,1.85rem)] font-bold uppercase leading-none tracking-[-0.03em]">
+                {product.volume}
+              </p>
+              <p className={cn("text-[0.58rem] uppercase tracking-[0.22em]", t.muted)}>
+                {product.flavorLabel}
+              </p>
+              <div className="mt-2 h-px w-10 bg-current/25" />
+              <p className={cn("max-w-[7.5rem] text-center text-[0.52rem] uppercase leading-relaxed tracking-[0.14em]", t.muted)}>
+                {product.feature}
+              </p>
+            </div>
+
+            <p className={cn("mt-auto text-[0.48rem] uppercase tracking-[0.2em]", t.muted)}>
               {label}
             </p>
           </div>
+
+          {/* Specular edge */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-y-0 left-[12%] w-px bg-gradient-to-b from-transparent via-white/35 to-transparent"
+          />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_30%_20%,rgba(255,255,255,0.18),transparent_45%)]"
+          />
+
           <span className="sr-only">
             {product.name} {product.flavorLabel}, {product.volume}. Imagen final
             pendiente.

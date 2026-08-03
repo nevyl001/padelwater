@@ -55,7 +55,7 @@ export const ProductCanStage = forwardRef<HTMLDivElement, ProductCanStageProps>(
         className={cn(
           "relative will-change-transform",
           mode === "fixed" &&
-            "pointer-events-none fixed left-0 top-0 z-30 opacity-0",
+            "pointer-events-none fixed left-0 top-0 z-30 will-change-transform",
           className,
         )}
       >

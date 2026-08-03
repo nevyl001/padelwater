@@ -4,53 +4,24 @@ import { useEffect, useRef } from "react";
 import { consumptionMoments } from "@/data/site-content";
 import { Container } from "@/components/ui/Container";
 import { SectionLabel } from "@/components/ui/SectionLabel";
+import { CourtField } from "@/components/atmosphere/CourtField";
 import { useMotionPreferences } from "@/components/motion/MotionPreferences";
 import { cn } from "@/lib/cn";
 
 const panelTones = [
-  "bg-pw-navy text-pw-white",
-  "bg-pw-water text-pw-white",
-  "bg-pw-lime-soft text-pw-navy",
+  {
+    bg: "bg-pw-navy text-pw-white",
+    court: "dark" as const,
+  },
+  {
+    bg: "bg-pw-water text-pw-white",
+    court: "water" as const,
+  },
+  {
+    bg: "bg-pw-lime-soft text-pw-navy",
+    court: "lime" as const,
+  },
 ] as const;
-
-function MomentCard({
-  label,
-  text,
-  tone,
-  compact,
-}: {
-  label: string;
-  text: string;
-  tone: string;
-  compact?: boolean;
-}) {
-  return (
-    <article
-      className={cn(
-        "flex flex-col justify-between rounded-sm",
-        tone,
-        compact
-          ? "h-full w-[min(72vw,38rem)] p-8 md:p-10"
-          : "min-h-[20rem] p-8 md:min-h-[22rem] md:p-10",
-      )}
-    >
-      <p className="text-xs uppercase tracking-[0.24em] opacity-60">{label}</p>
-      <div>
-        <h3 className={compact ? "text-editorial" : "text-section"}>
-          {label}.
-        </h3>
-        <p
-          className={cn(
-            "mt-4 text-body-lg opacity-80",
-            compact ? "max-w-md" : "max-w-xl",
-          )}
-        >
-          {text}
-        </p>
-      </div>
-    </article>
-  );
-}
 
 export function ConsumptionMoments() {
   const rootRef = useRef<HTMLElement>(null);
@@ -69,7 +40,7 @@ export function ConsumptionMoments() {
     let reverted: (() => void) | undefined;
 
     async function run() {
-      const { getGsap } = await import("@/lib/gsap");
+      const { getGsap } = await import("@/lib/animation/gsap");
       const { gsap, ScrollTrigger } = getGsap();
 
       const totalScroll = () =>
@@ -82,9 +53,9 @@ export function ConsumptionMoments() {
           scrollTrigger: {
             trigger: root,
             start: "top top",
-            end: () => `+=${Math.max(totalScroll(), window.innerHeight * 0.8)}`,
+            end: () => `+=${Math.max(totalScroll(), window.innerHeight * 0.85)}`,
             pin: true,
-            scrub: 0.6,
+            scrub: 0.65,
             anticipatePin: 1,
             invalidateOnRefresh: true,
           },
@@ -108,7 +79,6 @@ export function ConsumptionMoments() {
       ref={rootRef}
       className={cn(
         "relative bg-pw-ice",
-        // Desktop pin scene must fit exactly in the viewport so cards are not clipped
         "md:h-svh md:overflow-hidden",
         "max-md:section-pad",
         prefersReducedMotion && "md:h-auto md:overflow-visible md:section-pad",
@@ -118,51 +88,84 @@ export function ConsumptionMoments() {
       <div
         className={cn(
           "flex flex-col",
-          "md:h-full md:pt-[calc(var(--header-height)+1.25rem)] md:pb-8",
+          "md:h-full md:pt-[calc(var(--header-height)+1.5rem)] md:pb-0",
           prefersReducedMotion && "md:h-auto md:pt-0 md:pb-0",
         )}
       >
-        <Container className="shrink-0">
+        <Container className="relative z-10 shrink-0 max-md:text-center md:text-left">
           <SectionLabel>Momento de consumo</SectionLabel>
-          <h2 className="mt-3 max-w-3xl text-editorial text-pw-navy md:mt-4">
+          <h2 className="mt-3 max-w-3xl font-display text-[clamp(2rem,4.5vw,3.75rem)] font-bold uppercase leading-[1.02] tracking-[-0.03em] text-pw-navy md:mt-4">
             Antes. Durante. Después.
           </h2>
         </Container>
 
-        {/* Desktop horizontal track */}
+        {/* Desktop: full-bleed horizontal moments */}
         <div
           ref={trackRef}
           className={cn(
-            "mt-8 hidden min-h-0 w-max flex-1 gap-6 px-[max(1.75rem,calc((100vw-85rem)/2))]",
+            "mt-8 hidden min-h-0 w-max flex-1",
             prefersReducedMotion ? "md:hidden" : "md:flex",
           )}
         >
-          {consumptionMoments.map((moment, index) => (
-            <MomentCard
-              key={moment.id}
-              label={moment.label}
-              text={moment.text}
-              tone={panelTones[index]}
-              compact
-            />
-          ))}
+          {consumptionMoments.map((moment, index) => {
+            const tone = panelTones[index];
+            return (
+              <article
+                key={moment.id}
+                className={cn(
+                  "relative flex h-full w-[min(92vw,42rem)] flex-col justify-end overflow-hidden px-10 pb-14 pt-20",
+                  tone.bg,
+                )}
+              >
+                <CourtField tone={tone.court} intensity="soft" animated={false} />
+                <div className="relative z-10 max-w-md">
+                  <p className="text-xs uppercase tracking-[0.28em] opacity-55">
+                    {String(index + 1).padStart(2, "0")}
+                  </p>
+                  <h3 className="mt-4 font-display text-[clamp(2.5rem,5vw,4.5rem)] font-bold uppercase leading-[0.92] tracking-[-0.03em]">
+                    {moment.label}.
+                  </h3>
+                  <p className="mt-5 max-w-sm text-base leading-relaxed opacity-80 md:text-lg">
+                    {moment.text}
+                  </p>
+                </div>
+              </article>
+            );
+          })}
         </div>
 
-        {/* Mobile + reduced-motion vertical stack */}
+        {/* Mobile + reduced-motion */}
         <div
           className={cn(
-            "container-pw mt-10 space-y-5",
-            prefersReducedMotion ? "md:mt-14 md:block" : "md:hidden",
+            "mt-10 space-y-0",
+            prefersReducedMotion ? "md:mt-12 md:block" : "md:hidden",
           )}
         >
-          {consumptionMoments.map((moment, index) => (
-            <MomentCard
-              key={moment.id}
-              label={moment.label}
-              text={moment.text}
-              tone={panelTones[index]}
-            />
-          ))}
+          {consumptionMoments.map((moment, index) => {
+            const tone = panelTones[index];
+            return (
+              <article
+                key={moment.id}
+                className={cn(
+                  "relative overflow-hidden px-6 py-14 sm:px-10",
+                  tone.bg,
+                )}
+              >
+                <CourtField tone={tone.court} intensity="soft" animated={false} />
+                <div className="relative z-10 mx-auto max-w-md">
+                  <p className="text-xs uppercase tracking-[0.28em] opacity-55">
+                    {String(index + 1).padStart(2, "0")}
+                  </p>
+                  <h3 className="mt-3 font-display text-[clamp(2.25rem,10vw,3.25rem)] font-bold uppercase leading-[0.95] tracking-[-0.03em]">
+                    {moment.label}.
+                  </h3>
+                  <p className="mt-4 text-base leading-relaxed opacity-80">
+                    {moment.text}
+                  </p>
+                </div>
+              </article>
+            );
+          })}
         </div>
       </div>
     </section>

@@ -68,6 +68,8 @@ export function useLaunchConductor(
 
       const snapToAnchor = () => {
         const r = anchorEl.getBoundingClientRect();
+        // Avoid parking the can at 0,0 before layout settles
+        if (r.width < 8 || r.height < 8) return false;
         gsap.set(stageEl, {
           x: r.left + r.width / 2,
           y: r.top + r.height / 2,
@@ -75,17 +77,28 @@ export function useLaunchConductor(
           yPercent: -50,
           scale: 1,
           opacity: 1,
+          force3D: true,
         });
+        return true;
       };
 
-      snapToAnchor();
+      if (!snapToAnchor()) {
+        await new Promise<void>((resolve) => {
+          requestAnimationFrame(() => {
+            snapToAnchor();
+            resolve();
+          });
+        });
+      }
+      if (dead) return;
       setConductorOn(true);
 
       const ctx = gsap.context(() => {
         const lines = copyEl.querySelectorAll("[data-hero-line]");
         const late = copyEl.querySelectorAll("[data-hero-late]");
         const eyebrow = copyEl.querySelector("[data-hero-eyebrow]");
-        const dots = heroEl.querySelector("[data-hero-dots]");
+        const brand = copyEl.querySelector("[data-hero-brand]");
+        const court = heroEl.querySelector("[data-court-field]");
         const sheen = stageEl.querySelector("[data-highlight-sheen]");
         const reflection = stageEl.querySelector("[data-product-reflection]");
         const stages = gsap.utils.toArray<HTMLElement>(
@@ -94,27 +107,28 @@ export function useLaunchConductor(
         const holdHint = pinEl.querySelector("[data-hold-hint]");
 
         if (layer === "fullMotion") {
-          gsap.set([eyebrow, ...Array.from(late)], { opacity: 0, y: 16 });
+          gsap.set([eyebrow, brand, ...Array.from(late)], { opacity: 0, y: 18 });
           gsap.set(lines, { yPercent: 105, opacity: 0 });
-          if (dots) gsap.set(dots, { opacity: 0 });
+          if (court) gsap.set(court, { opacity: 0 });
           if (reflection) gsap.set(reflection, { opacity: 0 });
-          gsap.set(stageEl, { scale: 0.9 });
+          gsap.set(stageEl, { scale: 0.88 });
 
           const intro = gsap.timeline({ defaults: { ease: "power3.out" } });
-          if (dots) intro.to(dots, { opacity: 0.65, duration: 0.4 }, 0);
+          if (court) intro.to(court, { opacity: 1, duration: 0.7 }, 0);
           intro
-            .to(stageEl, { scale: 1, duration: 0.8 }, 0.05)
-            .to(reflection, { opacity: 1, duration: 0.3 }, 0.5)
-            .to(eyebrow, { opacity: 1, y: 0, duration: 0.35 }, 0.4)
+            .to(stageEl, { scale: 1, duration: 0.85 }, 0.08)
+            .to(reflection, { opacity: 1, duration: 0.35 }, 0.55)
+            .to(brand, { opacity: 1, y: 0, duration: 0.4 }, 0.25)
+            .to(eyebrow, { opacity: 1, y: 0, duration: 0.35 }, 0.45)
             .to(
               lines,
-              { yPercent: 0, opacity: 1, duration: 0.5, stagger: 0.07 },
-              0.5,
+              { yPercent: 0, opacity: 1, duration: 0.55, stagger: 0.08 },
+              0.55,
             )
             .to(
               late,
               { opacity: 1, y: 0, duration: 0.35, stagger: 0.05 },
-              0.9,
+              0.95,
             );
           if (sheen) {
             intro.fromTo(
@@ -161,7 +175,7 @@ export function useLaunchConductor(
 
         const pinCenter = () => {
           const r = pinEl.getBoundingClientRect();
-          return { x: r.left + r.width / 2, y: r.top + r.height * 0.52 };
+          return { x: r.left + r.width / 2, y: r.top + r.height * 0.54 };
         };
 
         ScrollTrigger.create({
@@ -189,17 +203,17 @@ export function useLaunchConductor(
           },
         });
 
-        tl.to(copyEl, { opacity: 0, y: -20, ease: "none", duration: 1 }, 0);
+        tl.to(copyEl, { opacity: 0, y: -28, ease: "none", duration: 1 }, 0);
         tl.to(
           stageEl,
           {
             x: () => pinCenter().x,
             y: () => pinCenter().y,
-            scale: 1.04,
+            scale: 1.08,
             ease: "none",
             duration: 1.2,
           },
-          0.15,
+          0.12,
         );
         tl.call(() => setActiveStage(0), undefined, 1.0);
 
@@ -215,10 +229,11 @@ export function useLaunchConductor(
           { autoAlpha: 1, y: 0, ease: "none", duration: 0.4 },
           s1 + 0.1,
         );
+        // Side layout: can shifts right so copy breathes on the left
         tl.to(
           stageEl,
           {
-            x: () => pinCenter().x - 72,
+            x: () => pinCenter().x + Math.min(160, window.innerWidth * 0.12),
             scale: 1,
             ease: "none",
             duration: 0.5,
@@ -240,11 +255,12 @@ export function useLaunchConductor(
           { autoAlpha: 1, y: 0, ease: "none", duration: 0.4 },
           s2 + 0.1,
         );
+        // Open / coco: can drifts left, copy on the right
         tl.to(
           stageEl,
           {
-            x: () => pinCenter().x + 36,
-            scale: 1.07,
+            x: () => pinCenter().x - Math.min(140, window.innerWidth * 0.1),
+            scale: 1.1,
             ease: "none",
             duration: 0.5,
           },
@@ -269,7 +285,8 @@ export function useLaunchConductor(
           stageEl,
           {
             x: () => pinCenter().x,
-            scale: 1.02,
+            y: () => pinCenter().y + 18,
+            scale: 1.05,
             ease: "none",
             duration: 0.5,
           },
