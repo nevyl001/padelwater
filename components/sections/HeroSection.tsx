@@ -95,7 +95,7 @@ export function HeroSection() {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_70%_40%,rgba(0,169,203,0.18),transparent_55%),radial-gradient(ellipse_at_20%_80%,rgba(183,243,51,0.08),transparent_45%)]" />
       <DotPattern className="bottom-[-8%] right-[-4%] h-[36%] w-[36%] opacity-50" />
 
-      <Container className="relative z-10 flex w-full flex-1 items-center py-[calc(var(--header-height)+3rem)] pb-24 lg:py-[calc(var(--header-height)+4rem)]">
+      <Container className="relative z-10 flex w-full flex-1 items-center py-[calc(var(--header-offset)+2.5rem)] pb-24 lg:py-[calc(var(--header-offset)+3.5rem)]">
         <div className="grid w-full items-center gap-14 lg:grid-cols-2 lg:gap-12 xl:gap-16">
           <div
             ref={contentRef}

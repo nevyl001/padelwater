@@ -19,6 +19,8 @@ export function Header() {
   useEffect(() => {
     const onScroll = () => setScrollY(window.scrollY);
     const onResize = () => setViewportH(window.innerHeight);
+    onScroll();
+    onResize();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize, { passive: true });
     return () => {
@@ -27,7 +29,7 @@ export function Header() {
     };
   }, []);
 
-  const compact = !isHome || scrollY > 40;
+  const compact = !isHome || scrollY > 48;
   const overHero = isHome && scrollY < viewportH * 0.85;
   const tone = overHero && !compact ? "light" : "dark";
 
@@ -35,20 +37,20 @@ export function Header() {
     <>
       <motion.header
         className={cn(
-          "fixed inset-x-0 top-0 z-50 transition-[background,border-color,backdrop-filter] duration-300",
+          "fixed inset-x-0 top-0 z-50 pt-[max(0.75rem,env(safe-area-inset-top))] transition-[background,border-color,backdrop-filter,padding] duration-300",
           compact
-            ? "border-b border-pw-navy/10 bg-pw-ice/80 backdrop-blur-md"
-            : "border-b border-transparent bg-transparent",
+            ? "border-b border-pw-navy/10 bg-pw-ice/85 pb-3 backdrop-blur-md"
+            : "border-b border-transparent bg-transparent pb-4",
         )}
         initial={{ y: -16, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
       >
-        <div className="container-pw flex h-[var(--header-height)] items-center justify-between gap-6">
+        <div className="container-pw flex min-h-12 items-center justify-between gap-6 md:min-h-14">
           <Wordmark tone={tone} />
 
           <nav
-            className="hidden items-center gap-7 lg:flex"
+            className="hidden items-center gap-8 lg:flex"
             aria-label="Principal"
           >
             {navigation.map((item) => (
