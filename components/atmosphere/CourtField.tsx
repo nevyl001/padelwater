@@ -13,54 +13,43 @@ type CourtFieldProps = {
 type Palette = {
   line: string;
   glow: string;
-  accent: string;
   washA: string;
-  washB: string;
 };
 
 const palettes: Record<NonNullable<CourtFieldProps["tone"]>, Palette> = {
   dark: {
     line: "rgba(255,255,255,0.28)",
     glow: "rgba(0,169,203,0.4)",
-    accent: "rgba(183,243,51,0.28)",
     washA: "rgba(0,169,203,0.1)",
-    washB: "rgba(183,243,51,0.06)",
   },
   light: {
     line: "rgba(7,26,56,0.16)",
     glow: "rgba(0,169,203,0.22)",
-    accent: "rgba(7,26,56,0.12)",
     washA: "rgba(0,169,203,0.06)",
-    washB: "rgba(183,243,51,0.08)",
   },
   water: {
     line: "rgba(255,255,255,0.32)",
     glow: "rgba(255,255,255,0.35)",
-    accent: "rgba(183,243,51,0.28)",
     washA: "rgba(255,255,255,0.08)",
-    washB: "rgba(183,243,51,0.08)",
   },
   lime: {
     line: "rgba(7,26,56,0.14)",
     glow: "rgba(0,169,203,0.28)",
-    accent: "rgba(7,26,56,0.1)",
     washA: "rgba(0,169,203,0.08)",
-    washB: "rgba(7,26,56,0.04)",
   },
 };
 
 type Particle = {
   u: number;
-  v: number;
   speed: number;
   size: number;
   life: number;
   phase: number;
+  spin: number;
 };
 
 /**
- * Minimal padel-court atmosphere: soft perspective lines only.
- * Elegant and diffused — suggests a court without drawing one hard.
+ * Soft court lines (blurred) + clearer padel balls on a separate layer.
  */
 export function CourtField({
   className,
@@ -69,15 +58,18 @@ export function CourtField({
   animated = true,
 }: CourtFieldProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const linesRef = useRef<HTMLCanvasElement>(null);
+  const ballsRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const wrap = wrapRef.current;
-    const canvas = canvasRef.current;
-    if (!wrap || !canvas) return;
+    const linesCanvas = linesRef.current;
+    const ballsCanvas = ballsRef.current;
+    if (!wrap || !linesCanvas || !ballsCanvas) return;
 
-    const ctx = canvas.getContext("2d", { alpha: true });
-    if (!ctx) return;
+    const linesCtx = linesCanvas.getContext("2d", { alpha: true });
+    const ballsCtx = ballsCanvas.getContext("2d", { alpha: true });
+    if (!linesCtx || !ballsCtx) return;
 
     const palette = palettes[tone];
     const strength = intensity === "soft" ? 0.65 : 1;
@@ -90,26 +82,31 @@ export function CourtField({
 
     const mobileInit =
       typeof window !== "undefined" && window.innerWidth < 768;
-    const particleCount = mobileInit ? 3 : 5;
+    const particleCount = mobileInit ? 6 : 9;
     const particles: Particle[] = Array.from({ length: particleCount }, (_, i) => ({
-      u: 0.25 + Math.random() * 0.5,
-      v: 0.4 + Math.random() * 0.45,
-      speed: 0.02 + Math.random() * 0.03,
-      size: 2.2 + Math.random() * 1.6,
+      u: 0.18 + Math.random() * 0.64,
+      speed: 0.018 + Math.random() * 0.028,
+      size: 4.5 + Math.random() * 3.2,
       life: Math.random(),
-      phase: i * 0.5,
+      phase: i * 0.47,
+      spin: (Math.random() > 0.5 ? 1 : -1) * (0.0012 + Math.random() * 0.002),
     }));
+
+    const sizeCanvas = (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) => {
+      canvas.width = Math.floor(w * dpr);
+      canvas.height = Math.floor(h * dpr);
+      canvas.style.width = `${w}px`;
+      canvas.style.height = `${h}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
 
     const resize = () => {
       const rect = wrap.getBoundingClientRect();
       dpr = Math.min(window.devicePixelRatio || 1, 2);
       w = Math.max(1, Math.floor(rect.width));
       h = Math.max(1, Math.floor(rect.height));
-      canvas.width = Math.floor(w * dpr);
-      canvas.height = Math.floor(h * dpr);
-      canvas.style.width = `${w}px`;
-      canvas.style.height = `${h}px`;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      sizeCanvas(linesCanvas, linesCtx);
+      sizeCanvas(ballsCanvas, ballsCtx);
     };
 
     const isMobileView = () => w < 768;
@@ -126,6 +123,7 @@ export function CourtField({
     };
 
     const strokePoly = (
+      ctx: CanvasRenderingContext2D,
       points: Array<{ x: number; y: number }>,
       close = false,
     ) => {
@@ -140,6 +138,7 @@ export function CourtField({
     };
 
     const drawCourt = (time: number) => {
+      const ctx = linesCtx;
       const mobile = isMobileView();
       const pulse = animated ? 0.85 + 0.15 * Math.sin(time * 0.0004) : 0.9;
       const drawProgress = animated
@@ -147,27 +146,41 @@ export function CourtField({
         : 1;
       const alpha = (mobile ? 0.38 : 0.42) * strength * pulse * drawProgress;
 
+      ctx.clearRect(0, 0, w, h);
+
+      const wash = ctx.createRadialGradient(
+        w * 0.5,
+        mobile ? h * 0.7 : h * 0.55,
+        0,
+        w * 0.5,
+        mobile ? h * 0.7 : h * 0.55,
+        w * (mobile ? 0.5 : 0.42),
+      );
+      wash.addColorStop(0, palette.washA);
+      wash.addColorStop(1, "transparent");
+      ctx.globalAlpha = 0.5 * strength;
+      ctx.fillStyle = wash;
+      ctx.fillRect(0, 0, w, h);
+
       ctx.save();
       ctx.globalAlpha = alpha;
       ctx.strokeStyle = palette.line;
-      ctx.lineWidth = mobile ? Math.max(1.1, w * 0.0032) : Math.max(1.15, w * 0.0018);
+      ctx.lineWidth = mobile
+        ? Math.max(1.1, w * 0.0032)
+        : Math.max(1.15, w * 0.0018);
       ctx.lineJoin = "round";
       ctx.lineCap = "round";
-      ctx.setLineDash([]);
 
-      // Outer padel footprint
       strokePoly(
+        ctx,
         [project(-1, 0.05), project(1, 0.05), project(1, 1), project(-1, 1)],
         true,
       );
-
-      // Service lines + center (reads as padel, not tennis alone)
       for (const d of [0.34, 0.66]) {
-        strokePoly([project(-1, d), project(1, d)]);
+        strokePoly(ctx, [project(-1, d), project(1, d)]);
       }
-      strokePoly([project(0, 0.34), project(0, 0.66)]);
+      strokePoly(ctx, [project(0, 0.34), project(0, 0.66)]);
 
-      // Soft net glow — one elegant cue, no posts/mesh
       const nL = project(-0.98, 0.5);
       const nR = project(0.98, 0.5);
       const netGrad = ctx.createLinearGradient(nL.x, nL.y, nR.x, nR.y);
@@ -176,13 +189,14 @@ export function CourtField({
       netGrad.addColorStop(1, "transparent");
       ctx.globalAlpha = alpha * 1.15;
       ctx.strokeStyle = netGrad;
-      ctx.lineWidth = mobile ? Math.max(1.6, w * 0.005) : Math.max(1.8, w * 0.0028);
+      ctx.lineWidth = mobile
+        ? Math.max(1.6, w * 0.005)
+        : Math.max(1.8, w * 0.0028);
       ctx.beginPath();
       ctx.moveTo(nL.x, nL.y);
       ctx.lineTo(nR.x, nR.y);
       ctx.stroke();
 
-      // Far glass — three faint vertical ticks only (not a solid wall)
       ctx.globalAlpha = alpha * 0.55;
       ctx.strokeStyle = palette.line;
       ctx.lineWidth = Math.max(0.9, w * 0.002);
@@ -195,72 +209,100 @@ export function CourtField({
         ctx.lineTo(p.x, farY - tickH);
         ctx.stroke();
       }
+      ctx.restore();
+    };
+
+    const drawPadelBall = (
+      ctx: CanvasRenderingContext2D,
+      x: number,
+      y: number,
+      r: number,
+      rotation: number,
+      alpha: number,
+    ) => {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(rotation);
+      ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
+
+      ctx.beginPath();
+      ctx.fillStyle = "rgba(3,17,38,0.28)";
+      ctx.ellipse(r * 0.1, r * 0.9, r * 0.9, r * 0.3, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      const body = ctx.createRadialGradient(-r * 0.35, -r * 0.4, r * 0.08, 0, 0, r);
+      body.addColorStop(0, "#f2ff8a");
+      body.addColorStop(0.45, "#d4f000");
+      body.addColorStop(1, "#9fbe00");
+      ctx.beginPath();
+      ctx.fillStyle = body;
+      ctx.arc(0, 0, r, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.strokeStyle = "rgba(7,26,56,0.28)";
+      ctx.lineWidth = Math.max(0.7, r * 0.08);
+      ctx.arc(0, 0, r - ctx.lineWidth * 0.3, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.strokeStyle = "rgba(255,255,255,0.9)";
+      ctx.lineWidth = Math.max(1, r * 0.14);
+      ctx.lineCap = "round";
+      ctx.moveTo(-r * 0.12, -r * 0.9);
+      ctx.bezierCurveTo(r * 0.95, -r * 0.35, r * 0.95, r * 0.35, -r * 0.12, r * 0.9);
+      ctx.moveTo(r * 0.12, -r * 0.9);
+      ctx.bezierCurveTo(-r * 0.95, -r * 0.35, -r * 0.95, r * 0.35, r * 0.12, r * 0.9);
+      ctx.stroke();
 
       ctx.restore();
     };
 
-    const drawWashes = () => {
-      const g = ctx.createRadialGradient(
-        w * 0.5,
-        isMobileView() ? h * 0.7 : h * 0.55,
-        0,
-        w * 0.5,
-        isMobileView() ? h * 0.7 : h * 0.55,
-        w * (isMobileView() ? 0.5 : 0.42),
-      );
-      g.addColorStop(0, palette.washA);
-      g.addColorStop(1, "transparent");
-      ctx.globalAlpha = 0.5 * strength;
-      ctx.fillStyle = g;
-      ctx.fillRect(0, 0, w, h);
-      ctx.globalAlpha = 1;
-    };
+    const drawBalls = (time: number) => {
+      const ctx = ballsCtx;
+      ctx.clearRect(0, 0, w, h);
 
-    const drawParticles = (time: number) => {
-      ctx.save();
       for (const p of particles) {
         const travel = animated
-          ? (p.life + time * 0.00008 * p.speed) % 1
+          ? (p.life + time * 0.00009 * p.speed) % 1
           : (p.life + 0.4) % 1;
-        const depth = 0.42 + travel * 0.5;
-        const sway = Math.sin(time * 0.0006 + p.phase) * 0.04;
-        const nx = (p.u * 2 - 1) * 0.5 + sway;
+        const depth = 0.38 + travel * 0.55;
+        const sway = Math.sin(time * 0.0007 + p.phase) * 0.05;
+        const nx = (p.u * 2 - 1) * 0.55 + sway;
         const pos = project(nx, depth);
         const alpha =
-          (animated ? Math.sin(travel * Math.PI) * 0.45 : 0.35) * strength;
-        const r = p.size * (0.7 + depth * 0.9);
+          (animated
+            ? 0.55 + 0.4 * Math.sin(travel * Math.PI)
+            : 0.85) * strength;
+        const r = p.size * (0.95 + depth * 1.15) * (isMobileView() ? 1.15 : 1);
+        const rotation = animated ? time * p.spin + p.phase : p.phase;
 
-        ctx.globalAlpha = Math.max(0, alpha);
+        // Glow behind the ball so it pops on dark/teal scenes
         const bloom = ctx.createRadialGradient(
           pos.x,
           pos.y,
           0,
           pos.x,
           pos.y,
-          r * 4,
+          r * 3.4,
         );
-        bloom.addColorStop(0, palette.accent);
+        bloom.addColorStop(0, "rgba(183,243,51,0.55)");
         bloom.addColorStop(1, "transparent");
+        ctx.globalAlpha = Math.max(0, alpha * 0.55);
         ctx.fillStyle = bloom;
         ctx.beginPath();
-        ctx.arc(pos.x, pos.y, r * 4, 0, Math.PI * 2);
+        ctx.arc(pos.x, pos.y, r * 3.4, 0, Math.PI * 2);
         ctx.fill();
 
-        // Soft orb — no hard ball drawing
-        ctx.beginPath();
-        ctx.fillStyle = "rgba(212,240,0,0.55)";
-        ctx.arc(pos.x, pos.y, r, 0, Math.PI * 2);
-        ctx.fill();
+        drawPadelBall(ctx, pos.x, pos.y, r, rotation, Math.min(1, alpha + 0.15));
       }
-      ctx.restore();
+      ctx.globalAlpha = 1;
     };
 
     const frame = (now: number) => {
       if (!running) return;
-      ctx.clearRect(0, 0, w, h);
-      drawWashes();
       drawCourt(now);
-      drawParticles(now);
+      drawBalls(now);
       if (animated) raf = requestAnimationFrame(frame);
     };
 
@@ -291,8 +333,12 @@ export function CourtField({
       )}
     >
       <canvas
-        ref={canvasRef}
+        ref={linesRef}
         className="absolute inset-0 h-full w-full origin-center scale-[1.04] opacity-80 blur-[2.5px] max-md:opacity-70 max-md:blur-[3px]"
+      />
+      <canvas
+        ref={ballsRef}
+        className="absolute inset-0 h-full w-full"
       />
     </div>
   );
