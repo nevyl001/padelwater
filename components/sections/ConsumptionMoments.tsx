@@ -103,7 +103,7 @@ export function ConsumptionMoments() {
         <div
           ref={trackRef}
           className={cn(
-            "mt-8 hidden min-h-0 w-max flex-1",
+            "mt-8 hidden min-h-0 w-max flex-1 pl-[max(2rem,calc((100vw-85rem)/2))]",
             prefersReducedMotion ? "md:hidden" : "md:flex",
           )}
         >
@@ -113,7 +113,7 @@ export function ConsumptionMoments() {
               <article
                 key={moment.id}
                 className={cn(
-                  "relative flex h-full w-[min(92vw,42rem)] flex-col justify-end overflow-hidden px-10 pb-14 pt-20",
+                  "relative flex h-full w-[min(92vw,42rem)] shrink-0 flex-col justify-end overflow-hidden px-12 pb-14 pt-20 sm:px-14",
                   tone.bg,
                 )}
               >
@@ -122,7 +122,7 @@ export function ConsumptionMoments() {
                   <p className="text-xs uppercase tracking-[0.28em] opacity-55">
                     {String(index + 1).padStart(2, "0")}
                   </p>
-                  <h3 className="mt-4 font-display text-[clamp(2.5rem,5vw,4.5rem)] font-bold uppercase leading-[0.92] tracking-[-0.03em]">
+                  <h3 className="mt-4 font-display text-[clamp(2.25rem,4.5vw,3.75rem)] font-bold uppercase leading-[0.95] tracking-[-0.03em]">
                     {moment.label}.
                   </h3>
                   <p className="mt-5 max-w-sm text-base leading-relaxed opacity-80 md:text-lg">

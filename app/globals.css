@@ -124,7 +124,7 @@
   }
 
   .container-pw {
-    width: min(100% - 3rem, var(--container-max));
+    width: min(100% - 4rem, var(--container-max));
     margin-inline: auto;
   }
 
@@ -163,13 +163,13 @@
 
   @media (min-width: 768px) {
     .container-pw {
-      width: min(100% - 6rem, var(--container-max));
+      width: min(100% - 8rem, var(--container-max));
     }
   }
 
   @media (min-width: 1280px) {
     .container-pw {
-      width: min(100% - 8rem, var(--container-max));
+      width: min(100% - 10rem, var(--container-max));
     }
   }
 

@@ -36,15 +36,15 @@ const courtTone = {
 function stageCopyClass(layout: (typeof productStoryStages)[number]["layout"]) {
   switch (layout) {
     case "backdrop":
-      return "left-[max(1.5rem,calc((100vw-85rem)/2))] right-auto top-[28%] w-[min(28rem,42vw)] -translate-y-0 text-left";
+      return "left-[max(2.5rem,calc((100vw-min(100vw,85rem))/2+1.5rem))] right-auto top-[26%] w-[min(26rem,38vw)] text-left";
     case "side":
-      return "left-[max(1.5rem,calc((100vw-85rem)/2))] right-auto top-1/2 w-[min(24rem,34vw)] -translate-y-1/2 text-left";
+      return "left-[max(2.5rem,calc((100vw-min(100vw,85rem))/2+1.5rem))] right-auto top-1/2 w-[min(22rem,32vw)] -translate-y-1/2 text-left";
     case "open":
-      return "left-auto right-[max(1.5rem,calc((100vw-85rem)/2))] top-[32%] w-[min(24rem,34vw)] text-right";
+      return "left-auto right-[max(2.5rem,calc((100vw-min(100vw,85rem))/2+1.5rem))] top-[30%] w-[min(22rem,32vw)] text-right";
     case "monument":
-      return "inset-x-0 top-[18%] mx-auto w-[min(36rem,90%)] -translate-y-0 text-center";
+      return "inset-x-[max(2rem,6%)] top-[16%] mx-auto w-[min(36rem,88%)] text-center";
     default:
-      return "left-1/2 top-1/2 w-[min(28rem,90%)] -translate-x-1/2 -translate-y-1/2 text-center";
+      return "left-1/2 top-1/2 w-[min(28rem,88%)] -translate-x-1/2 -translate-y-1/2 text-center";
   }
 }
 
@@ -53,21 +53,21 @@ export function LaunchExperience() {
   const heroRef = useRef<HTMLElement>(null);
   const storyRef = useRef<HTMLElement>(null);
   const pinRef = useRef<HTMLDivElement>(null);
-  const heroAnchorRef = useRef<HTMLDivElement>(null);
-  const stageRef = useRef<HTMLDivElement>(null);
+  const heroCanRef = useRef<HTMLDivElement>(null);
+  const storyCanRef = useRef<HTMLDivElement>(null);
   const heroCopyRef = useRef<HTMLDivElement>(null);
 
   const { prefersReducedMotion, isMobile, ready, layer } =
     useMotionPreferences();
 
-  const { activeStage, conductorOn, storyVh } = useLaunchConductor(
+  const { activeStage, storyVh } = useLaunchConductor(
     {
       rootRef,
       heroRef,
       storyRef,
       pinRef,
-      heroAnchorRef,
-      stageRef,
+      heroCanRef,
+      storyCanRef,
       heroCopyRef,
     },
     { ready, prefersReducedMotion, isMobile, layer },
@@ -75,7 +75,6 @@ export function LaunchExperience() {
 
   const canUseConductor = ready && !prefersReducedMotion && !isMobile;
   const showDesktopPin = canUseConductor;
-  const hideInlineCan = canUseConductor && conductorOn;
   const animateCourt = ready && !prefersReducedMotion;
 
   const tone = productStoryStages[activeStage]?.tone ?? "navy";
@@ -85,34 +84,20 @@ export function LaunchExperience() {
     tone === "lime-soft" ? "ice" : tone === "water" ? "water" : "navy";
 
   return (
-    <div ref={rootRef} data-launch-experience>
-      <ProductCanStage
-        ref={stageRef}
-        mode="fixed"
-        tone={canTone}
-        fitHeight
-        priority
-        showReflection
-        className={cn(!conductorOn && "invisible")}
-      />
-
+    <div ref={rootRef} data-launch-experience className="relative">
       <section
         ref={heroRef}
         className="relative flex min-h-[100svh] overflow-hidden bg-pw-navy-deep text-pw-white grain"
         aria-label="Presentación Pádel Water"
       >
-        <CourtField
-          tone="dark"
-          intensity="medium"
-          animated={animateCourt}
-        />
+        <CourtField tone="dark" intensity="medium" animated={animateCourt} />
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_70%_35%,rgba(0,169,203,0.18),transparent_42%),radial-gradient(ellipse_at_20%_70%,rgba(183,243,51,0.1),transparent_40%)]" />
 
         <Container className="relative z-10 flex w-full flex-1 items-end pb-16 pt-[calc(var(--header-offset)+1.5rem)] md:items-center md:pb-20 md:pt-[calc(var(--header-offset)+2.5rem)]">
-          <div className="grid w-full items-center gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-6 xl:gap-10">
+          <div className="grid w-full items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] lg:gap-16 xl:gap-20">
             <div
               ref={heroCopyRef}
-              className="mx-auto w-full max-w-xl text-center lg:mx-0 lg:max-w-none lg:pl-2 lg:pr-6 lg:text-left xl:pl-4"
+              className="mx-auto w-full max-w-xl text-center sm:px-2 lg:mx-0 lg:max-w-[34rem] lg:justify-self-start lg:px-0 lg:pl-4 lg:text-left xl:pl-8"
             >
               <div data-hero-brand className="mb-6 lg:mb-8">
                 <p
@@ -126,7 +111,7 @@ export function LaunchExperience() {
               <div data-hero-eyebrow>
                 <SectionLabel tone="lime">{heroContent.eyebrow}</SectionLabel>
               </div>
-              <h1 className="mt-5 font-display text-[clamp(2.35rem,5.2vw,4.25rem)] font-bold uppercase leading-[0.98] tracking-[-0.03em]">
+              <h1 className="mt-5 font-display text-[clamp(2.35rem,5vw,4rem)] font-bold uppercase leading-[0.98] tracking-[-0.03em]">
                 {heroContent.titleLines.map((line) => (
                   <span key={line} className="block overflow-hidden">
                     <span data-hero-line className="block">
@@ -137,7 +122,7 @@ export function LaunchExperience() {
               </h1>
               <p
                 data-hero-late
-                className="mx-auto mt-6 max-w-md text-base leading-relaxed text-white/70 md:text-lg lg:mx-0 lg:max-w-lg"
+                className="mx-auto mt-6 max-w-md text-base leading-relaxed text-white/70 md:text-lg lg:mx-0 lg:max-w-md"
               >
                 {heroContent.description}
               </p>
@@ -158,21 +143,13 @@ export function LaunchExperience() {
               </div>
             </div>
 
-            <div className="relative flex min-h-[min(58svh,420px)] items-center justify-center lg:min-h-[min(70svh,520px)]">
-              {/* Floor glow under can */}
+            <div className="relative flex min-h-[min(52svh,400px)] items-center justify-center lg:min-h-[min(68svh,500px)]">
               <div
                 aria-hidden
-                className="pointer-events-none absolute bottom-[8%] left-1/2 h-24 w-[55%] -translate-x-1/2 rounded-[100%] bg-pw-cyan/25 blur-3xl"
+                className="pointer-events-none absolute bottom-[10%] left-1/2 h-24 w-[55%] -translate-x-1/2 rounded-[100%] bg-pw-cyan/25 blur-3xl"
               />
-              <div ref={heroAnchorRef} className="relative z-10">
-                <div className={cn(hideInlineCan && "invisible")}>
-                  <ProductCanStage
-                    mode="inline"
-                    tone="navy"
-                    fitHeight
-                    priority
-                  />
-                </div>
+              <div ref={heroCanRef} className="relative z-10">
+                <ProductCanStage mode="inline" tone="navy" fitHeight priority />
               </div>
             </div>
           </div>
@@ -213,26 +190,33 @@ export function LaunchExperience() {
               animated={animateCourt}
             />
 
-            {/* Giant watermark for monument / backdrop beats */}
             {(activeLayout === "monument" || activeLayout === "backdrop") && (
               <p
                 aria-hidden
-                data-story-watermark
-                className="pointer-events-none absolute inset-x-0 top-[42%] z-0 -translate-y-1/2 text-center font-display text-[clamp(4.5rem,18vw,14rem)] font-bold uppercase leading-none tracking-[-0.04em] opacity-[0.08]"
+                className="pointer-events-none absolute inset-x-0 top-[42%] z-0 -translate-y-1/2 text-center font-display text-[clamp(4.5rem,16vw,12rem)] font-bold uppercase leading-none tracking-[-0.04em] opacity-[0.08]"
               >
                 {productStoryStages[activeStage]?.label}
               </p>
             )}
+
+            {/* Story can lives INSIDE the pin — never site-fixed */}
+            <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
+              <div ref={storyCanRef}>
+                <ProductCanStage
+                  mode="inline"
+                  tone={canTone}
+                  fitHeight
+                  showReflection
+                />
+              </div>
+            </div>
 
             <div className="relative z-20 h-full">
               {productStoryStages.map((stage) => (
                 <div
                   key={stage.id}
                   data-story-stage
-                  className={cn(
-                    "absolute px-4 md:px-0",
-                    stageCopyClass(stage.layout),
-                  )}
+                  className={cn("absolute px-2", stageCopyClass(stage.layout))}
                 >
                   <p className="text-xs uppercase tracking-[0.22em] opacity-55">
                     {stage.eyebrow}
@@ -241,11 +225,11 @@ export function LaunchExperience() {
                     className={cn(
                       "mt-3 font-display font-bold uppercase tracking-[-0.02em]",
                       stage.layout === "monument" &&
-                        "text-[clamp(3.5rem,9vw,6.5rem)] leading-[0.9]",
+                        "text-[clamp(3.25rem,8vw,5.75rem)] leading-[0.9]",
                       stage.layout === "backdrop" &&
-                        "text-[clamp(2.75rem,5.5vw,4.5rem)] leading-[0.95]",
+                        "text-[clamp(2.5rem,5vw,4rem)] leading-[0.95]",
                       (stage.layout === "side" || stage.layout === "open") &&
-                        "text-[clamp(2.25rem,4.2vw,3.5rem)] leading-[1.02]",
+                        "text-[clamp(2.1rem,4vw,3.25rem)] leading-[1.02]",
                     )}
                   >
                     {stage.label}
