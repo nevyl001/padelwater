@@ -45,7 +45,7 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
           aria-label="Menú de navegación"
         >
           <div className="flex items-center justify-between px-5 py-4">
-            <Wordmark tone="light" />
+            <Wordmark tone="light" onNavigate={onClose} />
             <button
               type="button"
               onClick={onClose}
