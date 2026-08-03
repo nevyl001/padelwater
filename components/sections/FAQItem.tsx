@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import type { KeyboardEvent } from "react";
+import { useEffect, useRef, type KeyboardEvent } from "react";
 import { TextReveal } from "@/components/motion/TextReveal";
 import { cn } from "@/lib/cn";
 
@@ -54,6 +54,40 @@ function PlusMinusIcon({ open }: { open: boolean }) {
 export function FAQItem({ item, index, isOpen, onToggle, onKeyDown, buttonRef }: FAQItemProps) {
   const prefersReducedMotion = useReducedMotion();
   const lines = splitIntoSentences(item.answer);
+  const answerRef = useRef<HTMLParagraphElement>(null);
+
+  // Manual mode, triggered directly by isOpen — not a scroll-into-view
+  // reveal, so it doesn't ride MaskReveal's ScrollTrigger path (which
+  // can mis-time here: opening a lower item shifts every row above it
+  // via the layout FLIP animation at the same instant the new content
+  // mounts, and a scroll-position check can catch it mid-shift).
+  useEffect(() => {
+    if (!isOpen || prefersReducedMotion) return;
+    const root = answerRef.current;
+    if (!root) return;
+
+    let dead = false;
+    let cleanup: (() => void) | undefined;
+
+    async function run() {
+      const { getGsap } = await import("@/lib/animation/gsap");
+      const { gsap } = getGsap();
+      if (dead || !root) return;
+      const units = root.querySelectorAll("[data-mask-unit]");
+      const tween = gsap.fromTo(
+        units,
+        { yPercent: 110, opacity: 0 },
+        { yPercent: 0, opacity: 1, duration: 0.6, delay: 0.15, stagger: 0.08, ease: "expo.out" },
+      );
+      cleanup = () => tween.kill();
+    }
+
+    void run();
+    return () => {
+      dead = true;
+      cleanup?.();
+    };
+  }, [isOpen, prefersReducedMotion]);
 
   return (
     <motion.div
@@ -115,10 +149,11 @@ export function FAQItem({ item, index, isOpen, onToggle, onKeyDown, buttonRef }:
           >
             <div className="max-w-2xl px-5 pb-7 pl-[3.25rem] pr-8 md:px-7 md:pl-[3.75rem]">
               <TextReveal
+                ref={answerRef}
                 as="p"
                 variant="bodyLg"
+                mode="manual"
                 lines={lines}
-                delay={0.12}
                 className="text-pw-muted"
               />
             </div>
