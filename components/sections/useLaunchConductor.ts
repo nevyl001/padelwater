@@ -158,138 +158,219 @@ export function useLaunchConductor(
           invalidateOnRefresh: true,
         });
 
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: rootEl,
-            start: "top top",
-            end: () =>
-              `+=${window.innerHeight + vh * (window.innerHeight / 100)}`,
-            scrub: isMobile ? 0.45 : 0.65,
-            invalidateOnRefresh: true,
-            onUpdate: (self) => {
-              if (isMobile) return;
-              const heroEnd = window.innerHeight / (self.end - self.start);
-              live = self.progress < heroEnd * 0.55;
-              if (!live) {
-                qx(0);
-                qy(0);
-              }
+        /**
+         * Mobile: hero scrolls away naturally. Scrub starts ONLY when the
+         * story pin engages — so the first can stays solid until then.
+         * Desktop: one continuous root scrub (hero → story theatre).
+         */
+        if (isMobile) {
+          gsap.set(storyCanEl, { autoAlpha: 1, scale: 1, x: 0, y: 0 });
+
+          const tl = gsap.timeline({
+            scrollTrigger: {
+              trigger: storyEl,
+              start: "top top",
+              end: () => `+=${vh * (window.innerHeight / 100)}`,
+              scrub: 0.45,
+              invalidateOnRefresh: true,
             },
-          },
-        });
+          });
 
-        tl.to(copyEl, { opacity: 0, y: -24, ease: "none", duration: 0.85 }, 0);
-        tl.to(
-          heroCanEl,
-          { autoAlpha: 0, scale: 0.9, y: -32, ease: "none", duration: 0.8 },
-          0.05,
-        );
-        tl.fromTo(
-          storyCanEl,
-          {
-            autoAlpha: 0,
-            scale: isMobile ? 0.96 : 0.94,
-            y: isMobile ? 0 : 24,
-          },
-          {
-            autoAlpha: 1,
-            scale: 1,
-            y: 0,
-            ease: "none",
-            duration: 0.85,
-          },
-          0.3,
-        );
-        tl.call(() => setActiveStage(0), undefined, 0.85);
+          // Hold stage 0 fully readable before any crossfade
+          tl.to({}, { duration: 0.55 }, 0);
+          tl.call(() => setActiveStage(0), undefined, 0);
 
-        const s1 = 1.45;
-        tl.to(
-          stages[0],
-          { autoAlpha: 0, y: outY, ease: "none", duration: 0.32 },
-          s1,
-        );
-        tl.fromTo(
-          stages[1],
-          { autoAlpha: 0, y: inY },
-          { autoAlpha: 1, y: 0, ease: "none", duration: 0.38 },
-          s1 + 0.08,
-        );
-        tl.to(
-          storyCanEl,
-          { x: shift, scale: 1, y: 0, ease: "none", duration: 0.45 },
-          s1,
-        );
-        tl.call(() => setActiveStage(1), undefined, s1 + 0.12);
-        tl.to({}, { duration: 0.6 }, s1 + 0.45);
-
-        const s2 = s1 + 1.05;
-        tl.to(
-          stages[1],
-          { autoAlpha: 0, y: outY, ease: "none", duration: 0.32 },
-          s2,
-        );
-        tl.fromTo(
-          stages[2],
-          { autoAlpha: 0, y: inY },
-          { autoAlpha: 1, y: 0, ease: "none", duration: 0.38 },
-          s2 + 0.08,
-        );
-        tl.to(
-          storyCanEl,
-          {
-            x: -shift * 0.75,
-            // Never scale past 1 on mobile — can must stay inside its band
-            scale: isMobile ? 1 : 1.02,
-            y: 0,
-            ease: "none",
-            duration: 0.45,
-          },
-          s2,
-        );
-        tl.call(() => setActiveStage(2), undefined, s2 + 0.12);
-        tl.to({}, { duration: 0.6 }, s2 + 0.45);
-
-        const s3 = s2 + 1.05;
-        tl.to(
-          stages[2],
-          { autoAlpha: 0, y: outY, ease: "none", duration: 0.32 },
-          s3,
-        );
-        tl.fromTo(
-          stages[3],
-          { autoAlpha: 0, y: isMobile ? 0 : 24 },
-          { autoAlpha: 1, y: 0, ease: "none", duration: 0.42 },
-          s3 + 0.08,
-        );
-        tl.to(
-          storyCanEl,
-          {
-            x: 0,
-            // Keep can clear of 470 above and body copy + shadow below
-            y: isMobile ? 0 : 12,
-            scale: isMobile ? 0.9 : 0.66,
-            ease: "none",
-            duration: 0.45,
-          },
-          s3,
-        );
-        tl.call(() => setActiveStage(3), undefined, s3 + 0.12);
-        tl.to({}, { duration: 0.65 }, s3 + 0.5);
-
-        const hold = s3 + 1.15;
-        if (holdHint) {
+          const s1 = 0.55;
           tl.to(
-            holdHint,
-            { autoAlpha: 0.65, ease: "none", duration: 0.3 },
+            stages[0],
+            { autoAlpha: 0, y: 0, ease: "none", duration: 0.28 },
+            s1,
+          );
+          tl.fromTo(
+            stages[1],
+            { autoAlpha: 0, y: 0 },
+            { autoAlpha: 1, y: 0, ease: "none", duration: 0.32 },
+            s1 + 0.1,
+          );
+          tl.call(() => setActiveStage(1), undefined, s1 + 0.12);
+          tl.to({}, { duration: 0.7 }, s1 + 0.4);
+
+          const s2 = s1 + 1.1;
+          tl.to(
+            stages[1],
+            { autoAlpha: 0, y: 0, ease: "none", duration: 0.28 },
+            s2,
+          );
+          tl.fromTo(
+            stages[2],
+            { autoAlpha: 0, y: 0 },
+            { autoAlpha: 1, y: 0, ease: "none", duration: 0.32 },
+            s2 + 0.1,
+          );
+          tl.call(() => setActiveStage(2), undefined, s2 + 0.12);
+          tl.to({}, { duration: 0.7 }, s2 + 0.4);
+
+          const s3 = s2 + 1.1;
+          tl.to(
+            stages[2],
+            { autoAlpha: 0, y: 0, ease: "none", duration: 0.28 },
+            s3,
+          );
+          tl.fromTo(
+            stages[3],
+            { autoAlpha: 0, y: 0 },
+            { autoAlpha: 1, y: 0, ease: "none", duration: 0.36 },
+            s3 + 0.1,
+          );
+          tl.to(
+            storyCanEl,
+            { scale: 0.9, ease: "none", duration: 0.4 },
+            s3,
+          );
+          tl.call(() => setActiveStage(3), undefined, s3 + 0.12);
+          tl.to({}, { duration: 0.75 }, s3 + 0.45);
+
+          const hold = s3 + 1.2;
+          if (holdHint) {
+            tl.to(
+              holdHint,
+              { autoAlpha: 0.65, ease: "none", duration: 0.3 },
+              hold,
+            );
+          }
+          tl.to(
+            pinEl.querySelector("[data-story-backdrop]"),
+            { backgroundColor: "#cfe8c4", ease: "none", duration: 0.4 },
             hold,
           );
+          tl.to({}, { duration: 0.5 }, hold + 0.2);
+        } else {
+          const tl = gsap.timeline({
+            scrollTrigger: {
+              trigger: rootEl,
+              start: "top top",
+              end: () =>
+                `+=${window.innerHeight + vh * (window.innerHeight / 100)}`,
+              scrub: 0.65,
+              invalidateOnRefresh: true,
+              onUpdate: (self) => {
+                const heroEnd = window.innerHeight / (self.end - self.start);
+                live = self.progress < heroEnd * 0.55;
+                if (!live) {
+                  qx(0);
+                  qy(0);
+                }
+              },
+            },
+          });
+
+          tl.to(copyEl, { opacity: 0, y: -24, ease: "none", duration: 0.85 }, 0);
+          tl.to(
+            heroCanEl,
+            { autoAlpha: 0, scale: 0.9, y: -32, ease: "none", duration: 0.8 },
+            0.05,
+          );
+          tl.fromTo(
+            storyCanEl,
+            { autoAlpha: 0, scale: 0.94, y: 24 },
+            {
+              autoAlpha: 1,
+              scale: 1,
+              y: 0,
+              ease: "none",
+              duration: 0.85,
+            },
+            0.3,
+          );
+          tl.call(() => setActiveStage(0), undefined, 0.85);
+
+          const s1 = 1.45;
+          tl.to(
+            stages[0],
+            { autoAlpha: 0, y: outY, ease: "none", duration: 0.32 },
+            s1,
+          );
+          tl.fromTo(
+            stages[1],
+            { autoAlpha: 0, y: inY },
+            { autoAlpha: 1, y: 0, ease: "none", duration: 0.38 },
+            s1 + 0.08,
+          );
+          tl.to(
+            storyCanEl,
+            { x: shift, scale: 1, y: 0, ease: "none", duration: 0.45 },
+            s1,
+          );
+          tl.call(() => setActiveStage(1), undefined, s1 + 0.12);
+          tl.to({}, { duration: 0.6 }, s1 + 0.45);
+
+          const s2 = s1 + 1.05;
+          tl.to(
+            stages[1],
+            { autoAlpha: 0, y: outY, ease: "none", duration: 0.32 },
+            s2,
+          );
+          tl.fromTo(
+            stages[2],
+            { autoAlpha: 0, y: inY },
+            { autoAlpha: 1, y: 0, ease: "none", duration: 0.38 },
+            s2 + 0.08,
+          );
+          tl.to(
+            storyCanEl,
+            {
+              x: -shift * 0.75,
+              scale: 1.02,
+              y: 0,
+              ease: "none",
+              duration: 0.45,
+            },
+            s2,
+          );
+          tl.call(() => setActiveStage(2), undefined, s2 + 0.12);
+          tl.to({}, { duration: 0.6 }, s2 + 0.45);
+
+          const s3 = s2 + 1.05;
+          tl.to(
+            stages[2],
+            { autoAlpha: 0, y: outY, ease: "none", duration: 0.32 },
+            s3,
+          );
+          tl.fromTo(
+            stages[3],
+            { autoAlpha: 0, y: 24 },
+            { autoAlpha: 1, y: 0, ease: "none", duration: 0.42 },
+            s3 + 0.08,
+          );
+          tl.to(
+            storyCanEl,
+            {
+              x: 0,
+              y: 12,
+              scale: 0.66,
+              ease: "none",
+              duration: 0.45,
+            },
+            s3,
+          );
+          tl.call(() => setActiveStage(3), undefined, s3 + 0.12);
+          tl.to({}, { duration: 0.65 }, s3 + 0.5);
+
+          const hold = s3 + 1.15;
+          if (holdHint) {
+            tl.to(
+              holdHint,
+              { autoAlpha: 0.65, ease: "none", duration: 0.3 },
+              hold,
+            );
+          }
+          tl.to(
+            pinEl.querySelector("[data-story-backdrop]"),
+            { backgroundColor: "#cfe8c4", ease: "none", duration: 0.4 },
+            hold,
+          );
+          tl.to({}, { duration: 0.5 }, hold + 0.2);
         }
-        tl.to(
-          pinEl.querySelector("[data-story-backdrop]"),
-          { backgroundColor: "#cfe8c4", ease: "none", duration: 0.4 },
-          hold,
-        );
-        tl.to({}, { duration: 0.5 }, hold + 0.2);
       }, rootEl);
 
       revert = () => {
