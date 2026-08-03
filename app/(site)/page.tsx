@@ -1,6 +1,5 @@
-import { HeroSection } from "@/components/sections/HeroSection";
+import { LaunchExperience } from "@/components/sections/LaunchExperience";
 import { BrandStatement } from "@/components/sections/BrandStatement";
-import { ProductStory } from "@/components/sections/ProductStory";
 import { BenefitsSection } from "@/components/sections/BenefitsSection";
 import { CoconutSection } from "@/components/sections/CoconutSection";
 import { ConsumptionMoments } from "@/components/sections/ConsumptionMoments";
@@ -71,9 +70,10 @@ export default function HomePage() {
     <>
       <JsonLd />
       <main>
-        <HeroSection />
+        {/* Escenas 1–2: Hero + Product Story (motion rebuild) */}
+        <LaunchExperience />
+        {/* Escenas 3–6: intactas hasta revisión visual de 1–2 */}
         <BrandStatement />
-        <ProductStory />
         <BenefitsSection />
         <CoconutSection />
         <ConsumptionMoments />

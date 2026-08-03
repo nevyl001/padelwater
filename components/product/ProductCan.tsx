@@ -1,6 +1,6 @@
-import { MediaSlot } from "@/components/ui/MediaSlot";
+import { ProductCanImage } from "@/components/product/ProductCanImage";
+import { ProductReflection } from "@/components/product/ProductReflection";
 import { cn } from "@/lib/cn";
-import { product } from "@/data/product";
 
 type ProductCanProps = {
   className?: string;
@@ -11,10 +11,7 @@ type ProductCanProps = {
   fitHeight?: boolean;
 };
 
-/**
- * Product protagonist slot. Replace `src` / product.media when final
- * photography arrives — do not synthesize a fake can.
- */
+/** Compatibility wrapper for sections outside the launch sequence. */
 export function ProductCan({
   className,
   src,
@@ -23,39 +20,18 @@ export function ProductCan({
   showReflection = true,
   fitHeight = false,
 }: ProductCanProps) {
-  const image = src ?? product.media.hero ?? product.media.front;
-
   return (
-    <div
-      className={cn(
-        "relative mx-auto w-full",
-        fitHeight ? "max-w-none" : "max-w-[280px]",
-        className,
-      )}
-    >
-      <MediaSlot
-        src={image}
-        alt={`${product.name} ${product.flavorLabel}, ${product.volume}`}
-        aspect="can"
+    <div className={cn("relative mx-auto w-full max-w-[280px]", className)}>
+      <ProductCanImage
+        src={src}
         priority={priority}
         tone={tone}
-        label="Lata 470 ml"
         fitHeight={fitHeight}
-        className="shadow-[var(--shadow-can)]"
+        className="max-w-none"
       />
       {showReflection ? <ProductReflection /> : null}
     </div>
   );
 }
 
-export function ProductReflection({ className }: { className?: string }) {
-  return (
-    <div
-      aria-hidden
-      className={cn(
-        "pointer-events-none mx-auto mt-3 h-10 w-[70%] rounded-[100%] bg-pw-navy/25 blur-xl",
-        className,
-      )}
-    />
-  );
-}
+export { ProductReflection } from "@/components/product/ProductReflection";

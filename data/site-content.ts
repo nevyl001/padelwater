@@ -27,26 +27,34 @@ export const productStoryStages = [
   {
     id: "hidratacion",
     label: "Hidratación",
+    eyebrow: "Para la cancha",
     text: "Electrolitos para acompañar el ritmo del partido.",
     tone: "navy" as const,
+    layout: "backdrop" as const,
   },
   {
-    id: "frescura",
-    label: "Frescura",
+    id: "electrolitos",
+    label: "Con electrolitos",
+    eyebrow: "En el empaque",
+    text: "Con electrolitos orales, tal como lo indica la lata.",
+    tone: "navy" as const,
+    layout: "side" as const,
+  },
+  {
+    id: "coco",
+    label: "Sabor coco",
+    eyebrow: "Frescura",
     text: "Sabor coco, ligero y directo.",
     tone: "water" as const,
-  },
-  {
-    id: "cancha",
-    label: "En la cancha",
-    text: "Antes, durante o después de jugar.",
-    tone: "ice" as const,
+    layout: "open" as const,
   },
   {
     id: "formato",
     label: "470 ml",
+    eyebrow: "Presentación",
     text: "Una presentación lista para acompañar cada encuentro.",
     tone: "lime-soft" as const,
+    layout: "monument" as const,
   },
 ] as const;
 
