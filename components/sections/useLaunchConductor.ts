@@ -146,12 +146,8 @@ export function useLaunchConductor(
         if (holdHint) gsap.set(holdHint, { autoAlpha: 0 });
 
         // On mobile, kill vertical stage travel — stays inside the text band
-        const stageOut = isMobile
-          ? { autoAlpha: 0, y: 0, ease: "none" as const, duration: 0.32 }
-          : { autoAlpha: 0, y: -16, ease: "none" as const, duration: 0.32 };
-        const stageInFrom = isMobile
-          ? { autoAlpha: 0, y: 0 }
-          : { autoAlpha: 0, y: 20 };
+        const outY = isMobile ? 0 : -16;
+        const inY = isMobile ? 0 : 20;
 
         ScrollTrigger.create({
           trigger: storyEl,
@@ -205,12 +201,12 @@ export function useLaunchConductor(
         const s1 = 1.45;
         tl.to(
           stages[0],
-          { autoAlpha: 0, y: -16, ease: "none", duration: 0.32 },
+          { autoAlpha: 0, y: outY, ease: "none", duration: 0.32 },
           s1,
         );
         tl.fromTo(
           stages[1],
-          { autoAlpha: 0, y: 20 },
+          { autoAlpha: 0, y: inY },
           { autoAlpha: 1, y: 0, ease: "none", duration: 0.38 },
           s1 + 0.08,
         );
@@ -225,12 +221,12 @@ export function useLaunchConductor(
         const s2 = s1 + 1.05;
         tl.to(
           stages[1],
-          { autoAlpha: 0, y: -16, ease: "none", duration: 0.32 },
+          { autoAlpha: 0, y: outY, ease: "none", duration: 0.32 },
           s2,
         );
         tl.fromTo(
           stages[2],
-          { autoAlpha: 0, y: 20 },
+          { autoAlpha: 0, y: inY },
           { autoAlpha: 1, y: 0, ease: "none", duration: 0.38 },
           s2 + 0.08,
         );
@@ -251,12 +247,12 @@ export function useLaunchConductor(
         const s3 = s2 + 1.05;
         tl.to(
           stages[2],
-          { autoAlpha: 0, y: -16, ease: "none", duration: 0.32 },
+          { autoAlpha: 0, y: outY, ease: "none", duration: 0.32 },
           s3,
         );
         tl.fromTo(
           stages[3],
-          { autoAlpha: 0, y: 24 },
+          { autoAlpha: 0, y: isMobile ? 0 : 24 },
           { autoAlpha: 1, y: 0, ease: "none", duration: 0.42 },
           s3 + 0.08,
         );
