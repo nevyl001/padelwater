@@ -100,12 +100,12 @@ export function CourtField({
     const t0 = performance.now();
 
     const particleCount =
-      typeof window !== "undefined" && window.innerWidth < 768 ? 8 : 14;
+      typeof window !== "undefined" && window.innerWidth < 768 ? 5 : 12;
     const particles: Particle[] = Array.from({ length: particleCount }, (_, i) => ({
-      u: Math.random(),
-      v: 0.15 + Math.random() * 0.75,
-      speed: 0.035 + Math.random() * 0.06,
-      size: 3.2 + Math.random() * 2.8,
+      u: 0.2 + Math.random() * 0.6,
+      v: 0.35 + Math.random() * 0.55,
+      speed: 0.025 + Math.random() * 0.04,
+      size: 2.8 + Math.random() * 2.2,
       life: Math.random(),
       phase: i * 0.37,
       spin: (Math.random() > 0.5 ? 1 : -1) * (0.001 + Math.random() * 0.0025),
@@ -123,13 +123,20 @@ export function CourtField({
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
 
+    const isMobileView = () => w < 768;
+
+    /**
+     * Mobile: flatter, wider court parked in the lower half so it reads as
+     * a padel court — not a tall wireframe spike behind the copy.
+     * Desktop: deeper perspective across more of the frame.
+     */
     const project = (nx: number, depth: number) => {
-      // nx: -1..1 across court, depth: 0 (far) .. 1 (near)
-      const vanishingY = h * 0.22;
-      const nearY = h * 0.96;
+      const mobile = isMobileView();
+      const vanishingY = mobile ? h * 0.42 : h * 0.2;
+      const nearY = mobile ? h * 0.9 : h * 0.96;
       const y = vanishingY + (nearY - vanishingY) * depth;
-      const halfFar = w * 0.14;
-      const halfNear = w * 0.46;
+      const halfFar = mobile ? w * 0.32 : w * 0.15;
+      const halfNear = mobile ? w * 0.46 : w * 0.46;
       const half = halfFar + (halfNear - halfFar) * depth;
       return { x: w * 0.5 + nx * half, y };
     };
@@ -149,8 +156,8 @@ export function CourtField({
     };
 
     const fillCourtSurface = () => {
-      const tl = project(-1, 0.06);
-      const tr = project(1, 0.06);
+      const tl = project(-1, 0.02);
+      const tr = project(1, 0.02);
       const br = project(1, 1);
       const bl = project(-1, 1);
       ctx.beginPath();
@@ -160,69 +167,109 @@ export function CourtField({
       ctx.lineTo(bl.x, bl.y);
       ctx.closePath();
       const turf = ctx.createLinearGradient(0, tl.y, 0, br.y);
-      if (tone === "dark" || tone === "water") {
-        turf.addColorStop(0, "rgba(0,120,150,0.16)");
-        turf.addColorStop(1, "rgba(0,80,110,0.28)");
+      // Classic blue padel turf — readable on lime and navy scenes
+      if (tone === "lime") {
+        turf.addColorStop(0, "rgba(0,140,170,0.42)");
+        turf.addColorStop(1, "rgba(0,95,125,0.55)");
+      } else if (tone === "dark" || tone === "water") {
+        turf.addColorStop(0, "rgba(0,130,160,0.28)");
+        turf.addColorStop(1, "rgba(0,85,115,0.4)");
       } else {
-        turf.addColorStop(0, "rgba(0,130,160,0.14)");
-        turf.addColorStop(1, "rgba(0,90,120,0.22)");
+        turf.addColorStop(0, "rgba(0,140,170,0.22)");
+        turf.addColorStop(1, "rgba(0,100,130,0.34)");
       }
       ctx.fillStyle = turf;
       ctx.fill();
     };
 
+    const drawSideGlass = (side: -1 | 1, drawProgress: number) => {
+      const mobile = isMobileView();
+      const wallH = mobile ? h * 0.07 : h * 0.09;
+      const near = project(side, 1);
+      const far = project(side, 0.02);
+      const nearTop = { x: near.x, y: near.y - wallH * 0.55 };
+      const farTop = { x: far.x, y: far.y - wallH };
+
+      ctx.beginPath();
+      ctx.moveTo(near.x, near.y);
+      ctx.lineTo(far.x, far.y);
+      ctx.lineTo(farTop.x, farTop.y);
+      ctx.lineTo(nearTop.x, nearTop.y);
+      ctx.closePath();
+      ctx.fillStyle =
+        tone === "dark" || tone === "water"
+          ? "rgba(180,220,235,0.08)"
+          : "rgba(255,255,255,0.22)";
+      ctx.globalAlpha = 0.9 * strength * drawProgress;
+      ctx.fill();
+      ctx.strokeStyle =
+        tone === "dark" || tone === "water"
+          ? "rgba(255,255,255,0.35)"
+          : "rgba(255,255,255,0.75)";
+      ctx.lineWidth = Math.max(1.5, w * 0.003);
+      ctx.stroke();
+
+      // Glass mullions
+      ctx.globalAlpha = 0.35 * strength * drawProgress;
+      for (const d of [0.25, 0.5, 0.75]) {
+        const p = project(side, d);
+        const top = p.y - wallH * (0.55 + (1 - d) * 0.45);
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(p.x, top);
+        ctx.stroke();
+      }
+    };
+
     const drawCourt = (time: number) => {
-      const pulse = animated ? 0.55 + 0.45 * Math.sin(time * 0.00055) : 0.7;
+      const mobile = isMobileView();
+      const pulse = animated ? 0.7 + 0.3 * Math.sin(time * 0.00045) : 0.85;
       const drawProgress = animated
-        ? Math.min(1, (time - t0) / 1600)
+        ? Math.min(1, (time - t0) / 1400)
         : 1;
 
-      // Surface first so lines read as court markings, not abstract rays
       ctx.save();
-      ctx.globalAlpha = 0.85 * strength * drawProgress;
+      ctx.globalAlpha = (mobile ? 0.95 : 0.85) * strength * drawProgress;
       fillCourtSurface();
       ctx.restore();
 
+      // Side glass cages — key padel cue
       ctx.save();
-      ctx.globalAlpha = 0.82 * strength * pulse * drawProgress;
-      ctx.strokeStyle =
-        tone === "dark" || tone === "water"
-          ? "rgba(255,255,255,0.55)"
-          : "rgba(255,255,255,0.92)";
-      ctx.lineWidth = Math.max(2, w * 0.0024);
+      drawSideGlass(-1, drawProgress);
+      drawSideGlass(1, drawProgress);
+      ctx.restore();
+
+      ctx.save();
+      ctx.globalAlpha = 0.95 * strength * pulse * drawProgress;
+      ctx.strokeStyle = "rgba(255,255,255,0.92)";
+      ctx.lineWidth = mobile
+        ? Math.max(2.4, w * 0.007)
+        : Math.max(2, w * 0.0026);
       ctx.lineJoin = "round";
       ctx.lineCap = "round";
       ctx.setLineDash([]);
 
-      // Outer boundary (padel court footprint)
+      // Outer boundary
       strokePoly(
-        [project(-1, 0.06), project(1, 0.06), project(1, 1), project(-1, 1)],
+        [project(-1, 0.02), project(1, 0.02), project(1, 1), project(-1, 1)],
         true,
       );
 
-      // Service lines (parallel to net) — classic padel layout
-      for (const d of [0.32, 0.68]) {
+      // Service boxes — padel proportions
+      for (const d of [0.34, 0.66]) {
         strokePoly([project(-1, d), project(1, d)]);
       }
+      strokePoly([project(0, 0.34), project(0, 0.66)]);
 
-      // Center line (service) — net to each service line
-      strokePoly([project(0, 0.32), project(0, 0.68)]);
-
-      // Side corridors hint (glass / out-of-bounds feel)
-      ctx.globalAlpha = 0.35 * strength * drawProgress;
-      ctx.lineWidth = Math.max(1.2, w * 0.0015);
-      strokePoly([project(-1.08, 0.06), project(-1.08, 1)]);
-      strokePoly([project(1.08, 0.06), project(1.08, 1)]);
-
-      // Net posts + band (readable as red/white net across mid-court)
+      // Net
       const netD = 0.5;
-      const nL = project(-1.02, netD);
-      const nR = project(1.02, netD);
-      const postH = Math.max(14, h * 0.035);
+      const nL = project(-1, netD);
+      const nR = project(1, netD);
+      const postH = mobile ? Math.max(18, h * 0.028) : Math.max(16, h * 0.035);
 
-      ctx.globalAlpha = 0.9 * strength * drawProgress;
-      ctx.strokeStyle = palette.accent;
-      ctx.lineWidth = Math.max(2.5, w * 0.003);
+      ctx.globalAlpha = 0.95 * strength * drawProgress;
+      ctx.strokeStyle = tone === "lime" ? "rgba(7,26,56,0.55)" : palette.accent;
+      ctx.lineWidth = Math.max(2.5, w * 0.004);
       ctx.beginPath();
       ctx.moveTo(nL.x, nL.y);
       ctx.lineTo(nL.x, nL.y - postH);
@@ -232,48 +279,40 @@ export function CourtField({
 
       const netGrad = ctx.createLinearGradient(nL.x, nL.y, nR.x, nR.y);
       netGrad.addColorStop(0, "transparent");
-      netGrad.addColorStop(0.12, palette.glow);
-      netGrad.addColorStop(0.5, "rgba(255,255,255,0.85)");
-      netGrad.addColorStop(0.88, palette.glow);
+      netGrad.addColorStop(0.15, palette.glow);
+      netGrad.addColorStop(0.5, "rgba(255,255,255,0.95)");
+      netGrad.addColorStop(0.85, palette.glow);
       netGrad.addColorStop(1, "transparent");
       ctx.strokeStyle = netGrad;
-      ctx.lineWidth = Math.max(3, w * 0.004);
+      ctx.lineWidth = mobile ? Math.max(3.5, w * 0.01) : Math.max(3, w * 0.0045);
       ctx.beginPath();
-      ctx.moveTo(nL.x, nL.y - postH * 0.55);
-      ctx.lineTo(nR.x, nR.y - postH * 0.55);
+      ctx.moveTo(nL.x, nL.y - postH * 0.5);
+      ctx.lineTo(nR.x, nR.y - postH * 0.5);
       ctx.stroke();
 
-      // Mesh ticks on the net
-      ctx.globalAlpha = 0.28 * strength;
-      ctx.strokeStyle = palette.line;
-      ctx.lineWidth = 1;
-      for (let i = 1; i < 10; i++) {
-        const t = i / 10;
-        const x = nL.x + (nR.x - nL.x) * t;
-        const y = nL.y + (nR.y - nL.y) * t;
-        ctx.beginPath();
-        ctx.moveTo(x, y - postH * 0.15);
-        ctx.lineTo(x, y - postH * 0.85);
-        ctx.stroke();
-      }
-
-      // Far glass wall — framed back board, not radiating ticks
+      // Back glass wall
+      const gL = project(-1, 0.02);
+      const gR = project(1, 0.02);
+      const wallH = mobile ? h * 0.055 : h * 0.07;
+      const glassTop = gL.y - wallH;
+      ctx.globalAlpha = 0.55 * strength * drawProgress;
+      ctx.fillStyle =
+        tone === "dark" || tone === "water"
+          ? "rgba(180,220,235,0.1)"
+          : "rgba(255,255,255,0.28)";
+      ctx.beginPath();
+      ctx.moveTo(gL.x, gL.y);
+      ctx.lineTo(gR.x, gR.y);
+      ctx.lineTo(gR.x, glassTop);
+      ctx.lineTo(gL.x, glassTop);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = "rgba(255,255,255,0.85)";
+      ctx.lineWidth = Math.max(1.8, w * 0.004);
+      ctx.stroke();
       ctx.globalAlpha = 0.4 * strength * drawProgress;
-      ctx.strokeStyle = palette.accent;
-      ctx.lineWidth = Math.max(1.4, w * 0.0018);
-      const glassY0 = project(0, 0.06).y;
-      const glassTop = glassY0 - Math.max(22, h * 0.05);
-      const gL = project(-1, 0.06);
-      const gR = project(1, 0.06);
-      strokePoly([
-        { x: gL.x, y: glassTop },
-        { x: gR.x, y: glassTop },
-        { x: gR.x, y: gR.y },
-        { x: gL.x, y: gL.y },
-      ], true);
-      // Vertical mullions
       for (const nx of [-0.5, 0, 0.5]) {
-        const p = project(nx, 0.06);
+        const p = project(nx, 0.02);
         ctx.beginPath();
         ctx.moveTo(p.x, glassTop);
         ctx.lineTo(p.x, p.y);
@@ -284,6 +323,24 @@ export function CourtField({
     };
 
     const drawWashes = (time: number) => {
+      if (isMobileView()) {
+        // Single soft wash — keep the court readable
+        const g = ctx.createRadialGradient(
+          w * 0.5,
+          h * 0.72,
+          0,
+          w * 0.5,
+          h * 0.72,
+          w * 0.55,
+        );
+        g.addColorStop(0, palette.washA);
+        g.addColorStop(1, "transparent");
+        ctx.globalAlpha = 0.55 * strength;
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, w, h);
+        ctx.globalAlpha = 1;
+        return;
+      }
       const a = animated ? time * 0.00015 : 0;
       const x1 = w * (0.25 + 0.08 * Math.sin(a));
       const y1 = h * (0.35 + 0.06 * Math.cos(a * 1.3));
@@ -372,12 +429,13 @@ export function CourtField({
         const travel = animated
           ? (p.life + time * 0.0001 * p.speed) % 1
           : (p.life + 0.35) % 1;
-        const depth = 0.18 + travel * 0.72;
+        const depth = isMobileView()
+          ? 0.4 + travel * 0.55
+          : 0.18 + travel * 0.72;
         const sway = animated
-          ? Math.sin(time * 0.001 + p.phase) * 0.07 +
-            Math.sin(time * 0.00035 + p.phase * 2) * 0.035
+          ? Math.sin(time * 0.001 + p.phase) * 0.05
           : Math.sin(p.phase) * 0.03;
-        const nx = (p.u * 2 - 1) * 0.72 + sway;
+        const nx = (p.u * 2 - 1) * (isMobileView() ? 0.55 : 0.72) + sway;
         const pos = project(nx, depth);
         const alpha =
           (animated
@@ -414,7 +472,7 @@ export function CourtField({
     };
 
     const drawSweep = (time: number) => {
-      if (!animated) return;
+      if (!animated || isMobileView()) return;
       const cycle = ((time * 0.00008) % 1) * w * 1.6 - w * 0.3;
       const grad = ctx.createLinearGradient(cycle, 0, cycle + w * 0.35, 0);
       grad.addColorStop(0, "transparent");
@@ -464,7 +522,7 @@ export function CourtField({
       )}
     >
       <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,transparent_40%,rgba(3,17,38,0.25)_100%)] opacity-50 mix-blend-multiply" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,transparent_55%,rgba(3,17,38,0.18)_100%)] opacity-40 mix-blend-multiply max-md:opacity-25" />
     </div>
   );
 }
