@@ -3,7 +3,8 @@
 import { useEffect, useState, type RefObject } from "react";
 import type { MotionLayer } from "@/lib/animation/preferences";
 
-const STORY_VH = 360;
+const STORY_VH_DESKTOP = 360;
+const STORY_VH_MOBILE = 300;
 
 type LaunchRefs = {
   rootRef: RefObject<HTMLDivElement | null>;
@@ -23,8 +24,8 @@ type LaunchFlags = {
 };
 
 /**
- * Desktop motion for hero → product story.
- * Cans stay in document flow (no site-wide fixed stage).
+ * Shared scroll theatre for hero → product story (desktop + mobile).
+ * Pin + scrub stages; can stays inside the pin (never site-fixed).
  */
 export function useLaunchConductor(
   refs: LaunchRefs,
@@ -32,11 +33,10 @@ export function useLaunchConductor(
 ): { activeStage: number; storyVh: number } {
   const [activeStage, setActiveStage] = useState(0);
   const { ready, prefersReducedMotion, isMobile, layer } = flags;
+  const storyVh = isMobile ? STORY_VH_MOBILE : STORY_VH_DESKTOP;
 
   useEffect(() => {
-    if (!ready || prefersReducedMotion || isMobile) {
-      return;
-    }
+    if (!ready || prefersReducedMotion) return;
 
     const root = refs.rootRef.current;
     const hero = refs.heroRef.current;
@@ -56,6 +56,8 @@ export function useLaunchConductor(
     const heroCanEl = heroCan;
     const storyCanEl = storyCan;
     const copyEl = copy;
+    const vh = isMobile ? STORY_VH_MOBILE : STORY_VH_DESKTOP;
+    const shift = isMobile ? 28 : 100;
 
     let dead = false;
     let revert: (() => void) | undefined;
@@ -79,43 +81,42 @@ export function useLaunchConductor(
         );
         const holdHint = pinEl.querySelector("[data-hold-hint]");
 
-        gsap.set(storyCanEl, { autoAlpha: 0, scale: 0.92 });
+        gsap.set(storyCanEl, { autoAlpha: 0, scale: 0.92, x: 0, y: 0 });
 
-        if (layer === "fullMotion") {
-          gsap.set([eyebrow, brand, ...Array.from(late)], { opacity: 0, y: 18 });
-          gsap.set(lines, { yPercent: 105, opacity: 0 });
-          if (court) gsap.set(court, { opacity: 0 });
-          if (reflection) gsap.set(reflection, { opacity: 0 });
-          gsap.set(heroCanEl, { scale: 0.92 });
+        // Intro on both desktop and mobile
+        gsap.set([eyebrow, brand, ...Array.from(late)], { opacity: 0, y: 18 });
+        gsap.set(lines, { yPercent: 105, opacity: 0 });
+        if (court) gsap.set(court, { opacity: 0 });
+        if (reflection) gsap.set(reflection, { opacity: 0 });
+        gsap.set(heroCanEl, { scale: 0.92, opacity: 1 });
 
-          const intro = gsap.timeline({ defaults: { ease: "power3.out" } });
-          if (court) intro.to(court, { opacity: 1, duration: 0.7 }, 0);
-          intro
-            .to(heroCanEl, { scale: 1, duration: 0.85 }, 0.08)
-            .to(reflection, { opacity: 1, duration: 0.35 }, 0.55)
-            .to(brand, { opacity: 1, y: 0, duration: 0.4 }, 0.25)
-            .to(eyebrow, { opacity: 1, y: 0, duration: 0.35 }, 0.45)
-            .to(
-              lines,
-              { yPercent: 0, opacity: 1, duration: 0.55, stagger: 0.08 },
-              0.55,
-            )
-            .to(
-              late,
-              { opacity: 1, y: 0, duration: 0.35, stagger: 0.05 },
-              0.95,
-            );
-          if (sheen) {
-            intro.fromTo(
-              sheen,
-              { x: "-130%", opacity: 0 },
-              { x: "230%", opacity: 1, duration: 0.65, ease: "power2.inOut" },
-              0.65,
-            );
-          }
+        const intro = gsap.timeline({ defaults: { ease: "power3.out" } });
+        if (court) intro.to(court, { opacity: 1, duration: 0.55 }, 0);
+        intro
+          .to(heroCanEl, { scale: 1, duration: 0.75 }, 0.06)
+          .to(reflection, { opacity: 1, duration: 0.3 }, 0.45)
+          .to(brand, { opacity: 1, y: 0, duration: 0.35 }, 0.18)
+          .to(eyebrow, { opacity: 1, y: 0, duration: 0.3 }, 0.32)
+          .to(
+            lines,
+            { yPercent: 0, opacity: 1, duration: 0.48, stagger: 0.07 },
+            0.38,
+          )
+          .to(
+            late,
+            { opacity: 1, y: 0, duration: 0.32, stagger: 0.05 },
+            0.78,
+          );
+        if (sheen) {
+          intro.fromTo(
+            sheen,
+            { x: "-130%", opacity: 0 },
+            { x: "230%", opacity: 1, duration: 0.55, ease: "power2.inOut" },
+            0.55,
+          );
         }
 
-        let live = true;
+        let live = !isMobile;
         const qx = gsap.quickTo(heroCanEl, "x", {
           duration: 0.55,
           ease: "power3",
@@ -125,17 +126,19 @@ export function useLaunchConductor(
           ease: "power3",
         });
 
-        const onMove = (e: PointerEvent) => {
-          if (!live) return;
-          const hr = heroEl.getBoundingClientRect();
-          if (e.clientY < hr.top || e.clientY > hr.bottom) return;
-          const px = (e.clientX - hr.left) / hr.width - 0.5;
-          const py = (e.clientY - hr.top) / hr.height - 0.5;
-          qx(px * 14);
-          qy(py * 10);
-        };
-        window.addEventListener("pointermove", onMove, { passive: true });
-        offPointer = () => window.removeEventListener("pointermove", onMove);
+        if (!isMobile) {
+          const onMove = (e: PointerEvent) => {
+            if (!live) return;
+            const hr = heroEl.getBoundingClientRect();
+            if (e.clientY < hr.top || e.clientY > hr.bottom) return;
+            const px = (e.clientX - hr.left) / hr.width - 0.5;
+            const py = (e.clientY - hr.top) / hr.height - 0.5;
+            qx(px * 14);
+            qy(py * 10);
+          };
+          window.addEventListener("pointermove", onMove, { passive: true });
+          offPointer = () => window.removeEventListener("pointermove", onMove);
+        }
 
         gsap.set(stages, { autoAlpha: 0, y: 24 });
         if (stages[0]) gsap.set(stages[0], { autoAlpha: 1, y: 0 });
@@ -144,7 +147,7 @@ export function useLaunchConductor(
         ScrollTrigger.create({
           trigger: storyEl,
           start: "top top",
-          end: () => `+=${STORY_VH * (window.innerHeight / 100)}`,
+          end: () => `+=${vh * (window.innerHeight / 100)}`,
           pin: pinEl,
           anticipatePin: 1,
           invalidateOnRefresh: true,
@@ -155,10 +158,11 @@ export function useLaunchConductor(
             trigger: rootEl,
             start: "top top",
             end: () =>
-              `+=${window.innerHeight + STORY_VH * (window.innerHeight / 100)}`,
-            scrub: 0.65,
+              `+=${window.innerHeight + vh * (window.innerHeight / 100)}`,
+            scrub: isMobile ? 0.45 : 0.65,
             invalidateOnRefresh: true,
             onUpdate: (self) => {
+              if (isMobile) return;
               const heroEnd = window.innerHeight / (self.end - self.start);
               live = self.progress < heroEnd * 0.55;
               if (!live) {
@@ -169,95 +173,94 @@ export function useLaunchConductor(
           },
         });
 
-        // Hero exit → story can enters (local elements only)
-        tl.to(copyEl, { opacity: 0, y: -28, ease: "none", duration: 0.9 }, 0);
+        tl.to(copyEl, { opacity: 0, y: -24, ease: "none", duration: 0.85 }, 0);
         tl.to(
           heroCanEl,
-          { autoAlpha: 0, scale: 0.9, y: -40, ease: "none", duration: 0.85 },
+          { autoAlpha: 0, scale: 0.9, y: -32, ease: "none", duration: 0.8 },
           0.05,
         );
         tl.fromTo(
           storyCanEl,
-          { autoAlpha: 0, scale: 0.94, y: 28 },
-          { autoAlpha: 1, scale: 1, y: 0, ease: "none", duration: 0.9 },
-          0.35,
+          { autoAlpha: 0, scale: 0.94, y: 24 },
+          { autoAlpha: 1, scale: 1, y: 0, ease: "none", duration: 0.85 },
+          0.3,
         );
-        tl.call(() => setActiveStage(0), undefined, 0.9);
+        tl.call(() => setActiveStage(0), undefined, 0.85);
 
-        const s1 = 1.55;
+        const s1 = 1.45;
         tl.to(
           stages[0],
-          { autoAlpha: 0, y: -18, ease: "none", duration: 0.35 },
+          { autoAlpha: 0, y: -16, ease: "none", duration: 0.32 },
           s1,
         );
         tl.fromTo(
           stages[1],
-          { autoAlpha: 0, y: 22 },
-          { autoAlpha: 1, y: 0, ease: "none", duration: 0.4 },
-          s1 + 0.1,
+          { autoAlpha: 0, y: 20 },
+          { autoAlpha: 1, y: 0, ease: "none", duration: 0.38 },
+          s1 + 0.08,
         );
         tl.to(
           storyCanEl,
-          { x: 100, scale: 1, ease: "none", duration: 0.5 },
+          { x: shift, scale: 1, ease: "none", duration: 0.45 },
           s1,
         );
-        tl.call(() => setActiveStage(1), undefined, s1 + 0.15);
-        tl.to({}, { duration: 0.65 }, s1 + 0.5);
+        tl.call(() => setActiveStage(1), undefined, s1 + 0.12);
+        tl.to({}, { duration: 0.6 }, s1 + 0.45);
 
-        const s2 = s1 + 1.15;
+        const s2 = s1 + 1.05;
         tl.to(
           stages[1],
-          { autoAlpha: 0, y: -18, ease: "none", duration: 0.35 },
+          { autoAlpha: 0, y: -16, ease: "none", duration: 0.32 },
           s2,
         );
         tl.fromTo(
           stages[2],
-          { autoAlpha: 0, y: 22 },
-          { autoAlpha: 1, y: 0, ease: "none", duration: 0.4 },
-          s2 + 0.1,
+          { autoAlpha: 0, y: 20 },
+          { autoAlpha: 1, y: 0, ease: "none", duration: 0.38 },
+          s2 + 0.08,
         );
         tl.to(
           storyCanEl,
-          { x: -80, scale: 1.02, ease: "none", duration: 0.5 },
+          { x: -shift * 0.75, scale: 1.02, ease: "none", duration: 0.45 },
           s2,
         );
-        tl.call(() => setActiveStage(2), undefined, s2 + 0.15);
-        tl.to({}, { duration: 0.65 }, s2 + 0.5);
+        tl.call(() => setActiveStage(2), undefined, s2 + 0.12);
+        tl.to({}, { duration: 0.6 }, s2 + 0.45);
 
-        const s3 = s2 + 1.15;
+        const s3 = s2 + 1.05;
         tl.to(
           stages[2],
-          { autoAlpha: 0, y: -18, ease: "none", duration: 0.35 },
+          { autoAlpha: 0, y: -16, ease: "none", duration: 0.32 },
           s3,
         );
         tl.fromTo(
           stages[3],
-          { autoAlpha: 0, y: 28 },
-          { autoAlpha: 1, y: 0, ease: "none", duration: 0.45 },
-          s3 + 0.1,
+          { autoAlpha: 0, y: 24 },
+          { autoAlpha: 1, y: 0, ease: "none", duration: 0.42 },
+          s3 + 0.08,
         );
         tl.to(
           storyCanEl,
-          { x: 0, y: 8, scale: 1, ease: "none", duration: 0.5 },
+          { x: 0, y: isMobile ? 4 : 8, scale: 1, ease: "none", duration: 0.45 },
           s3,
         );
-        tl.call(() => setActiveStage(3), undefined, s3 + 0.15);
-        tl.to({}, { duration: 0.7 }, s3 + 0.55);
+        tl.call(() => setActiveStage(3), undefined, s3 + 0.12);
+        tl.to({}, { duration: 0.65 }, s3 + 0.5);
 
-        const hold = s3 + 1.25;
+        const hold = s3 + 1.15;
         if (holdHint) {
           tl.to(
             holdHint,
-            { autoAlpha: 0.65, ease: "none", duration: 0.35 },
+            { autoAlpha: 0.65, ease: "none", duration: 0.3 },
             hold,
           );
         }
         tl.to(
           pinEl.querySelector("[data-story-backdrop]"),
-          { backgroundColor: "#cfe8c4", ease: "none", duration: 0.45 },
+          { backgroundColor: "#cfe8c4", ease: "none", duration: 0.4 },
           hold,
         );
-        tl.to({}, { duration: 0.55 }, hold + 0.25);
+        tl.to({}, { duration: 0.5 }, hold + 0.2);
       }, rootEl);
 
       revert = () => {
@@ -296,5 +299,5 @@ export function useLaunchConductor(
     refs.heroCopyRef,
   ]);
 
-  return { activeStage, storyVh: STORY_VH };
+  return { activeStage, storyVh };
 }
