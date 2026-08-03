@@ -10,6 +10,7 @@ import { ProductCanStage } from "@/components/product/ProductCanStage";
 import { CourtField } from "@/components/atmosphere/CourtField";
 import { useMotionPreferences } from "@/components/motion/MotionPreferences";
 import { useLaunchConductor } from "@/components/sections/useLaunchConductor";
+import { useMobileLaunchMotion } from "@/components/sections/useMobileLaunchMotion";
 import { cn } from "@/lib/cn";
 
 const toneBg = {
@@ -56,6 +57,7 @@ export function LaunchExperience() {
   const heroCanRef = useRef<HTMLDivElement>(null);
   const storyCanRef = useRef<HTMLDivElement>(null);
   const heroCopyRef = useRef<HTMLDivElement>(null);
+  const mobileStoryRef = useRef<HTMLDivElement>(null);
 
   const { prefersReducedMotion, isMobile, ready, layer } =
     useMotionPreferences();
@@ -71,6 +73,17 @@ export function LaunchExperience() {
       heroCopyRef,
     },
     { ready, prefersReducedMotion, isMobile, layer },
+  );
+
+  useMobileLaunchMotion(
+    {
+      rootRef,
+      heroRef,
+      heroCanRef,
+      heroCopyRef,
+      mobileStoryRef,
+    },
+    { ready, prefersReducedMotion, isMobile },
   );
 
   const canUseConductor = ready && !prefersReducedMotion && !isMobile;
@@ -276,59 +289,107 @@ export function LaunchExperience() {
           </div>
         </div>
 
-        <div className={cn(showDesktopPin && "md:hidden")}>
-          {productStoryStages.map((stage, index) => (
-            <div
-              key={stage.id}
-              className={cn(
-                "relative overflow-hidden section-pad",
-                toneBg[stage.tone],
-                toneText[stage.tone],
-              )}
-            >
-              <CourtField
-                tone={courtTone[stage.tone]}
-                intensity="soft"
-                animated={false}
-              />
-              <Container className="relative z-10">
-                <div className="mx-auto flex max-w-lg flex-col items-center gap-10 text-center">
-                  <div className="w-full">
-                    <p className="text-xs uppercase tracking-[0.22em] opacity-55">
-                      {stage.eyebrow}
-                    </p>
-                    <h2 className="mt-3 font-display text-[clamp(2.25rem,9vw,3.25rem)] font-bold uppercase leading-[1.02] tracking-[-0.02em]">
-                      {stage.label}
-                    </h2>
-                    <p className="mx-auto mt-4 max-w-md text-base leading-relaxed opacity-80">
-                      {stage.text}
-                    </p>
-                    {index === 1 ? (
-                      <ul className="mt-6 space-y-2 text-sm opacity-75">
-                        <li>{product.feature}</li>
-                        <li>{product.flavorLabel}</li>
-                      </ul>
+        <div
+          ref={mobileStoryRef}
+          className={cn(showDesktopPin && "md:hidden")}
+        >
+          {productStoryStages.map((stage, index) => {
+            const showCan = index === 0 || index === 2 || index === 3;
+            const canFirst = index === 0 || index === 3;
+            return (
+              <div
+                key={stage.id}
+                data-mobile-beat
+                className={cn(
+                  "relative flex min-h-[100svh] flex-col justify-center overflow-hidden py-16",
+                  toneBg[stage.tone],
+                  toneText[stage.tone],
+                )}
+              >
+                <CourtField
+                  tone={courtTone[stage.tone]}
+                  intensity="medium"
+                  animated={animateCourt}
+                />
+                <p
+                  aria-hidden
+                  data-beat-mark
+                  className="pointer-events-none absolute inset-x-0 top-1/2 z-0 -translate-y-1/2 text-center font-display text-[clamp(4.5rem,28vw,9rem)] font-bold uppercase leading-none tracking-[-0.05em] opacity-[0.08]"
+                >
+                  {stage.label}
+                </p>
+                <Container className="relative z-10">
+                  <div
+                    className={cn(
+                      "mx-auto flex max-w-md flex-col gap-10",
+                      canFirst ? "items-center text-center" : "items-stretch text-left",
+                    )}
+                  >
+                    {showCan && canFirst ? (
+                      <div data-beat-can className="mx-auto w-full max-w-[180px]">
+                        <ProductCanStage
+                          mode="inline"
+                          size="inline"
+                          quiet={index === 3}
+                          tone={
+                            stage.tone === "lime-soft"
+                              ? "ice"
+                              : stage.tone === "water"
+                                ? "water"
+                                : "navy"
+                          }
+                          showReflection={index === 3}
+                        />
+                      </div>
+                    ) : null}
+
+                    <div data-beat-copy className="w-full">
+                      <p className="text-[0.7rem] uppercase tracking-[0.28em] opacity-55">
+                        {String(index + 1).padStart(2, "0")} · {stage.eyebrow}
+                      </p>
+                      <h2 className="mt-3 font-display text-[clamp(2.4rem,11vw,3.4rem)] font-bold uppercase leading-[1.02] tracking-[-0.03em]">
+                        {stage.label}
+                      </h2>
+                      <p className="mt-4 max-w-md text-base leading-relaxed opacity-80">
+                        {stage.text}
+                      </p>
+                      {index === 1 ? (
+                        <ul className="mt-6 space-y-2 text-sm opacity-75">
+                          <li>{product.feature}</li>
+                          <li>{product.flavorLabel}</li>
+                        </ul>
+                      ) : null}
+                    </div>
+
+                    {showCan && !canFirst ? (
+                      <div data-beat-can className="mx-auto w-full max-w-[170px]">
+                        <ProductCanStage
+                          mode="inline"
+                          size="inline"
+                          quiet
+                          tone={
+                            stage.tone === "lime-soft"
+                              ? "ice"
+                              : stage.tone === "water"
+                                ? "water"
+                                : "navy"
+                          }
+                        />
+                      </div>
+                    ) : null}
+
+                    {!showCan ? (
+                      <div
+                        data-beat-can
+                        aria-hidden
+                        className="h-1 w-16 rounded-full bg-current/30"
+                      />
                     ) : null}
                   </div>
-                  <div className="w-full max-w-[200px]">
-                    <ProductCanStage
-                      mode="inline"
-                      size="inline"
-                      quiet={index === 3}
-                      tone={
-                        stage.tone === "lime-soft"
-                          ? "ice"
-                          : stage.tone === "water"
-                            ? "water"
-                            : "navy"
-                      }
-                      showReflection={index === 3}
-                    />
-                  </div>
-                </div>
-              </Container>
-            </div>
-          ))}
+                </Container>
+              </div>
+            );
+          })}
         </div>
       </section>
     </div>

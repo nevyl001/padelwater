@@ -31,11 +31,11 @@ export const motionProfiles = {
     storyStages: 4,
   },
   mobileMotion: {
-    enableParallax: false,
+    enableParallax: true,
     enableMagnetic: false,
     enablePointerHero: false,
-    storyVh: 180,
-    storyStages: 3,
+    storyVh: 220,
+    storyStages: 4,
   },
   reducedMotion: {
     enableParallax: false,

@@ -26,46 +26,82 @@ const panelTones = [
 export function ConsumptionMoments() {
   const rootRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
+  const mobileStackRef = useRef<HTMLDivElement>(null);
   const { prefersReducedMotion, isMobile, ready } = useMotionPreferences();
+  const animateCourt = ready && !prefersReducedMotion;
 
   useEffect(() => {
     const rootEl = rootRef.current;
-    const trackEl = trackRef.current;
-    if (!ready || !rootEl || !trackEl || prefersReducedMotion || isMobile) {
-      return;
-    }
+    if (!ready || !rootEl || prefersReducedMotion) return;
 
-    const root = rootEl;
-    const track = trackEl;
     let reverted: (() => void) | undefined;
 
     async function run() {
       const { getGsap } = await import("@/lib/animation/gsap");
       const { gsap, ScrollTrigger } = getGsap();
-
-      const totalScroll = () =>
-        Math.max(0, track.scrollWidth - window.innerWidth);
+      const root = rootEl!;
 
       const ctx = gsap.context(() => {
-        gsap.to(track, {
-          x: () => -totalScroll(),
-          ease: "none",
-          scrollTrigger: {
-            trigger: root,
-            start: "top top",
-            end: () => `+=${Math.max(totalScroll(), window.innerHeight * 0.85)}`,
-            pin: true,
-            scrub: 0.65,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-          },
-        });
+        if (!isMobile && trackRef.current) {
+          const track = trackRef.current;
+          const totalScroll = () =>
+            Math.max(0, track.scrollWidth - window.innerWidth);
+
+          gsap.to(track, {
+            x: () => -totalScroll(),
+            ease: "none",
+            scrollTrigger: {
+              trigger: root,
+              start: "top top",
+              end: () =>
+                `+=${Math.max(totalScroll(), window.innerHeight * 0.85)}`,
+              pin: true,
+              scrub: 0.65,
+              anticipatePin: 1,
+              invalidateOnRefresh: true,
+            },
+          });
+        }
+
+        if (isMobile && mobileStackRef.current) {
+          const cards = gsap.utils.toArray<HTMLElement>(
+            mobileStackRef.current.querySelectorAll("[data-moment-card]"),
+          );
+          cards.forEach((card) => {
+            const copy = card.querySelector("[data-moment-copy]");
+            const court = card.querySelector("[data-court-field]");
+            if (copy) gsap.set(copy.children, { opacity: 0, y: 26 });
+            if (court) gsap.set(court, { opacity: 0.4 });
+
+            const tl = gsap.timeline({
+              scrollTrigger: {
+                trigger: card,
+                start: "top 80%",
+                toggleActions: "play none none reverse",
+              },
+            });
+            if (court) tl.to(court, { opacity: 1, duration: 0.45 }, 0);
+            if (copy) {
+              tl.to(
+                copy.children,
+                {
+                  opacity: 1,
+                  y: 0,
+                  duration: 0.42,
+                  stagger: 0.08,
+                  ease: "power3.out",
+                },
+                0.05,
+              );
+            }
+          });
+        }
       }, root);
 
       reverted = () => {
         ctx.revert();
         ScrollTrigger.getAll()
-          .filter((t) => t.trigger === root)
+          .filter((t) => t.trigger === root || (t.trigger instanceof Element && root.contains(t.trigger)))
           .forEach((t) => t.kill());
       };
     }
@@ -80,7 +116,6 @@ export function ConsumptionMoments() {
       className={cn(
         "relative bg-pw-ice",
         "md:h-svh md:overflow-hidden",
-        "max-md:section-pad",
         prefersReducedMotion && "md:h-auto md:overflow-visible md:section-pad",
       )}
       aria-label="Momentos de consumo"
@@ -92,14 +127,13 @@ export function ConsumptionMoments() {
           prefersReducedMotion && "md:h-auto md:pt-0 md:pb-0",
         )}
       >
-        <Container className="relative z-10 shrink-0 max-md:text-center md:text-left">
+        <Container className="relative z-10 shrink-0 max-md:px-6 max-md:pt-14 max-md:text-center md:text-left">
           <SectionLabel>Momento de consumo</SectionLabel>
           <h2 className="mt-3 max-w-3xl font-display text-[clamp(2rem,4.5vw,3.75rem)] font-bold uppercase leading-[1.02] tracking-[-0.03em] text-pw-navy md:mt-4">
             Antes. Durante. Después.
           </h2>
         </Container>
 
-        {/* Desktop: full-bleed horizontal moments */}
         <div
           ref={trackRef}
           className={cn(
@@ -117,7 +151,11 @@ export function ConsumptionMoments() {
                   tone.bg,
                 )}
               >
-                <CourtField tone={tone.court} intensity="soft" animated={false} />
+                <CourtField
+                  tone={tone.court}
+                  intensity="soft"
+                  animated={animateCourt}
+                />
                 <div className="relative z-10 max-w-md">
                   <p className="text-xs uppercase tracking-[0.28em] opacity-55">
                     {String(index + 1).padStart(2, "0")}
@@ -134,10 +172,10 @@ export function ConsumptionMoments() {
           })}
         </div>
 
-        {/* Mobile + reduced-motion */}
         <div
+          ref={mobileStackRef}
           className={cn(
-            "mt-10 space-y-0",
+            "mt-8 space-y-0",
             prefersReducedMotion ? "md:mt-12 md:block" : "md:hidden",
           )}
         >
@@ -146,17 +184,25 @@ export function ConsumptionMoments() {
             return (
               <article
                 key={moment.id}
+                data-moment-card
                 className={cn(
-                  "relative overflow-hidden px-6 py-14 sm:px-10",
+                  "relative min-h-[70svh] overflow-hidden px-6 py-16 sm:px-10",
                   tone.bg,
                 )}
               >
-                <CourtField tone={tone.court} intensity="soft" animated={false} />
-                <div className="relative z-10 mx-auto max-w-md">
+                <CourtField
+                  tone={tone.court}
+                  intensity="medium"
+                  animated={animateCourt}
+                />
+                <div
+                  data-moment-copy
+                  className="relative z-10 mx-auto flex max-w-md flex-col justify-end"
+                >
                   <p className="text-xs uppercase tracking-[0.28em] opacity-55">
                     {String(index + 1).padStart(2, "0")}
                   </p>
-                  <h3 className="mt-3 font-display text-[clamp(2.25rem,10vw,3.25rem)] font-bold uppercase leading-[0.95] tracking-[-0.03em]">
+                  <h3 className="mt-3 font-display text-[clamp(2.5rem,12vw,3.5rem)] font-bold uppercase leading-[0.95] tracking-[-0.03em]">
                     {moment.label}.
                   </h3>
                   <p className="mt-4 text-base leading-relaxed opacity-80">

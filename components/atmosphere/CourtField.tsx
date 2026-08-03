@@ -93,7 +93,9 @@ export function CourtField({
     let dpr = 1;
     const t0 = performance.now();
 
-    const particles: Particle[] = Array.from({ length: 28 }, (_, i) => ({
+    const particleCount =
+      typeof window !== "undefined" && window.innerWidth < 768 ? 16 : 28;
+    const particles: Particle[] = Array.from({ length: particleCount }, (_, i) => ({
       u: Math.random(),
       v: 0.15 + Math.random() * 0.75,
       speed: 0.04 + Math.random() * 0.08,
