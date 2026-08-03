@@ -116,20 +116,15 @@ export function ProductStoryScene() {
                   ))}
                 </div>
 
-                {/* MIDDLE — can only, height-locked */}
-                <div className="relative z-10 flex min-h-0 flex-1 items-center justify-center overflow-hidden px-5 py-2">
-                  <div
-                    ref={canRef}
-                    className="h-full max-h-full w-auto"
-                    style={{ aspectRatio: "3 / 7", maxWidth: "min(148px, 38vw)" }}
-                  >
+                {/* MIDDLE — can always visible, width-sized, centered */}
+                <div className="relative z-10 flex min-h-0 flex-1 items-center justify-center overflow-hidden px-5 py-3">
+                  <div ref={canRef} className="w-[min(158px,40vw)] shrink-0">
                     <ProductCanStage
                       mode="inline"
                       tone={canTone}
                       size="inline"
                       quiet
                       showReflection={false}
-                      className="h-full w-full [&_[data-product-can-image]]:!aspect-auto [&_[data-product-can-image]]:!h-full [&_[data-product-can-image]]:!w-full [&_[data-product-can-image]]:!max-w-none [&_[data-product-can-image]]:!shadow-none"
                     />
                   </div>
                 </div>
@@ -166,20 +161,15 @@ export function ProductStoryScene() {
               </>
             ) : (
               <>
-                {/* DESKTOP: can locked to middle band — cannot enter title/body zones */}
+                {/* DESKTOP: can always centered in the middle band */}
                 <div className="pointer-events-none absolute inset-x-0 top-[20%] bottom-[24%] z-[5] flex items-center justify-center overflow-hidden px-8">
-                  <div
-                    ref={canRef}
-                    className="h-[min(100%,42svh)] w-auto max-w-[200px]"
-                    style={{ aspectRatio: "3 / 7" }}
-                  >
+                  <div ref={canRef} className="w-[min(220px,20vw)] shrink-0">
                     <ProductCanStage
                       mode="inline"
                       tone={canTone}
-                      size="story"
+                      size="inline"
                       quiet
                       showReflection={activeStage !== monumentIndex}
-                      className="h-full w-full [&_[data-product-can-image]]:!aspect-auto [&_[data-product-can-image]]:!h-full [&_[data-product-can-image]]:!w-full [&_[data-product-can-image]]:!max-w-none [&_[data-product-can-image]]:!max-h-full"
                     />
                   </div>
                 </div>

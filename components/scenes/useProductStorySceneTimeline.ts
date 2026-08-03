@@ -18,11 +18,11 @@ type ProductStorySceneFlags = {
   storyVh: number;
 };
 
-// Desktop can framing — monument stays centered inside the clipped middle band
+// Can stays centered in every stage — no lateral drift into the copy
 const desktopCanStates: Array<{ x?: number; y?: number; scale?: number }> = [
-  {},
-  { x: 56, scale: 1 },
-  { x: -42, scale: 1 },
+  { x: 0, scale: 1 },
+  { x: 0, scale: 1 },
+  { x: 0, scale: 1 },
   { x: 0, y: 0, scale: 1 },
 ];
 
@@ -83,15 +83,17 @@ export function useProductStorySceneTimeline(
         });
 
         prepareMediaExpansion(gsap, canEl);
+        gsap.set(canEl, { autoAlpha: 1, x: 0, y: 0, scale: 1, rotateX: 0 });
         gsap.set(stageEls, { autoAlpha: 0, y: isMobile ? 0 : 24 });
         if (stageEls[0]) gsap.set(stageEls[0], { autoAlpha: 1, y: 0 });
         const stage0Units = stageEls[0]?.querySelectorAll("[data-mask-unit]");
         if (stage0Units) gsap.set(stage0Units, { yPercent: 0, opacity: 1 });
         if (holdHintEl) gsap.set(holdHintEl, { autoAlpha: 0 });
 
+        // Soft settle — never hide the can
         applyMediaExpansion(tl, canEl, {
-          from: { rotateX: -10, scale: 0.92, y: 18 },
-          to: { rotateX: 0, scale: 1, y: 0 },
+          from: { rotateX: -6, scale: 0.96, y: 10, autoAlpha: 1 },
+          to: { rotateX: 0, scale: 1, y: 0, autoAlpha: 1 },
           duration: 0.22,
           ease: "none",
           position: 0,
