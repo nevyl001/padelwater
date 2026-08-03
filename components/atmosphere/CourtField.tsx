@@ -87,7 +87,7 @@ export function CourtField({
       // Stay in the lower-right floor of the court — never the copy column
       u: 0.58 + Math.random() * 0.34,
       speed: 0.016 + Math.random() * 0.022,
-      size: 2.4 + Math.random() * 1.8,
+      size: 3.6 + Math.random() * 2.4,
       life: Math.random(),
       phase: i * 0.47,
       spin: (Math.random() > 0.5 ? 1 : -1) * (0.0012 + Math.random() * 0.002),
@@ -280,7 +280,7 @@ export function CourtField({
           (animated
             ? 0.65 + 0.3 * Math.sin(travel * Math.PI)
             : 0.85) * strength;
-        const r = p.size * (0.85 + depth * 0.7) * (isMobileView() ? 1.05 : 1);
+        const r = p.size * (1.05 + depth * 0.85) * (isMobileView() ? 1.2 : 1.15);
         const rotation = animated ? time * p.spin + p.phase : p.phase;
 
         // Glow behind the ball so it pops on dark/teal scenes
