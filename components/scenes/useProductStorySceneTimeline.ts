@@ -18,12 +18,12 @@ type ProductStorySceneFlags = {
   storyVh: number;
 };
 
-// Desktop can framing per stage. Monument stays centered and large.
+// Desktop can framing — monument stays centered inside the clipped middle band
 const desktopCanStates: Array<{ x?: number; y?: number; scale?: number }> = [
   {},
   { x: 56, scale: 1 },
-  { x: -42, scale: 1.02 },
-  { x: 0, y: -6, scale: 0.92 },
+  { x: -42, scale: 1 },
+  { x: 0, y: 0, scale: 1 },
 ];
 
 /**
@@ -131,8 +131,8 @@ export function useProductStorySceneTimeline(
             const target = desktopCanStates[i] ?? {};
             tl.to(canEl, { ...target, ease: "none", duration: 0.45 }, start);
           } else if (isLast) {
-            // Stay large and centered on mobile monument — never shrink away
-            tl.to(canEl, { scale: 1, y: 0, ease: "none", duration: 0.4 }, start);
+            // Keep can inside the clipped middle band — no shrink/drift
+            tl.to(canEl, { scale: 1, x: 0, y: 0, ease: "none", duration: 0.35 }, start);
           }
 
           tl.call(() => setActiveStage(i), undefined, start + 0.15);

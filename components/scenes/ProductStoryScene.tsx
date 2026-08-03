@@ -23,24 +23,22 @@ type Stage = (typeof productStoryStages)[number];
 function desktopShellClass(layout: Stage["layout"]) {
   switch (layout) {
     case "monument":
-      return "inset-0 grid grid-rows-[auto_minmax(0,1fr)_auto] px-[max(2rem,8%)] pb-28 pt-8 text-center";
+      // Title only — lives in the top safe zone; body is rendered separately
+      return "inset-x-0 top-0 h-[20%] px-[max(2rem,8%)] pt-6 text-center";
     case "backdrop":
-      return "left-[max(2.5rem,calc((100vw-min(100vw,85rem))/2+1.5rem))] top-[18%] w-[min(26rem,34vw)] text-left";
+      return "left-[max(2.5rem,calc((100vw-min(100vw,85rem))/2+1.5rem))] top-[22%] w-[min(26rem,34vw)] text-left";
     case "side":
-      return "left-[max(2.5rem,calc((100vw-min(100vw,85rem))/2+1.5rem))] top-[16%] w-[min(22rem,28vw)] text-left";
+      return "left-[max(2.5rem,calc((100vw-min(100vw,85rem))/2+1.5rem))] top-[22%] w-[min(22rem,28vw)] text-left";
     case "open":
-      return "right-[max(2.5rem,calc((100vw-min(100vw,85rem))/2+1.5rem))] top-[18%] w-[min(22rem,28vw)] text-right";
+      return "right-[max(2.5rem,calc((100vw-min(100vw,85rem))/2+1.5rem))] top-[22%] w-[min(22rem,28vw)] text-right";
     default:
-      return "left-1/2 top-1/2 w-[min(28rem,88%)] -translate-x-1/2 -translate-y-1/2 text-center";
+      return "left-1/2 top-[22%] w-[min(28rem,88%)] -translate-x-1/2 text-center";
   }
 }
 
 /**
- * Product story — 4-stage pin/scrub, fully independent from HeroScene.
- * Stage labels reuse the same MaskReveal system as the hero; the
- * crossfade between stages is a continuous scrub, a different
- * interaction pattern from a one-shot entrance, so it stays on raw
- * GSAP tweens rather than forcing MaskReveal's own trigger modes.
+ * Product story — 4-stage pin/scrub.
+ * Can is locked to a clipped middle band so it can never cover title or body.
  */
 export function ProductStoryScene() {
   const rootRef = useRef<HTMLElement>(null);
@@ -61,6 +59,8 @@ export function ProductStoryScene() {
   const tone = productStoryStages[activeStage]?.tone ?? "navy";
   const canTone = canToneFromStage(tone);
   const progressTone = tone === "lime-soft" ? "dark" : "light";
+  const monument = productStoryStages.find((s) => s.layout === "monument");
+  const monumentIndex = productStoryStages.findIndex((s) => s.layout === "monument");
 
   return (
     <>
@@ -76,8 +76,7 @@ export function ProductStoryScene() {
           <div
             data-story-backdrop
             className={cn(
-              "relative overflow-hidden pt-[var(--header-offset)] transition-colors duration-500",
-              isMobile ? "flex h-svh flex-col" : "h-svh",
+              "relative flex h-svh flex-col overflow-hidden pt-[var(--header-offset)] transition-colors duration-500",
               toneBg[tone],
               toneText[tone],
             )}
@@ -85,8 +84,9 @@ export function ProductStoryScene() {
             <CourtField tone={courtTone[tone]} intensity="medium" animated={animateCourt} />
 
             {isMobile ? (
-              <div className="relative z-10 flex min-h-0 flex-1 flex-col items-center justify-center gap-4 px-5 pb-6 pt-2">
-                <div className="relative z-20 h-[6.1rem] w-full max-w-sm shrink-0 overflow-hidden">
+              <>
+                {/* TOP — copy only */}
+                <div className="relative z-20 h-[5.75rem] shrink-0 overflow-hidden px-5 pt-2">
                   {productStoryStages.map((stage, index) => (
                     <div
                       key={stage.id}
@@ -95,7 +95,7 @@ export function ProductStoryScene() {
                       }}
                       data-story-stage
                       className={cn(
-                        "absolute inset-x-0 top-0 text-center",
+                        "absolute inset-x-5 top-2 text-center",
                         index === 0 ? "opacity-100" : "opacity-0",
                       )}
                     >
@@ -103,12 +103,12 @@ export function ProductStoryScene() {
                         {String(index + 1).padStart(2, "0")} · {stage.eyebrow}
                       </p>
                       <MaskReveal as="div" mode="manual" splitBy="block">
-                        <h2 className="mt-1 font-display text-[clamp(1.55rem,7vw,2.15rem)] font-bold uppercase leading-[1.02] tracking-[-0.03em]">
+                        <h2 className="mt-1 font-display text-[clamp(1.45rem,6.5vw,2rem)] font-bold uppercase leading-[1.02] tracking-[-0.03em]">
                           {stage.label}
                         </h2>
                       </MaskReveal>
                       {stage.layout !== "monument" ? (
-                        <p className="mx-auto mt-1.5 line-clamp-2 max-w-[17rem] text-[0.78rem] leading-snug opacity-80">
+                        <p className="mx-auto mt-1 line-clamp-2 max-w-[17rem] text-[0.75rem] leading-snug opacity-80">
                           {stage.text}
                         </p>
                       ) : null}
@@ -116,73 +116,70 @@ export function ProductStoryScene() {
                   ))}
                 </div>
 
-                <div
-                  ref={canRef}
-                  className="w-[min(178px,48vw)] shrink-0 [&_[data-product-can-image]]:max-h-[min(50svh,380px)]"
-                >
-                  <ProductCanStage
-                    mode="inline"
-                    tone={canTone}
-                    size="inline"
-                    quiet
-                    showReflection={false}
-                  />
-                </div>
-
-                <div className="relative z-20 mt-3 min-h-[4.5rem] w-full max-w-sm shrink-0">
-                  {productStoryStages.map((stage, index) =>
-                    stage.layout === "monument" ? (
-                      <p
-                        key={`bot-${stage.id}`}
-                        className={cn(
-                          "px-1 text-center text-[0.8rem] leading-snug transition-opacity duration-300",
-                          activeStage === index
-                            ? "opacity-85"
-                            : "pointer-events-none absolute inset-x-0 top-0 opacity-0",
-                        )}
-                      >
-                        {stage.text}
-                      </p>
-                    ) : null,
-                  )}
-                  <SectionProgress
-                    total={productStoryStages.length}
-                    active={activeStage}
-                    tone={progressTone}
-                    className="mt-4 justify-center"
-                  />
-                  <p
-                    ref={holdHintRef as React.Ref<HTMLParagraphElement>}
-                    className="mt-2 text-center text-[0.55rem] uppercase tracking-[0.28em]"
-                  >
-                    Sigue explorando
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <>
-                <div
-                  className={cn(
-                    "pointer-events-none absolute inset-0 z-[5] flex items-center justify-center px-6",
-                    activeStage === 3
-                      ? "pb-[7.5rem] pt-[calc(var(--header-offset)+5.25rem)]"
-                      : "pt-[calc(var(--header-offset)*0.35)]",
-                  )}
-                >
+                {/* MIDDLE — can only, height-locked */}
+                <div className="relative z-10 flex min-h-0 flex-1 items-center justify-center overflow-hidden px-5 py-2">
                   <div
                     ref={canRef}
-                    className={cn(
-                      "flex max-h-full items-center justify-center",
-                      activeStage === 3 &&
-                        "[&_[data-product-can-image]]:!h-[min(48svh,420px)] [&_[data-product-can-image]]:!shadow-[0_14px_32px_rgba(3,17,38,0.16)]",
-                    )}
+                    className="h-full max-h-full w-auto"
+                    style={{ aspectRatio: "3 / 7", maxWidth: "min(148px, 38vw)" }}
+                  >
+                    <ProductCanStage
+                      mode="inline"
+                      tone={canTone}
+                      size="inline"
+                      quiet
+                      showReflection={false}
+                      className="h-full w-full [&_[data-product-can-image]]:!aspect-auto [&_[data-product-can-image]]:!h-full [&_[data-product-can-image]]:!w-full [&_[data-product-can-image]]:!max-w-none [&_[data-product-can-image]]:!shadow-none"
+                    />
+                  </div>
+                </div>
+
+                {/* BOTTOM — monument body + chrome */}
+                <div className="relative z-20 flex h-[6.75rem] shrink-0 flex-col justify-start overflow-hidden px-5 pb-3 pt-1">
+                  {monument ? (
+                    <p
+                      className={cn(
+                        "text-center text-[0.78rem] leading-snug transition-opacity duration-300",
+                        activeStage === monumentIndex
+                          ? "opacity-85"
+                          : "pointer-events-none opacity-0",
+                      )}
+                    >
+                      {monument.text}
+                    </p>
+                  ) : null}
+                  <div className="mt-auto">
+                    <SectionProgress
+                      total={productStoryStages.length}
+                      active={activeStage}
+                      tone={progressTone}
+                      className="justify-center"
+                    />
+                    <p
+                      ref={holdHintRef as React.Ref<HTMLParagraphElement>}
+                      className="mt-1.5 text-center text-[0.55rem] uppercase tracking-[0.28em]"
+                    >
+                      Sigue explorando
+                    </p>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                {/* DESKTOP: can locked to middle band — cannot enter title/body zones */}
+                <div className="pointer-events-none absolute inset-x-0 top-[20%] bottom-[24%] z-[5] flex items-center justify-center overflow-hidden px-8">
+                  <div
+                    ref={canRef}
+                    className="h-[min(100%,42svh)] w-auto max-w-[200px]"
+                    style={{ aspectRatio: "3 / 7" }}
                   >
                     <ProductCanStage
                       mode="inline"
                       tone={canTone}
                       size="story"
                       quiet
-                      showReflection={activeStage !== 3}
+                      showReflection={activeStage !== monumentIndex}
+                      className="h-full w-full [&_[data-product-can-image]]:!aspect-auto [&_[data-product-can-image]]:!h-full [&_[data-product-can-image]]:!w-full [&_[data-product-can-image]]:!max-w-none [&_[data-product-can-image]]:!max-h-full"
                     />
                   </div>
                 </div>
@@ -196,31 +193,24 @@ export function ProductStoryScene() {
                       }}
                       data-story-stage
                       className={cn(
-                        "absolute",
+                        "absolute overflow-hidden",
                         desktopShellClass(stage.layout),
                         index === 0 ? "opacity-100" : "opacity-0",
                       )}
                     >
                       {stage.layout === "monument" ? (
-                        <>
-                          <div className="relative z-30 mx-auto w-full max-w-xl shrink-0">
-                            <p className="text-xs uppercase tracking-[0.22em] opacity-55">
-                              {stage.eyebrow}
-                            </p>
-                            <MaskReveal as="div" mode="manual" splitBy="block">
-                              <h2 className="mt-2 font-display text-[clamp(2.2rem,4.8vw,3.25rem)] font-bold uppercase leading-[0.92] tracking-[-0.03em]">
-                                {stage.label}
-                              </h2>
-                            </MaskReveal>
-                          </div>
-                          {/* Empty middle row — can lives in the absolute layer above */}
-                          <div aria-hidden className="min-h-0" />
-                          <p className="relative z-30 mx-auto mb-12 max-w-md shrink-0 text-lg leading-relaxed opacity-85">
-                            {stage.text}
+                        <div className="mx-auto w-full max-w-xl">
+                          <p className="text-xs uppercase tracking-[0.22em] opacity-55">
+                            {stage.eyebrow}
                           </p>
-                        </>
+                          <MaskReveal as="div" mode="manual" splitBy="block">
+                            <h2 className="mt-2 font-display text-[clamp(2.1rem,4.5vw,3.1rem)] font-bold uppercase leading-[0.92] tracking-[-0.03em]">
+                              {stage.label}
+                            </h2>
+                          </MaskReveal>
+                        </div>
                       ) : (
-                        <div className="relative z-30">
+                        <div>
                           <p className="text-xs uppercase tracking-[0.22em] opacity-55">
                             {stage.eyebrow}
                           </p>
@@ -262,18 +252,33 @@ export function ProductStoryScene() {
                     </div>
                   ))}
 
-                  <SectionProgress
-                    total={productStoryStages.length}
-                    active={activeStage}
-                    tone={progressTone}
-                    className="absolute bottom-14 left-1/2 z-30 -translate-x-1/2 justify-center"
-                  />
-                  <p
-                    ref={holdHintRef as React.Ref<HTMLParagraphElement>}
-                    className="absolute bottom-8 left-1/2 z-30 -translate-x-1/2 text-[0.65rem] uppercase tracking-[0.28em]"
-                  >
-                    Sigue explorando
-                  </p>
+                  {/* Bottom safe zone — monument body never shares pixels with the can */}
+                  <div className="absolute inset-x-0 bottom-0 z-30 flex h-[24%] flex-col items-center justify-end overflow-hidden px-[max(2rem,8%)] pb-8">
+                    {monument ? (
+                      <p
+                        className={cn(
+                          "mb-6 max-w-md text-center text-lg leading-relaxed transition-opacity duration-300",
+                          activeStage === monumentIndex
+                            ? "opacity-85"
+                            : "pointer-events-none opacity-0",
+                        )}
+                      >
+                        {monument.text}
+                      </p>
+                    ) : null}
+                    <SectionProgress
+                      total={productStoryStages.length}
+                      active={activeStage}
+                      tone={progressTone}
+                      className="justify-center"
+                    />
+                    <p
+                      ref={holdHintRef as React.Ref<HTMLParagraphElement>}
+                      className="mt-2 text-[0.65rem] uppercase tracking-[0.28em]"
+                    >
+                      Sigue explorando
+                    </p>
+                  </div>
                 </div>
               </>
             )}
