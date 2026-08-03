@@ -36,7 +36,10 @@ export function useLaunchConductor(
   const storyVh = isMobile ? STORY_VH_MOBILE : STORY_VH_DESKTOP;
 
   useEffect(() => {
-    if (!ready || prefersReducedMotion) return;
+    // Desktop pin theatre only — mobile has its own document-flow component
+    if (!ready || prefersReducedMotion || isMobile) {
+      return;
+    }
 
     const root = refs.rootRef?.current;
     const hero = refs.heroRef?.current;
