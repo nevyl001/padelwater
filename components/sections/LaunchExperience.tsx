@@ -36,7 +36,7 @@ const courtTone = {
 function stageShellClass(layout: (typeof productStoryStages)[number]["layout"]) {
   switch (layout) {
     case "monument":
-      return "inset-x-0 top-0 bottom-0 grid grid-rows-[auto_1fr_auto] px-6 pt-2 pb-16 text-center sm:px-[max(2rem,8%)] sm:pt-4 sm:pb-20";
+      return "inset-x-0 top-0 bottom-0 flex flex-col px-6 pt-3 pb-[4.5rem] text-center sm:px-[max(2rem,8%)] sm:pt-5 sm:pb-24";
     case "backdrop":
       return "inset-x-6 top-[12%] text-center md:inset-x-auto md:left-[max(2.5rem,calc((100vw-min(100vw,85rem))/2+1.5rem))] md:right-auto md:top-[20%] md:w-[min(26rem,34vw)] md:text-left";
     case "side":
@@ -190,7 +190,13 @@ export function LaunchExperience() {
 
             {/* Story can — shorter + quiet face so stage type never stacks on it */}
             <div className="pointer-events-none absolute inset-0 z-[5] flex items-center justify-center pt-6 md:pt-10">
-              <div ref={storyCanRef}>
+              <div
+                ref={storyCanRef}
+                className={cn(
+                  "transition-transform duration-300",
+                  activeStage === 3 && "translate-y-[6%] scale-[0.94]",
+                )}
+              >
                 <ProductCanStage
                   mode="inline"
                   tone={canTone}
@@ -214,16 +220,20 @@ export function LaunchExperience() {
                 >
                   {stage.layout === "monument" ? (
                     <>
-                      <div className="mx-auto w-full max-w-xl justify-self-center">
+                      <div className="relative z-30 mx-auto w-full max-w-xl shrink-0">
                         <p className="text-xs uppercase tracking-[0.22em] opacity-55">
                           {stage.eyebrow}
                         </p>
-                        <h2 className="mt-2 font-display text-[clamp(2.75rem,6vw,4.5rem)] font-bold uppercase leading-[0.92] tracking-[-0.03em]">
+                        <h2 className="mt-2 font-display text-[clamp(2.35rem,7vw,4rem)] font-bold uppercase leading-[0.92] tracking-[-0.03em]">
                           {stage.label}
                         </h2>
                       </div>
-                      <div aria-hidden className="min-h-[min(46svh,360px)]" />
-                      <p className="mx-auto max-w-md justify-self-center text-base leading-relaxed opacity-85 md:text-lg">
+                      {/* Spacer reserved for the can — keeps title/body clear */}
+                      <div
+                        aria-hidden
+                        className="relative z-0 min-h-[min(40svh,300px)] w-full flex-1 sm:min-h-[min(44svh,340px)]"
+                      />
+                      <p className="relative z-30 mx-auto max-w-sm shrink-0 text-base leading-relaxed opacity-85 md:max-w-md md:text-lg">
                         {stage.text}
                       </p>
                     </>

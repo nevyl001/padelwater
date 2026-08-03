@@ -37,7 +37,7 @@ export const ProductCanStage = forwardRef<HTMLDivElement, ProductCanStageProps>(
           className={cn(
             size === "hero" && "aspect-[3/7] h-[min(58svh,440px)] w-auto",
             size === "story" &&
-              "aspect-[3/7] h-[min(52svh,400px)] w-auto max-md:h-[min(46svh,340px)]",
+              "aspect-[3/7] h-[min(44svh,360px)] w-auto max-md:h-[min(38svh,300px)]",
             size === "inline" && "aspect-[3/7] w-full max-w-[240px]",
             className,
           )}

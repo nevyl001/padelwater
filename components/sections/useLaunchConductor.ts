@@ -38,13 +38,13 @@ export function useLaunchConductor(
   useEffect(() => {
     if (!ready || prefersReducedMotion) return;
 
-    const root = refs.rootRef.current;
-    const hero = refs.heroRef.current;
-    const story = refs.storyRef.current;
-    const pin = refs.pinRef.current;
-    const heroCan = refs.heroCanRef.current;
-    const storyCan = refs.storyCanRef.current;
-    const copy = refs.heroCopyRef.current;
+    const root = refs.rootRef?.current;
+    const hero = refs.heroRef?.current;
+    const story = refs.storyRef?.current;
+    const pin = refs.pinRef?.current;
+    const heroCan = refs.heroCanRef?.current;
+    const storyCan = refs.storyCanRef?.current;
+    const copy = refs.heroCopyRef?.current;
     if (!root || !hero || !story || !pin || !heroCan || !storyCan || !copy) {
       return;
     }
@@ -241,7 +241,13 @@ export function useLaunchConductor(
         );
         tl.to(
           storyCanEl,
-          { x: 0, y: isMobile ? 4 : 8, scale: 1, ease: "none", duration: 0.45 },
+          {
+            x: 0,
+            y: isMobile ? 42 : 36,
+            scale: 0.92,
+            ease: "none",
+            duration: 0.45,
+          },
           s3,
         );
         tl.call(() => setActiveStage(3), undefined, s3 + 0.12);
