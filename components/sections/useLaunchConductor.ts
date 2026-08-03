@@ -36,8 +36,7 @@ export function useLaunchConductor(
   const storyVh = isMobile ? STORY_VH_MOBILE : STORY_VH_DESKTOP;
 
   useEffect(() => {
-    // Desktop pin theatre only — mobile has its own document-flow component
-    if (!ready || prefersReducedMotion || isMobile) {
+    if (!ready || prefersReducedMotion) {
       return;
     }
 
@@ -183,8 +182,14 @@ export function useLaunchConductor(
         );
         tl.fromTo(
           storyCanEl,
-          { autoAlpha: 0, scale: 0.94, y: 24 },
-          { autoAlpha: 1, scale: isMobile ? 1 : 1.04, y: 0, ease: "none", duration: 0.85 },
+          { autoAlpha: 0, scale: 0.94, y: isMobile ? 12 : 24 },
+          {
+            autoAlpha: 1,
+            scale: 1,
+            y: 0,
+            ease: "none",
+            duration: 0.85,
+          },
           0.3,
         );
         tl.call(() => setActiveStage(0), undefined, 0.85);
@@ -203,7 +208,7 @@ export function useLaunchConductor(
         );
         tl.to(
           storyCanEl,
-          { x: shift, scale: 1, ease: "none", duration: 0.45 },
+          { x: shift, scale: 1, y: 0, ease: "none", duration: 0.45 },
           s1,
         );
         tl.call(() => setActiveStage(1), undefined, s1 + 0.12);
@@ -223,7 +228,13 @@ export function useLaunchConductor(
         );
         tl.to(
           storyCanEl,
-          { x: -shift * 0.75, scale: 1.02, ease: "none", duration: 0.45 },
+          {
+            x: -shift * 0.75,
+            scale: isMobile ? 1 : 1.02,
+            y: 0,
+            ease: "none",
+            duration: 0.45,
+          },
           s2,
         );
         tl.call(() => setActiveStage(2), undefined, s2 + 0.12);
@@ -246,8 +257,7 @@ export function useLaunchConductor(
           {
             x: 0,
             y: 0,
-            // Monument beat: keep the can between title and body bands
-            scale: isMobile ? 0.86 : 0.8,
+            scale: isMobile ? 0.92 : 0.8,
             ease: "none",
             duration: 0.45,
           },
