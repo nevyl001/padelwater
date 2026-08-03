@@ -78,7 +78,7 @@ export function CourtScene() {
                 )}
               >
                 <CourtField tone={tone.court} intensity="soft" animated={animateCourt} />
-                <div className="relative z-10 max-w-md">
+                <div className="relative z-20 max-w-md">
                   <p className="text-xs uppercase tracking-[0.28em] opacity-55">
                     {String(index + 1).padStart(2, "0")}
                   </p>
@@ -113,7 +113,7 @@ export function CourtScene() {
                 )}
               >
                 <CourtField tone={tone.court} intensity="medium" animated={animateCourt} />
-                <div className="relative z-10 mx-auto flex max-w-md flex-col justify-end">
+                <div className="relative z-20 mx-auto flex max-w-md flex-col justify-end">
                   <p
                     data-moment-eyebrow
                     className="text-xs uppercase tracking-[0.28em] opacity-55"

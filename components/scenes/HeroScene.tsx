@@ -48,9 +48,9 @@ export function HeroScene() {
       <CourtField tone="dark" intensity="medium" animated={animateCourt} />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_70%_35%,rgba(0,169,203,0.18),transparent_42%),radial-gradient(ellipse_at_20%_70%,rgba(183,243,51,0.1),transparent_40%)]" />
 
-      <Container className="relative z-10 flex w-full flex-1 items-center pb-16 pt-[calc(var(--header-offset)+2.5rem)] md:pb-20">
+      <Container className="relative z-20 flex w-full flex-1 items-center pb-16 pt-[calc(var(--header-offset)+2.5rem)] md:pb-20">
         <div className="grid w-full items-center gap-10 text-center md:gap-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] lg:text-left xl:gap-20">
-          <div className="mx-auto w-full max-w-md lg:mx-0 lg:max-w-[34rem] lg:pl-4 xl:pl-8">
+          <div className="relative z-20 mx-auto w-full max-w-md lg:mx-0 lg:max-w-[34rem] lg:pl-4 xl:pl-8">
             <MaskReveal ref={eyebrowRef} as="div" mode="manual" splitBy="block">
               <SectionLabel tone="lime">{heroContent.eyebrow}</SectionLabel>
             </MaskReveal>
@@ -84,7 +84,7 @@ export function HeroScene() {
             </MaskReveal>
           </div>
 
-          <div className="relative flex min-h-[min(58svh,460px)] items-center justify-center">
+          <div className="relative z-10 flex min-h-[min(58svh,460px)] items-center justify-center">
             <ProductGlow />
             <div
               ref={canRef}
@@ -96,7 +96,7 @@ export function HeroScene() {
         </div>
       </Container>
 
-      <div className="absolute inset-x-0 bottom-7 z-10 flex justify-center">
+      <div className="absolute inset-x-0 bottom-7 z-20 flex justify-center">
         <ScrollIndicator href="#producto" />
       </div>
     </section>

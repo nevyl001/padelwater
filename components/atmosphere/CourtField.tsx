@@ -82,12 +82,12 @@ export function CourtField({
 
     const mobileInit =
       typeof window !== "undefined" && window.innerWidth < 768;
-    const particleCount = mobileInit ? 7 : 9;
+    const particleCount = mobileInit ? 5 : 7;
     const particles: Particle[] = Array.from({ length: particleCount }, (_, i) => ({
-      // Bias toward the sides so balls frame the can instead of hiding under it
-      u: i % 2 === 0 ? 0.08 + Math.random() * 0.28 : 0.64 + Math.random() * 0.28,
-      speed: 0.018 + Math.random() * 0.028,
-      size: 5.2 + Math.random() * 3.6,
+      // Stay in the lower-right floor of the court — never the copy column
+      u: 0.58 + Math.random() * 0.34,
+      speed: 0.016 + Math.random() * 0.022,
+      size: 2.4 + Math.random() * 1.8,
       life: Math.random(),
       phase: i * 0.47,
       spin: (Math.random() > 0.5 ? 1 : -1) * (0.0012 + Math.random() * 0.002),
@@ -267,15 +267,20 @@ export function CourtField({
         const travel = animated
           ? (p.life + time * 0.00009 * p.speed) % 1
           : (p.life + 0.4) % 1;
-        const depth = 0.55 + travel * 0.42;
-        const sway = Math.sin(time * 0.0007 + p.phase) * 0.04;
-        const nx = (p.u * 2 - 1) * 0.72 + sway;
+        // Keep balls on the near floor only (bottom of frame) so they never meet headlines
+        const depth = 0.72 + travel * 0.26;
+        const sway = Math.sin(time * 0.0007 + p.phase) * 0.03;
+        const nx = (p.u * 2 - 1) * 0.78 + sway;
         const pos = project(nx, depth);
+
+        // Hard clip: no balls in the upper text band or left copy column
+        if (pos.y < h * 0.58 || pos.x < w * 0.42) continue;
+
         const alpha =
           (animated
-            ? 0.7 + 0.3 * Math.sin(travel * Math.PI)
-            : 0.92) * strength;
-        const r = p.size * (1.05 + depth * 1.2) * (isMobileView() ? 1.25 : 1);
+            ? 0.65 + 0.3 * Math.sin(travel * Math.PI)
+            : 0.85) * strength;
+        const r = p.size * (0.85 + depth * 0.7) * (isMobileView() ? 1.05 : 1);
         const rotation = animated ? time * p.spin + p.phase : p.phase;
 
         // Glow behind the ball so it pops on dark/teal scenes
@@ -339,10 +344,10 @@ export function CourtField({
           className="absolute inset-0 h-full w-full origin-center scale-[1.04] opacity-80 blur-[2.5px] max-md:opacity-70 max-md:blur-[3px]"
         />
       </div>
-      {/* Mobile: balls above the can; desktop: stay with the court atmosphere */}
+      {/* Above the can, always under copy (text must stay z-20+) */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 z-[18] overflow-hidden md:z-0"
+        className="pointer-events-none absolute inset-0 z-[12] overflow-hidden md:z-[6]"
       >
         <canvas ref={ballsRef} className="absolute inset-0 h-full w-full" />
       </div>
