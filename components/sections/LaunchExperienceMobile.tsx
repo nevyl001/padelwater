@@ -19,8 +19,8 @@ import {
 import { cn } from "@/lib/cn";
 
 /**
- * Mobile launch WITH pin+scrub theatre.
- * Strict bands so copy (top) and can (middle) never collide.
+ * Mobile pin+scrub with HARD flex bands:
+ * [text top] [can middle] [footer bottom] — impossible to overlap.
  */
 export function LaunchExperienceMobile() {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -43,12 +43,7 @@ export function LaunchExperienceMobile() {
       storyCanRef,
       heroCopyRef,
     },
-    {
-      ready,
-      prefersReducedMotion,
-      isMobile: true,
-      layer,
-    },
+    { ready, prefersReducedMotion, isMobile: true, layer },
   );
 
   const showPin = !prefersReducedMotion;
@@ -64,12 +59,12 @@ export function LaunchExperienceMobile() {
         aria-label="Presentación Pádel Water"
       >
         <CourtField tone="dark" intensity="medium" animated={animateCourt} />
-        <Container className="relative z-10 flex flex-col items-center gap-9 px-5 pb-14 pt-[calc(var(--header-offset)+1.25rem)] text-center">
+        <Container className="relative z-10 flex flex-col items-center gap-8 px-5 pb-12 pt-[calc(var(--header-offset)+1.25rem)] text-center">
           <div ref={heroCopyRef} className="w-full max-w-md">
             <div data-hero-eyebrow>
               <SectionLabel tone="lime">{heroContent.eyebrow}</SectionLabel>
             </div>
-            <h1 className="mt-4 font-display text-[clamp(2.2rem,9vw,3.1rem)] font-bold uppercase leading-[1.02] tracking-[-0.03em]">
+            <h1 className="mt-4 font-display text-[clamp(2.1rem,8.5vw,2.9rem)] font-bold uppercase leading-[1.02] tracking-[-0.03em]">
               {heroContent.titleLines.map((line) => (
                 <span key={line} className="block overflow-hidden">
                   <span data-hero-line className="block">
@@ -80,13 +75,13 @@ export function LaunchExperienceMobile() {
             </h1>
             <p
               data-hero-late
-              className="mx-auto mt-5 max-w-sm text-base leading-relaxed text-white/70"
+              className="mx-auto mt-4 max-w-sm text-[0.95rem] leading-relaxed text-white/70"
             >
               {heroContent.description}
             </p>
             <div
               data-hero-late
-              className="mt-8 flex flex-wrap justify-center gap-3"
+              className="mt-7 flex flex-wrap justify-center gap-3"
             >
               <Button href={heroContent.primaryHref} size="lg">
                 {heroContent.primaryCta}
@@ -101,7 +96,7 @@ export function LaunchExperienceMobile() {
             </div>
           </div>
 
-          <div ref={heroCanRef} className="w-full max-w-[200px]">
+          <div ref={heroCanRef} className="w-[180px]">
             <ProductCanStage mode="inline" tone="navy" size="inline" priority />
           </div>
 
@@ -124,7 +119,7 @@ export function LaunchExperienceMobile() {
           <div
             data-story-backdrop
             className={cn(
-              "relative h-svh overflow-hidden pt-[var(--header-offset)]",
+              "relative flex h-svh flex-col overflow-hidden pt-[var(--header-offset)]",
               toneBg[tone],
               toneText[tone],
             )}
@@ -135,74 +130,69 @@ export function LaunchExperienceMobile() {
               animated={animateCourt}
             />
 
-            {/* CAN BAND — fixed middle slot, never enters the text band */}
-            <div className="pointer-events-none absolute inset-x-0 top-[48%] z-[5] flex -translate-y-1/2 justify-center">
-              <div
-                ref={storyCanRef}
-                className={cn(activeStage === 3 && "scale-[0.9]")}
-              >
-                <div className="w-[min(42vw,170px)]">
-                  <ProductCanStage
-                    mode="inline"
-                    tone={canTone}
-                    size="inline"
-                    quiet
-                    showReflection
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* TEXT BAND — top only */}
-            <div className="relative z-20 h-full">
+            {/* ── BAND 1: TEXT (fixed height, never overlaps can) ── */}
+            <div className="relative z-20 h-[28svh] shrink-0 overflow-hidden px-5 pt-2">
               {productStoryStages.map((stage, index) => (
                 <div
                   key={stage.id}
                   data-story-stage
                   className={cn(
-                    "absolute inset-x-5",
-                    stage.layout === "monument"
-                      ? "top-[6%] bottom-[8%] flex flex-col"
-                      : "top-[6%] max-h-[34%] overflow-hidden",
+                    "absolute inset-x-5 top-2 text-center",
                     index === 0 ? "opacity-100" : "opacity-0",
                   )}
                 >
-                  <div className="mx-auto w-full max-w-sm shrink-0 text-center">
-                    <p className="text-[0.65rem] uppercase tracking-[0.24em] opacity-55">
-                      {String(index + 1).padStart(2, "0")} · {stage.eyebrow}
+                  <p className="text-[0.62rem] uppercase tracking-[0.24em] opacity-55">
+                    {String(index + 1).padStart(2, "0")} · {stage.eyebrow}
+                  </p>
+                  <h2 className="mt-1.5 font-display text-[clamp(1.7rem,7.5vw,2.35rem)] font-bold uppercase leading-[1.02] tracking-[-0.03em]">
+                    {stage.label}
+                  </h2>
+                  {stage.layout !== "monument" ? (
+                    <p className="mx-auto mt-2 max-w-[17.5rem] text-[0.82rem] leading-snug opacity-80">
+                      {stage.text}
                     </p>
-                    <h2 className="mt-2 font-display text-[clamp(1.85rem,8vw,2.6rem)] font-bold uppercase leading-[1.02] tracking-[-0.03em]">
-                      {stage.label}
-                    </h2>
-                    {stage.layout !== "monument" ? (
-                      <>
-                        <p className="mx-auto mt-2 max-w-[18rem] text-[0.9rem] leading-snug opacity-80">
-                          {stage.text}
-                        </p>
-                        {stage.layout === "side" ? (
-                          <ul className="mt-3 space-y-1.5 text-[0.75rem] opacity-70">
-                            <li>{product.feature}</li>
-                            <li>{product.flavorLabel}</li>
-                          </ul>
-                        ) : null}
-                      </>
-                    ) : null}
-                  </div>
-
-                  {stage.layout === "monument" ? (
-                    <>
-                      <div aria-hidden className="min-h-[38svh] flex-1" />
-                      <p className="mx-auto max-w-[18rem] shrink-0 text-center text-[0.9rem] leading-snug opacity-85">
-                        {stage.text}
-                      </p>
-                    </>
+                  ) : null}
+                  {stage.layout === "side" ? (
+                    <ul className="mt-2 space-y-1 text-[0.7rem] opacity-65">
+                      <li>{product.feature}</li>
+                      <li>{product.flavorLabel}</li>
+                    </ul>
                   ) : null}
                 </div>
               ))}
+            </div>
 
+            {/* ── BAND 2: CAN (owns the middle forever) ── */}
+            <div className="relative z-10 flex min-h-0 flex-1 items-center justify-center px-5">
+              <div ref={storyCanRef} className="w-[150px]">
+                <ProductCanStage
+                  mode="inline"
+                  tone={canTone}
+                  size="inline"
+                  quiet
+                  showReflection={activeStage === 3}
+                />
+              </div>
+            </div>
+
+            {/* ── BAND 3: FOOTER (monument body + hint) ── */}
+            <div className="relative z-20 h-[16svh] shrink-0 px-5 pb-4">
+              {productStoryStages.map((stage, index) =>
+                stage.layout === "monument" ? (
+                  <p
+                    key={`bot-${stage.id}`}
+                    className={cn(
+                      "absolute inset-x-5 top-1 text-center text-[0.85rem] leading-snug transition-opacity duration-300",
+                      activeStage === index ? "opacity-85" : "pointer-events-none opacity-0",
+                    )}
+                  >
+                    {stage.text}
+                  </p>
+                ) : null,
+              )}
               <p
                 data-hold-hint
-                className="absolute bottom-5 left-1/2 z-30 -translate-x-1/2 text-[0.6rem] uppercase tracking-[0.28em]"
+                className="absolute inset-x-0 bottom-3 text-center text-[0.58rem] uppercase tracking-[0.28em]"
               >
                 Sigue explorando
               </p>
@@ -210,7 +200,6 @@ export function LaunchExperienceMobile() {
           </div>
         </div>
 
-        {/* Reduced-motion fallback */}
         <div className={cn(showPin && "hidden")}>
           {productStoryStages.map((stage, index) => (
             <div
@@ -227,16 +216,16 @@ export function LaunchExperienceMobile() {
                     <p className="text-xs uppercase tracking-[0.22em] opacity-55">
                       {stage.eyebrow}
                     </p>
-                    <h2 className="mt-3 font-display text-[clamp(2rem,9vw,2.8rem)] font-bold uppercase">
+                    <h2 className="mt-3 font-display text-3xl font-bold uppercase">
                       {stage.label}
                     </h2>
-                    <p className="mt-4 text-base opacity-80">{stage.text}</p>
+                    <p className="mt-4 opacity-80">{stage.text}</p>
                   </div>
-                  <div className="w-[170px]">
+                  <div className="w-[160px]">
                     <ProductCanStage
                       mode="inline"
                       size="inline"
-                      quiet={index === 3}
+                      quiet
                       tone={canToneFromStage(stage.tone)}
                     />
                   </div>

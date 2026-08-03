@@ -141,9 +141,17 @@ export function useLaunchConductor(
           offPointer = () => window.removeEventListener("pointermove", onMove);
         }
 
-        gsap.set(stages, { autoAlpha: 0, y: 24 });
+        gsap.set(stages, { autoAlpha: 0, y: isMobile ? 12 : 24 });
         if (stages[0]) gsap.set(stages[0], { autoAlpha: 1, y: 0 });
         if (holdHint) gsap.set(holdHint, { autoAlpha: 0 });
+
+        // On mobile, kill vertical stage travel — stays inside the text band
+        const stageOut = isMobile
+          ? { autoAlpha: 0, y: 0, ease: "none" as const, duration: 0.32 }
+          : { autoAlpha: 0, y: -16, ease: "none" as const, duration: 0.32 };
+        const stageInFrom = isMobile
+          ? { autoAlpha: 0, y: 0 }
+          : { autoAlpha: 0, y: 20 };
 
         ScrollTrigger.create({
           trigger: storyEl,
