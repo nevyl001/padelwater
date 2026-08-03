@@ -18,8 +18,8 @@ import {
 import { cn } from "@/lib/cn";
 
 /**
- * Mobile pin+scrub with HARD flex bands:
- * [text top] [can middle] [footer bottom] — impossible to overlap.
+ * Mobile pin+scrub: compact centered cluster (copy → can → footer)
+ * so nothing piles up and nothing floats with huge empty gaps.
  */
 export function LaunchExperienceMobile() {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -129,38 +129,36 @@ export function LaunchExperienceMobile() {
               animated={animateCourt}
             />
 
-            {/* BAND 1 — copy only; clipped so it can never paint over the can */}
-            <div className="relative z-20 h-[24svh] max-h-[210px] shrink-0 overflow-hidden px-5 pt-1">
-              {productStoryStages.map((stage, index) => (
-                <div
-                  key={stage.id}
-                  data-story-stage
-                  className={cn(
-                    "absolute inset-x-5 top-0 flex h-full flex-col justify-start text-center",
-                    index === 0 ? "opacity-100" : "opacity-0",
-                  )}
-                >
-                  <p className="text-[0.58rem] uppercase tracking-[0.22em] opacity-55">
-                    {String(index + 1).padStart(2, "0")} · {stage.eyebrow}
-                  </p>
-                  <h2 className="mt-1 font-display text-[clamp(1.45rem,6.8vw,2.05rem)] font-bold uppercase leading-[1.02] tracking-[-0.03em]">
-                    {stage.label}
-                  </h2>
-                  {stage.layout !== "monument" ? (
-                    <p className="mx-auto mt-1.5 line-clamp-3 max-w-[17rem] text-[0.78rem] leading-snug opacity-80">
-                      {stage.text}
+            {/* Gap stays fixed (gap-3); leftover viewport space sits around the cluster */}
+            <div className="relative z-10 flex min-h-0 flex-1 flex-col items-center justify-center gap-3 px-5 pb-5">
+              <div className="relative z-20 h-[6.6rem] w-full max-w-sm shrink-0 overflow-hidden">
+                {productStoryStages.map((stage, index) => (
+                  <div
+                    key={stage.id}
+                    data-story-stage
+                    className={cn(
+                      "absolute inset-x-0 top-0 text-center",
+                      index === 0 ? "opacity-100" : "opacity-0",
+                    )}
+                  >
+                    <p className="text-[0.58rem] uppercase tracking-[0.22em] opacity-55">
+                      {String(index + 1).padStart(2, "0")} · {stage.eyebrow}
                     </p>
-                  ) : null}
-                </div>
-              ))}
-            </div>
+                    <h2 className="mt-1 font-display text-[clamp(1.55rem,7vw,2.15rem)] font-bold uppercase leading-[1.02] tracking-[-0.03em]">
+                      {stage.label}
+                    </h2>
+                    {stage.layout !== "monument" ? (
+                      <p className="mx-auto mt-1.5 line-clamp-2 max-w-[17rem] text-[0.8rem] leading-snug opacity-80">
+                        {stage.text}
+                      </p>
+                    ) : null}
+                  </div>
+                ))}
+              </div>
 
-            {/* BAND 2 — can height-locked to this slot; overflow clipped */}
-            <div className="relative z-10 flex min-h-0 flex-1 items-center justify-center overflow-hidden px-5 py-1">
               <div
                 ref={storyCanRef}
-                className="mx-auto h-full max-h-full w-auto"
-                style={{ aspectRatio: "3 / 7", maxWidth: "min(132px, 34vw)" }}
+                className="w-[min(152px,40vw)] shrink-0 [&_[data-product-can-image]]:max-h-[46svh]"
               >
                 <ProductCanStage
                   mode="inline"
@@ -168,34 +166,32 @@ export function LaunchExperienceMobile() {
                   size="inline"
                   quiet
                   showReflection={false}
-                  className="h-full w-full [&_[data-product-can-image]]:!aspect-auto [&_[data-product-can-image]]:!h-full [&_[data-product-can-image]]:!w-full [&_[data-product-can-image]]:!max-w-none"
                 />
               </div>
-            </div>
 
-            {/* BAND 3 — monument body + hold hint */}
-            <div className="relative z-20 h-[14svh] max-h-[120px] shrink-0 overflow-hidden px-5 pb-3">
-              {productStoryStages.map((stage, index) =>
-                stage.layout === "monument" ? (
-                  <p
-                    key={`bot-${stage.id}`}
-                    className={cn(
-                      "absolute inset-x-5 top-0 text-center text-[0.8rem] leading-snug transition-opacity duration-300",
-                      activeStage === index
-                        ? "opacity-85"
-                        : "pointer-events-none opacity-0",
-                    )}
-                  >
-                    {stage.text}
-                  </p>
-                ) : null,
-              )}
-              <p
-                data-hold-hint
-                className="absolute inset-x-0 bottom-2 text-center text-[0.55rem] uppercase tracking-[0.28em]"
-              >
-                Sigue explorando
-              </p>
+              <div className="relative z-20 h-12 w-full max-w-sm shrink-0">
+                {productStoryStages.map((stage, index) =>
+                  stage.layout === "monument" ? (
+                    <p
+                      key={`bot-${stage.id}`}
+                      className={cn(
+                        "absolute inset-x-0 top-0 text-center text-[0.8rem] leading-snug transition-opacity duration-300",
+                        activeStage === index
+                          ? "opacity-85"
+                          : "pointer-events-none opacity-0",
+                      )}
+                    >
+                      {stage.text}
+                    </p>
+                  ) : null,
+                )}
+                <p
+                  data-hold-hint
+                  className="absolute inset-x-0 bottom-0 text-center text-[0.55rem] uppercase tracking-[0.28em]"
+                >
+                  Sigue explorando
+                </p>
+              </div>
             </div>
           </div>
         </div>
