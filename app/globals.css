@@ -187,51 +187,14 @@
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
-  @keyframes court-drift {
+  @keyframes court-ambient {
     0%,
     100% {
-      transform: translate3d(0, 0, 0) scale(1);
-    }
-    50% {
-      transform: translate3d(0, -1.5%, 0) scale(1.02);
-    }
-  }
-
-  @keyframes court-pulse {
-    0%,
-    100% {
-      opacity: 0.55;
-    }
-    50% {
-      opacity: 0.95;
-    }
-  }
-
-  @keyframes court-sheen {
-    0% {
-      transform: translateX(-40%);
-      opacity: 0;
-    }
-    30% {
       opacity: 1;
     }
-    100% {
-      transform: translateX(40%);
-      opacity: 0;
+    50% {
+      opacity: 0.92;
     }
-  }
-
-  .court-drift {
-    animation: court-drift 14s var(--ease-out-expo) infinite;
-    transform-origin: 50% 100%;
-  }
-
-  .court-pulse {
-    animation: court-pulse 5.5s ease-in-out infinite;
-  }
-
-  .court-sheen {
-    animation: court-sheen 9s ease-in-out infinite;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -241,12 +204,6 @@
 
     .grain::before {
       display: none;
-    }
-
-    .court-drift,
-    .court-pulse,
-    .court-sheen {
-      animation: none !important;
     }
 
     *,

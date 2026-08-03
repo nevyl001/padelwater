@@ -33,16 +33,16 @@ const courtTone = {
   "lime-soft": "lime" as const,
 };
 
-function stageCopyClass(layout: (typeof productStoryStages)[number]["layout"]) {
+function stageShellClass(layout: (typeof productStoryStages)[number]["layout"]) {
   switch (layout) {
-    case "backdrop":
-      return "left-[max(2.5rem,calc((100vw-min(100vw,85rem))/2+1.5rem))] right-auto top-[26%] w-[min(26rem,38vw)] text-left";
-    case "side":
-      return "left-[max(2.5rem,calc((100vw-min(100vw,85rem))/2+1.5rem))] right-auto top-1/2 w-[min(22rem,32vw)] -translate-y-1/2 text-left";
-    case "open":
-      return "left-auto right-[max(2.5rem,calc((100vw-min(100vw,85rem))/2+1.5rem))] top-[30%] w-[min(22rem,32vw)] text-right";
     case "monument":
-      return "inset-x-[max(2rem,6%)] top-[16%] mx-auto w-[min(36rem,88%)] text-center";
+      return "inset-0 flex flex-col items-center px-[max(2rem,6%)] pt-6 pb-24 text-center";
+    case "backdrop":
+      return "left-[max(2.5rem,calc((100vw-min(100vw,85rem))/2+1.5rem))] right-auto top-[22%] w-[min(26rem,36vw)] text-left";
+    case "side":
+      return "left-[max(2.5rem,calc((100vw-min(100vw,85rem))/2+1.5rem))] right-auto top-1/2 w-[min(22rem,30vw)] -translate-y-1/2 text-left";
+    case "open":
+      return "left-auto right-[max(2.5rem,calc((100vw-min(100vw,85rem))/2+1.5rem))] top-[28%] w-[min(22rem,30vw)] text-right";
     default:
       return "left-1/2 top-1/2 w-[min(28rem,88%)] -translate-x-1/2 -translate-y-1/2 text-center";
   }
@@ -78,8 +78,6 @@ export function LaunchExperience() {
   const animateCourt = ready && !prefersReducedMotion;
 
   const tone = productStoryStages[activeStage]?.tone ?? "navy";
-  const activeLayout =
-    productStoryStages[activeStage]?.layout ?? ("backdrop" as const);
   const canTone =
     tone === "lime-soft" ? "ice" : tone === "water" ? "water" : "navy";
 
@@ -186,22 +184,13 @@ export function LaunchExperience() {
           >
             <CourtField
               tone={courtTone[tone]}
-              intensity="soft"
+              intensity="medium"
               animated={animateCourt}
             />
 
-            {(activeLayout === "monument" || activeLayout === "backdrop") && (
-              <p
-                aria-hidden
-                className="pointer-events-none absolute inset-x-0 top-[42%] z-0 -translate-y-1/2 text-center font-display text-[clamp(4.5rem,16vw,12rem)] font-bold uppercase leading-none tracking-[-0.04em] opacity-[0.08]"
-              >
-                {productStoryStages[activeStage]?.label}
-              </p>
-            )}
-
-            {/* Story can lives INSIDE the pin — never site-fixed */}
-            <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
-              <div ref={storyCanRef}>
+            {/* Story can — below copy so text never reads through the can */}
+            <div className="pointer-events-none absolute inset-0 z-[5] flex items-center justify-center">
+              <div ref={storyCanRef} className="translate-y-4">
                 <ProductCanStage
                   mode="inline"
                   tone={canTone}
@@ -216,48 +205,63 @@ export function LaunchExperience() {
                 <div
                   key={stage.id}
                   data-story-stage
-                  className={cn("absolute px-2", stageCopyClass(stage.layout))}
+                  className={cn("absolute", stageShellClass(stage.layout))}
                 >
-                  <p className="text-xs uppercase tracking-[0.22em] opacity-55">
-                    {stage.eyebrow}
-                  </p>
-                  <h2
-                    className={cn(
-                      "mt-3 font-display font-bold uppercase tracking-[-0.02em]",
-                      stage.layout === "monument" &&
-                        "text-[clamp(3.25rem,8vw,5.75rem)] leading-[0.9]",
-                      stage.layout === "backdrop" &&
-                        "text-[clamp(2.5rem,5vw,4rem)] leading-[0.95]",
-                      (stage.layout === "side" || stage.layout === "open") &&
-                        "text-[clamp(2.1rem,4vw,3.25rem)] leading-[1.02]",
-                    )}
-                  >
-                    {stage.label}
-                  </h2>
-                  <p
-                    className={cn(
-                      "mt-4 text-base leading-relaxed opacity-80 md:text-lg",
-                      stage.layout === "monument" && "mx-auto max-w-md",
-                      stage.layout === "open" && "ml-auto max-w-sm",
-                      stage.layout !== "monument" &&
-                        stage.layout !== "open" &&
-                        "max-w-sm",
-                    )}
-                  >
-                    {stage.text}
-                  </p>
-                  {stage.layout === "side" ? (
-                    <ul className="mt-8 space-y-3 text-sm opacity-75">
-                      <li className="flex items-center gap-3">
-                        <span className="h-px w-8 bg-current/40" />
-                        {product.feature}
-                      </li>
-                      <li className="flex items-center gap-3">
-                        <span className="h-px w-8 bg-current/40" />
-                        {product.flavorLabel}
-                      </li>
-                    </ul>
-                  ) : null}
+                  {stage.layout === "monument" ? (
+                    <>
+                      <div className="relative z-10 w-full max-w-2xl shrink-0">
+                        <p className="text-xs uppercase tracking-[0.22em] opacity-55">
+                          {stage.eyebrow}
+                        </p>
+                        <h2 className="mt-3 font-display text-[clamp(3rem,7vw,5.25rem)] font-bold uppercase leading-[0.9] tracking-[-0.03em]">
+                          {stage.label}
+                        </h2>
+                      </div>
+                      <div className="min-h-[min(48svh,360px)] w-full shrink-0" />
+                      <p className="relative z-10 mx-auto max-w-md text-base leading-relaxed opacity-85 md:text-lg">
+                        {stage.text}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-xs uppercase tracking-[0.22em] opacity-55">
+                        {stage.eyebrow}
+                      </p>
+                      <h2
+                        className={cn(
+                          "mt-3 font-display font-bold uppercase tracking-[-0.02em]",
+                          stage.layout === "backdrop" &&
+                            "text-[clamp(2.5rem,5vw,4rem)] leading-[0.95]",
+                          (stage.layout === "side" ||
+                            stage.layout === "open") &&
+                            "text-[clamp(2.1rem,4vw,3.25rem)] leading-[1.02]",
+                        )}
+                      >
+                        {stage.label}
+                      </h2>
+                      <p
+                        className={cn(
+                          "mt-4 text-base leading-relaxed opacity-80 md:text-lg",
+                          stage.layout === "open" && "ml-auto max-w-sm",
+                          stage.layout !== "open" && "max-w-sm",
+                        )}
+                      >
+                        {stage.text}
+                      </p>
+                      {stage.layout === "side" ? (
+                        <ul className="mt-8 space-y-3 text-sm opacity-75">
+                          <li className="flex items-center gap-3">
+                            <span className="h-px w-8 bg-current/40" />
+                            {product.feature}
+                          </li>
+                          <li className="flex items-center gap-3">
+                            <span className="h-px w-8 bg-current/40" />
+                            {product.flavorLabel}
+                          </li>
+                        </ul>
+                      ) : null}
+                    </>
+                  )}
                 </div>
               ))}
 

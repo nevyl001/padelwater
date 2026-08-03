@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { cn } from "@/lib/cn";
 
 type CourtFieldProps = {
@@ -9,30 +10,62 @@ type CourtFieldProps = {
   animated?: boolean;
 };
 
-const inkByTone = {
-  dark: "text-white",
-  light: "text-pw-navy",
-  water: "text-white",
-  lime: "text-pw-navy",
-} as const;
+type Palette = {
+  line: string;
+  glow: string;
+  accent: string;
+  particle: string;
+  washA: string;
+  washB: string;
+};
 
-const strokeByTone = {
-  dark: "opacity-90",
-  light: "opacity-80",
-  water: "opacity-90",
-  lime: "opacity-85",
-} as const;
+const palettes: Record<NonNullable<CourtFieldProps["tone"]>, Palette> = {
+  dark: {
+    line: "rgba(255,255,255,0.22)",
+    glow: "rgba(0,169,203,0.55)",
+    accent: "rgba(183,243,51,0.45)",
+    particle: "rgba(183,243,51,0.85)",
+    washA: "rgba(0,169,203,0.16)",
+    washB: "rgba(183,243,51,0.1)",
+  },
+  light: {
+    line: "rgba(7,26,56,0.14)",
+    glow: "rgba(0,169,203,0.28)",
+    accent: "rgba(7,26,56,0.18)",
+    particle: "rgba(0,169,203,0.55)",
+    washA: "rgba(0,169,203,0.08)",
+    washB: "rgba(183,243,51,0.12)",
+  },
+  water: {
+    line: "rgba(255,255,255,0.28)",
+    glow: "rgba(255,255,255,0.45)",
+    accent: "rgba(183,243,51,0.4)",
+    particle: "rgba(183,243,51,0.8)",
+    washA: "rgba(255,255,255,0.1)",
+    washB: "rgba(183,243,51,0.12)",
+  },
+  lime: {
+    line: "rgba(7,26,56,0.16)",
+    glow: "rgba(0,169,203,0.35)",
+    accent: "rgba(7,26,56,0.2)",
+    particle: "rgba(0,169,203,0.65)",
+    washA: "rgba(0,169,203,0.1)",
+    washB: "rgba(7,26,56,0.06)",
+  },
+};
 
-const glowByTone = {
-  dark: "from-pw-cyan/20 via-transparent to-pw-lime/15",
-  light: "from-pw-cyan/10 via-transparent to-pw-lime/20",
-  water: "from-white/15 via-transparent to-pw-lime/20",
-  lime: "from-pw-navy/10 via-transparent to-pw-cyan/15",
-} as const;
+type Particle = {
+  u: number;
+  v: number;
+  speed: number;
+  size: number;
+  life: number;
+  phase: number;
+};
 
 /**
- * Atmospheric padel-court field — lines + perspective, not a literal diagram.
- * Pure SVG/CSS so it works without assets and respects reduced motion via `animated`.
+ * Live canvas atmosphere: perspective court, energy particles, glow washes.
+ * Falls back to a static frame when `animated` is false.
  */
 export function CourtField({
   className,
@@ -40,12 +73,247 @@ export function CourtField({
   intensity = "medium",
   animated = true,
 }: CourtFieldProps) {
-  const stroke = strokeByTone[tone];
-  const ink = inkByTone[tone];
-  const opacity = intensity === "soft" ? "opacity-45" : "opacity-75";
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const wrap = wrapRef.current;
+    const canvas = canvasRef.current;
+    if (!wrap || !canvas) return;
+
+    const ctx = canvas.getContext("2d", { alpha: true });
+    if (!ctx) return;
+
+    const palette = palettes[tone];
+    const strength = intensity === "soft" ? 0.72 : 1;
+    let raf = 0;
+    let running = true;
+    let w = 0;
+    let h = 0;
+    let dpr = 1;
+    const t0 = performance.now();
+
+    const particles: Particle[] = Array.from({ length: 28 }, (_, i) => ({
+      u: Math.random(),
+      v: 0.15 + Math.random() * 0.75,
+      speed: 0.04 + Math.random() * 0.08,
+      size: 1.2 + Math.random() * 2.4,
+      life: Math.random(),
+      phase: i * 0.37,
+    }));
+
+    const resize = () => {
+      const rect = wrap.getBoundingClientRect();
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = Math.max(1, Math.floor(rect.width));
+      h = Math.max(1, Math.floor(rect.height));
+      canvas.width = Math.floor(w * dpr);
+      canvas.height = Math.floor(h * dpr);
+      canvas.style.width = `${w}px`;
+      canvas.style.height = `${h}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+
+    const project = (nx: number, depth: number) => {
+      // nx: -1..1 across court, depth: 0 (far) .. 1 (near)
+      const vanishingY = h * 0.18;
+      const nearY = h * 0.98;
+      const y = vanishingY + (nearY - vanishingY) * depth;
+      const halfFar = w * 0.16;
+      const halfNear = w * 0.48;
+      const half = halfFar + (halfNear - halfFar) * depth;
+      return { x: w * 0.5 + nx * half, y };
+    };
+
+    const drawCourt = (time: number) => {
+      const pulse = animated ? 0.5 + 0.5 * Math.sin(time * 0.0007) : 0.65;
+      const drawProgress = animated
+        ? Math.min(1, (time - t0) / 1800)
+        : 1;
+
+      ctx.save();
+      ctx.globalAlpha = 0.55 * strength * pulse;
+      ctx.strokeStyle = palette.line;
+      ctx.lineWidth = 1.25;
+      ctx.lineJoin = "round";
+      ctx.setLineDash([]);
+
+      // Outer court trapezoid
+      const tl = project(-1, 0.08);
+      const tr = project(1, 0.08);
+      const br = project(1, 1);
+      const bl = project(-1, 1);
+      ctx.beginPath();
+      ctx.moveTo(tl.x, tl.y);
+      ctx.lineTo(tr.x, tr.y);
+      ctx.lineTo(br.x, br.y);
+      ctx.lineTo(bl.x, bl.y);
+      ctx.closePath();
+      ctx.stroke();
+
+      // Depth lines
+      for (const d of [0.28, 0.48, 0.68, 0.85]) {
+        const a = project(-1, d);
+        const b = project(1, d);
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
+      }
+
+      // Center + service
+      const c0 = project(0, 0.08);
+      const c1 = project(0, 0.68);
+      ctx.beginPath();
+      ctx.moveTo(c0.x, c0.y);
+      ctx.lineTo(c1.x, c1.y);
+      ctx.stroke();
+
+      for (const sx of [-0.5, 0.5]) {
+        const a = project(sx, 0.28);
+        const b = project(sx, 0.68);
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
+      }
+
+      // Net glow bar
+      const nL = project(-0.72, 0.22);
+      const nR = project(0.72, 0.22);
+      const grad = ctx.createLinearGradient(nL.x, nL.y, nR.x, nR.y);
+      grad.addColorStop(0, "transparent");
+      grad.addColorStop(0.5, palette.glow);
+      grad.addColorStop(1, "transparent");
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 2.5;
+      ctx.globalAlpha = 0.75 * strength * drawProgress;
+      ctx.beginPath();
+      ctx.moveTo(nL.x, nL.y);
+      ctx.lineTo(nR.x, nR.y);
+      ctx.stroke();
+
+      // Glass fence ticks at far end
+      ctx.globalAlpha = 0.35 * strength;
+      ctx.strokeStyle = palette.accent;
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 12; i++) {
+        const nx = -1 + (i / 12) * 2;
+        const base = project(nx, 0.08);
+        const tip = project(nx * 0.92, 0.02);
+        ctx.beginPath();
+        ctx.moveTo(base.x, base.y);
+        ctx.lineTo(tip.x, tip.y);
+        ctx.stroke();
+      }
+      ctx.restore();
+    };
+
+    const drawWashes = (time: number) => {
+      const a = animated ? time * 0.00015 : 0;
+      const x1 = w * (0.25 + 0.08 * Math.sin(a));
+      const y1 = h * (0.35 + 0.06 * Math.cos(a * 1.3));
+      const x2 = w * (0.72 + 0.07 * Math.cos(a * 0.9));
+      const y2 = h * (0.55 + 0.05 * Math.sin(a * 1.1));
+
+      const g1 = ctx.createRadialGradient(x1, y1, 0, x1, y1, w * 0.42);
+      g1.addColorStop(0, palette.washA);
+      g1.addColorStop(1, "transparent");
+      ctx.fillStyle = g1;
+      ctx.fillRect(0, 0, w, h);
+
+      const g2 = ctx.createRadialGradient(x2, y2, 0, x2, y2, w * 0.38);
+      g2.addColorStop(0, palette.washB);
+      g2.addColorStop(1, "transparent");
+      ctx.fillStyle = g2;
+      ctx.fillRect(0, 0, w, h);
+    };
+
+    const drawParticles = (time: number) => {
+      if (!animated) return;
+      ctx.save();
+      for (const p of particles) {
+        const travel = (p.life + time * 0.00012 * p.speed) % 1;
+        const depth = 0.12 + travel * 0.82;
+        const sway =
+          Math.sin(time * 0.0012 + p.phase) * 0.08 +
+          Math.sin(time * 0.0004 + p.phase * 2) * 0.04;
+        const nx = (p.u * 2 - 1) * 0.75 + sway;
+        const pos = project(nx, depth);
+        const alpha =
+          Math.sin(travel * Math.PI) * 0.85 * strength *
+          (0.55 + 0.45 * Math.sin(time * 0.002 + p.phase));
+        const r = p.size * (0.6 + depth * 1.1);
+
+        ctx.beginPath();
+        ctx.fillStyle = palette.particle;
+        ctx.globalAlpha = Math.max(0, alpha);
+        ctx.arc(pos.x, pos.y, r, 0, Math.PI * 2);
+        ctx.fill();
+
+        // soft bloom
+        const bloom = ctx.createRadialGradient(
+          pos.x,
+          pos.y,
+          0,
+          pos.x,
+          pos.y,
+          r * 5,
+        );
+        bloom.addColorStop(0, palette.glow);
+        bloom.addColorStop(1, "transparent");
+        ctx.globalAlpha = Math.max(0, alpha * 0.35);
+        ctx.fillStyle = bloom;
+        ctx.beginPath();
+        ctx.arc(pos.x, pos.y, r * 5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    };
+
+    const drawSweep = (time: number) => {
+      if (!animated) return;
+      const cycle = ((time * 0.00008) % 1) * w * 1.6 - w * 0.3;
+      const grad = ctx.createLinearGradient(cycle, 0, cycle + w * 0.35, 0);
+      grad.addColorStop(0, "transparent");
+      grad.addColorStop(0.5, palette.accent);
+      grad.addColorStop(1, "transparent");
+      ctx.save();
+      ctx.globalAlpha = 0.08 * strength;
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+      ctx.restore();
+    };
+
+    const frame = (now: number) => {
+      if (!running) return;
+      ctx.clearRect(0, 0, w, h);
+      drawWashes(now);
+      drawCourt(now);
+      drawParticles(now);
+      drawSweep(now);
+      if (animated) raf = requestAnimationFrame(frame);
+    };
+
+    resize();
+    frame(performance.now());
+
+    const ro = new ResizeObserver(() => {
+      resize();
+      if (!animated) frame(performance.now());
+    });
+    ro.observe(wrap);
+
+    return () => {
+      running = false;
+      cancelAnimationFrame(raf);
+      ro.disconnect();
+    };
+  }, [tone, intensity, animated]);
 
   return (
     <div
+      ref={wrapRef}
       aria-hidden
       data-court-field
       className={cn(
@@ -53,77 +321,8 @@ export function CourtField({
         className,
       )}
     >
-      <div
-        className={cn(
-          "absolute inset-0 bg-gradient-to-br",
-          glowByTone[tone],
-        )}
-      />
-
-      <svg
-        className={cn(
-          "absolute inset-x-[-8%] bottom-[-18%] h-[78%] w-[116%]",
-          ink,
-          opacity,
-          stroke,
-          animated && "court-drift",
-        )}
-        viewBox="0 0 1200 700"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <defs>
-          <linearGradient id="courtFade" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="currentColor" stopOpacity="0" />
-            <stop offset="35%" stopColor="currentColor" stopOpacity="0.55" />
-            <stop offset="100%" stopColor="currentColor" stopOpacity="0.9" />
-          </linearGradient>
-        </defs>
-
-        {/* Perspective outer court */}
-        <g
-          stroke="url(#courtFade)"
-          strokeWidth="2"
-          className={animated ? "court-pulse" : undefined}
-        >
-          <path d="M140 660 L320 180 H880 L1060 660 Z" />
-          <path d="M260 660 L380 180" />
-          <path d="M940 660 L820 180" />
-          <path d="M200 520 H1000" />
-          <path d="M230 420 H970" />
-          <path d="M280 300 H920" />
-          {/* Service boxes */}
-          <path d="M600 180 V520" />
-          <path d="M380 300 V520" />
-          <path d="M820 300 V520" />
-          {/* Net suggestion */}
-          <path d="M340 250 H860" strokeWidth="3" />
-          <path d="M600 230 V270" strokeWidth="3" />
-        </g>
-
-        {/* Accent ticks — padel glass / fence rhythm */}
-        <g strokeWidth="1.5" className="opacity-40" stroke="currentColor">
-          {Array.from({ length: 11 }).map((_, i) => {
-            const x = 320 + i * 56;
-            return (
-              <path
-                key={x}
-                d={`M${x} 175 L${x + (i - 5) * 8} 155`}
-              />
-            );
-          })}
-        </g>
-      </svg>
-
-      {/* Soft moving light across the glass */}
-      {animated ? (
-        <div className="court-sheen absolute inset-0 bg-[linear-gradient(105deg,transparent_40%,rgba(183,243,51,0.07)_50%,transparent_60%)]" />
-      ) : null}
-
-      {/* Depth vignette — only on dark / water fields */}
-      {(tone === "dark" || tone === "water") && (
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_120%,transparent_20%,rgba(3,17,38,0.55)_80%)] mix-blend-multiply opacity-60" />
-      )}
+      <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,transparent_40%,rgba(3,17,38,0.25)_100%)] opacity-50 mix-blend-multiply" />
     </div>
   );
 }
