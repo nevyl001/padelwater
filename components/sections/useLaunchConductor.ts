@@ -73,7 +73,6 @@ export function useLaunchConductor(
         const lines = copyEl.querySelectorAll("[data-hero-line]");
         const late = copyEl.querySelectorAll("[data-hero-late]");
         const eyebrow = copyEl.querySelector("[data-hero-eyebrow]");
-        const brand = copyEl.querySelector("[data-hero-brand]");
         const court = heroEl.querySelector("[data-court-field]");
         const sheen = heroCanEl.querySelector("[data-highlight-sheen]");
         const reflection = heroCanEl.querySelector("[data-product-reflection]");
@@ -85,7 +84,7 @@ export function useLaunchConductor(
         gsap.set(storyCanEl, { autoAlpha: 0, scale: 0.92, x: 0, y: 0 });
 
         // Intro on both desktop and mobile
-        gsap.set([eyebrow, brand, ...Array.from(late)], { opacity: 0, y: 18 });
+        gsap.set([eyebrow, ...Array.from(late)], { opacity: 0, y: 18 });
         gsap.set(lines, { yPercent: 105, opacity: 0 });
         if (court) gsap.set(court, { opacity: 0 });
         if (reflection) gsap.set(reflection, { opacity: 0 });
@@ -96,17 +95,16 @@ export function useLaunchConductor(
         intro
           .to(heroCanEl, { scale: 1, duration: 0.75 }, 0.06)
           .to(reflection, { opacity: 1, duration: 0.3 }, 0.45)
-          .to(brand, { opacity: 1, y: 0, duration: 0.35 }, 0.18)
-          .to(eyebrow, { opacity: 1, y: 0, duration: 0.3 }, 0.32)
+          .to(eyebrow, { opacity: 1, y: 0, duration: 0.3 }, 0.28)
           .to(
             lines,
             { yPercent: 0, opacity: 1, duration: 0.48, stagger: 0.07 },
-            0.38,
+            0.35,
           )
           .to(
             late,
             { opacity: 1, y: 0, duration: 0.32, stagger: 0.05 },
-            0.78,
+            0.75,
           );
         if (sheen) {
           intro.fromTo(

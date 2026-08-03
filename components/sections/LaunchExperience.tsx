@@ -110,15 +110,6 @@ export function LaunchExperience() {
               ref={heroCopyRef}
               className="mx-auto w-full max-w-xl text-center sm:px-2 lg:mx-0 lg:max-w-[34rem] lg:justify-self-start lg:px-0 lg:pl-4 lg:text-left xl:pl-8"
             >
-              <div data-hero-brand className="mb-6 lg:mb-8">
-                <p
-                  className="font-display text-[clamp(1.6rem,3.2vw,2.35rem)] font-bold uppercase leading-none tracking-[0.06em]"
-                  aria-hidden
-                >
-                  <span className="text-pw-cyan">Pádel</span>{" "}
-                  <span className="text-pw-lime">Water</span>
-                </p>
-              </div>
               <div data-hero-eyebrow>
                 <SectionLabel tone="lime">{heroContent.eyebrow}</SectionLabel>
               </div>
