@@ -198,15 +198,18 @@ export function ProductShowcaseScene() {
         }}
       />
 
-      <Container className="relative z-10 py-10 md:py-24 lg:py-32">
-        <div className="mb-5 flex flex-col gap-2 text-center md:mb-14 md:gap-3 md:text-left">
-          <p className="text-[0.68rem] uppercase tracking-[0.3em] text-pw-lime">
+      <Container className="relative z-10 py-8 md:py-24 lg:py-32">
+        {/* Mobile: compact eyebrow only. Desktop: full brand header. */}
+        <div className="mb-3 flex flex-col gap-1.5 text-center md:mb-14 md:gap-3 md:text-left">
+          <p className="text-[0.65rem] uppercase tracking-[0.3em] text-pw-lime md:text-[0.68rem]">
             Producto
           </p>
-          <h2 className="text-editorial text-pw-white">{product.name}</h2>
+          <h2 className="sr-only md:not-sr-only md:block md:text-editorial md:text-pw-white">
+            {product.name}
+          </h2>
         </div>
 
-        <div className="grid items-center gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-14 xl:gap-20">
+        <div className="grid items-center gap-4 md:gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-14 xl:gap-20">
           <div
             ref={panelRef}
             className={cn(
@@ -225,7 +228,7 @@ export function ProductShowcaseScene() {
               role="tablist"
               aria-label="Características del producto"
               id={tablistId}
-              className="-mx-1 mt-6 flex gap-2 overflow-x-auto px-1 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] justify-start md:mt-8 lg:mt-10 lg:flex-wrap lg:overflow-visible [&::-webkit-scrollbar]:hidden"
+              className="-mx-1 mt-5 flex justify-center gap-2 overflow-x-auto px-1 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] md:mt-8 md:justify-start lg:mt-10 lg:flex-wrap lg:overflow-visible [&::-webkit-scrollbar]:hidden"
             >
               {showcaseAttributes.map((attr, index) => {
                 const selected = attr.id === activeId;
@@ -241,7 +244,7 @@ export function ProductShowcaseScene() {
                     onClick={() => setActiveId(attr.id)}
                     onKeyDown={(e) => onTabKeyDown(e, index)}
                     className={cn(
-                      "shrink-0 rounded-sm border px-3.5 py-2.5 text-[0.62rem] uppercase tracking-[0.2em] transition-[color,background-color,border-color] duration-300",
+                      "shrink-0 rounded-sm border px-3 py-2 text-[0.6rem] uppercase tracking-[0.18em] transition-[color,background-color,border-color] duration-300 md:px-3.5 md:py-2.5 md:text-[0.62rem] md:tracking-[0.2em]",
                       selected
                         ? "border-pw-lime bg-pw-lime/12 text-pw-lime"
                         : "border-white/18 text-white/60 hover:border-white/40 hover:text-white/90",
@@ -253,7 +256,7 @@ export function ProductShowcaseScene() {
               })}
             </div>
 
-            <div className="mt-6 flex justify-center md:mt-8 lg:mt-10 lg:justify-start">
+            <div className="mt-5 flex justify-center md:mt-8 lg:mt-10 lg:justify-start">
               <Button
                 variant="secondary"
                 onClick={() => setInfoOpen(true)}
@@ -267,14 +270,14 @@ export function ProductShowcaseScene() {
           <div
             ref={stageRef}
             className={cn(
-              "relative order-1 flex items-center justify-center py-1 md:min-h-[min(68svh,540px)] md:py-0 lg:order-2",
+              "relative order-1 -mx-2 flex items-center justify-center md:mx-0 md:min-h-[min(68svh,540px)] lg:order-2",
               !prefersReducedMotion && "opacity-0",
             )}
           >
             <div
               ref={glowRef}
               aria-hidden
-              className="pointer-events-none absolute left-1/2 top-[48%] h-[58%] w-[58%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(0,169,203,0.5),transparent_70%)] blur-2xl"
+              className="pointer-events-none absolute left-1/2 top-[48%] h-[70%] w-[70%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(0,169,203,0.55),transparent_70%)] blur-2xl md:h-[58%] md:w-[58%]"
             />
 
             <OrbitalRings

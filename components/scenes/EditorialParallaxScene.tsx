@@ -9,8 +9,8 @@ import { distances, gsapEasings, scales } from "@/lib/motion";
 import { cn } from "@/lib/cn";
 
 /**
- * Artistic brand attitude — typography as the image on desktop;
- * clean stacked composition on mobile (no overlapping ghost type / balls).
+ * Brand attitude. Desktop: asymmetric editorial.
+ * Mobile: centered, balanced composition with intentional accents.
  */
 export function EditorialParallaxScene() {
   const rootRef = useRef<HTMLElement>(null);
@@ -19,7 +19,7 @@ export function EditorialParallaxScene() {
   const fgRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
 
-  const { ready, prefersReducedMotion, profile, isMobile } = useMotionPreferences();
+  const { ready, prefersReducedMotion, profile } = useMotionPreferences();
   const strength = profile.parallaxStrength;
 
   useEffect(() => {
@@ -137,12 +137,18 @@ export function EditorialParallaxScene() {
           tone="dark"
           intensity="soft"
           animated={animateCourt}
-          showBalls={!isMobile}
+          showBalls={false}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-pw-navy-deep/60 via-pw-navy/25 to-pw-navy-deep/90" />
+        <div className="absolute inset-0 bg-gradient-to-b from-pw-navy-deep/55 via-pw-navy/20 to-pw-navy-deep/90" />
       </div>
 
-      {/* Ghost type — desktop only */}
+      {/* Soft ambient glow */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,rgba(0,169,203,0.18),transparent_55%),radial-gradient(ellipse_at_80%_85%,rgba(183,243,51,0.1),transparent_40%)]"
+      />
+
+      {/* Ghost type — desktop */}
       <div
         ref={titleRef}
         className="pointer-events-none absolute inset-0 z-[1] hidden items-center justify-center md:flex"
@@ -157,9 +163,9 @@ export function EditorialParallaxScene() {
         </p>
       </div>
 
-      <Container className="relative z-10 grid min-h-0 items-center gap-10 py-16 md:min-h-[92svh] md:gap-14 md:py-28 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16">
-        <div ref={midRef} className="relative max-w-xl">
-          <p className="text-[0.68rem] uppercase tracking-[0.32em] text-pw-lime/85">
+      <Container className="relative z-10 py-16 text-center md:min-h-[92svh] md:py-28 md:text-left lg:grid lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:gap-16">
+        <div ref={midRef} className="relative mx-auto max-w-xl md:mx-0">
+          <p className="text-[0.68rem] uppercase tracking-[0.32em] text-pw-lime/90">
             En la cancha
           </p>
           <h2 className="mt-4 text-editorial text-pw-white md:mt-5">
@@ -168,20 +174,29 @@ export function EditorialParallaxScene() {
               {communitySection.titleLines[1]}
             </span>
           </h2>
-          <p className="mt-5 max-w-md text-base leading-relaxed text-white/72 md:mt-7 md:text-lg">
+          <p className="mx-auto mt-5 max-w-md text-base leading-relaxed text-white/75 md:mx-0 md:mt-7 md:text-lg">
             {communitySection.text}
           </p>
 
-          {/* Mobile brand line — readable, no overlap */}
-          <p className="mt-8 max-w-[20ch] border-t border-white/15 pt-6 font-display text-lg font-bold uppercase leading-[1.15] tracking-[-0.02em] text-white/55 md:hidden">
-            {brandStatement.lines[0]}{" "}
-            <span className="text-white/40">{brandStatement.lines[1]}</span>
-          </p>
+          {/* Mobile accent row — balanced, intentional */}
+          <div className="relative mx-auto mt-10 max-w-sm md:hidden">
+            <div className="h-px w-full bg-gradient-to-r from-transparent via-white/25 to-transparent" />
+            <div className="mt-7 flex items-start justify-center gap-4">
+              <PadelBallDecoration className="mt-1 h-9 w-9 shrink-0" />
+              <p className="text-left font-display text-[0.95rem] font-bold uppercase leading-[1.2] tracking-[-0.02em] text-white/60">
+                {brandStatement.lines[0]}
+                <span className="mt-1 block text-white/40">
+                  {brandStatement.lines[1]}
+                </span>
+              </p>
+            </div>
+            <PadelBallDecoration className="absolute -right-1 bottom-[-0.5rem] h-6 w-6 opacity-70" />
+          </div>
         </div>
 
         <div
           ref={fgRef}
-          className="relative hidden min-h-[240px] items-center justify-end md:flex"
+          className="relative mt-0 hidden min-h-[240px] items-center justify-end md:flex"
         >
           <div
             aria-hidden
