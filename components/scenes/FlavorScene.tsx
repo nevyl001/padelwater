@@ -9,6 +9,7 @@ import { cn } from "@/lib/cn";
 
 /**
  * Sensory beat — packaging diagonals + cyan/lime energy, not a label reprint.
+ * Top fades from solid navy so the handoff from Editorial reads continuous.
  */
 export function FlavorScene() {
   const { prefersReducedMotion } = useMotionPreferences();
@@ -17,25 +18,25 @@ export function FlavorScene() {
     <section
       id="sabor"
       data-scene="flavor"
-      className="relative overflow-hidden bg-pw-navy py-20 text-pw-white md:py-28"
+      className="relative overflow-hidden bg-pw-navy py-24 text-pw-white md:py-32"
       aria-label="Sabor coco"
     >
-      <BrandDiagonals intensity="bold" tone="navy" />
+      <BrandDiagonals intensity="soft" className="opacity-70" />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_28%_18%,rgba(0,174,239,0.28),transparent_48%),radial-gradient(ellipse_at_82%_78%,rgba(191,215,69,0.18),transparent_46%),linear-gradient(180deg,rgba(12,16,40,0.35),transparent_45%,rgba(12,16,40,0.55))]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(12,16,40,0.92)_0%,transparent_42%),radial-gradient(ellipse_at_28%_28%,rgba(0,174,239,0.22),transparent_48%),radial-gradient(ellipse_at_82%_78%,rgba(191,215,69,0.16),transparent_46%),linear-gradient(180deg,rgba(12,16,40,0.55),transparent_38%,rgba(12,16,40,0.5))]"
       />
 
       <div aria-hidden className="pointer-events-none absolute inset-0">
         <div
           className={cn(
-            "absolute -left-[18%] top-[5%] h-[75%] w-[65%] rounded-full bg-[radial-gradient(circle,rgba(0,169,203,0.22),transparent_70%)] blur-3xl",
+            "absolute -left-[18%] top-[12%] h-[70%] w-[65%] rounded-full bg-[radial-gradient(circle,rgba(0,169,203,0.2),transparent_70%)] blur-3xl",
             !prefersReducedMotion && "animate-flavor-drift-a",
           )}
         />
         <div
           className={cn(
-            "absolute -right-[12%] bottom-[-25%] h-[70%] w-[50%] rounded-full bg-[radial-gradient(circle,rgba(191,215,69,0.2),transparent_72%)] blur-3xl",
+            "absolute -right-[12%] bottom-[-25%] h-[70%] w-[50%] rounded-full bg-[radial-gradient(circle,rgba(191,215,69,0.18),transparent_72%)] blur-3xl",
             !prefersReducedMotion && "animate-flavor-drift-b",
           )}
         />
