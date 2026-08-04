@@ -66,8 +66,8 @@ export function HeroScene() {
         animated={animateAurora}
         className="opacity-90"
       />
-      <CourtField tone="dark" intensity="soft" animated={animateCourt} />
-      <BrandDiagonals intensity="soft" className="opacity-50" />
+      <CourtField tone="dark" intensity="medium" animated={animateCourt} />
+      <BrandDiagonals intensity="soft" className="opacity-55" />
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_74%_42%,rgba(0,169,203,0.28),transparent_48%),radial-gradient(ellipse_at_18%_78%,rgba(191,215,69,0.12),transparent_44%)]"

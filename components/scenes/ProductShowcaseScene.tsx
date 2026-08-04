@@ -203,7 +203,7 @@ export function ProductShowcaseScene() {
 
       <Container className="relative z-10 py-12 sm:py-16 md:py-24 lg:py-28 xl:py-32">
         <div className="mb-5 flex flex-col gap-1.5 text-center sm:mb-7 md:mb-12 md:gap-3 md:text-left lg:mb-14">
-          <p className="text-[0.68rem] font-medium uppercase tracking-[0.28em] text-pw-lime">
+          <p className="text-[0.8rem] font-semibold uppercase tracking-[0.26em] text-pw-lime md:text-[0.88rem] md:tracking-[0.28em]">
             Producto
           </p>
           <h2 className="sr-only md:not-sr-only md:block md:text-editorial md:text-pw-white">
@@ -335,7 +335,7 @@ function AttributePanel({
         !reduced && "animate-showcase-panel",
       )}
     >
-      <p className="text-[0.68rem] font-medium uppercase tracking-[0.28em] text-pw-cyan">
+      <p className="text-[0.8rem] font-semibold uppercase tracking-[0.26em] text-pw-cyan md:text-[0.88rem] md:tracking-[0.28em]">
         {attribute.eyebrow}
       </p>
       <h3 className="mt-3.5 text-section text-pw-white sm:mt-4">

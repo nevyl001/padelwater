@@ -20,9 +20,9 @@ type Palette = {
 
 const palettes: Record<NonNullable<CourtFieldProps["tone"]>, Palette> = {
   dark: {
-    line: "rgba(255,255,255,0.28)",
-    glow: "rgba(0,169,203,0.4)",
-    washA: "rgba(0,169,203,0.1)",
+    line: "rgba(255,255,255,0.4)",
+    glow: "rgba(0,169,203,0.48)",
+    washA: "rgba(0,169,203,0.14)",
   },
   light: {
     line: "rgba(7,26,56,0.16)",
@@ -79,7 +79,7 @@ export function CourtField({
     if (showBalls && !ballsCtx) return;
 
     const palette = palettes[tone];
-    const strength = intensity === "soft" ? 0.65 : 1;
+    const strength = intensity === "soft" ? 0.82 : 1;
     let raf = 0;
     let running = true;
     let w = 0;
@@ -349,7 +349,7 @@ export function CourtField({
       >
         <canvas
           ref={linesRef}
-          className="absolute inset-0 h-full w-full origin-center scale-[1.04] opacity-80 blur-[2.5px] max-md:opacity-70 max-md:blur-[3px]"
+          className="absolute inset-0 h-full w-full origin-center scale-[1.04] opacity-95 blur-[1.5px] max-md:opacity-85 max-md:blur-[2px]"
         />
       </div>
       {showBalls ? (

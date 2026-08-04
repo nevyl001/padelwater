@@ -17,7 +17,7 @@ export function FlavorScene() {
     <section
       id="sabor"
       data-scene="flavor"
-      className="relative overflow-hidden bg-pw-navy py-16 text-pw-white md:py-24"
+      className="relative overflow-hidden bg-pw-navy py-20 text-pw-white md:py-28"
       aria-label="Sabor coco"
     >
       <BrandDiagonals intensity="bold" tone="navy" />

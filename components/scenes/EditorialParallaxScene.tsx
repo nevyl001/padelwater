@@ -15,7 +15,6 @@ import { cn } from "@/lib/cn";
 export function EditorialParallaxScene() {
   const rootRef = useRef<HTMLElement>(null);
   const bgRef = useRef<HTMLDivElement>(null);
-  const midRef = useRef<HTMLDivElement>(null);
   const fgRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
 
@@ -26,14 +25,12 @@ export function EditorialParallaxScene() {
     if (!ready || prefersReducedMotion || strength <= 0) return;
     const root = rootRef.current;
     const bg = bgRef.current;
-    const mid = midRef.current;
     const fg = fgRef.current;
     const title = titleRef.current;
-    if (!root || !bg || !mid || !fg || !title) return;
+    if (!root || !bg || !fg || !title) return;
 
     const rootEl = root;
     const bgEl = bg;
-    const midEl = mid;
     const fgEl = fg;
     const titleEl = title;
 
@@ -46,26 +43,13 @@ export function EditorialParallaxScene() {
       if (dead) return;
 
       const ctx = gsap.context(() => {
+        // Atmosphere only — never parallax the main copy (it was clipping
+        // mid-sentence at section edges under overflow-hidden).
         gsap.fromTo(
           bgEl,
-          { y: distances.parallaxBg * strength },
+          { y: distances.parallaxBg * strength * 0.7 },
           {
-            y: -distances.parallaxBg * strength,
-            ease: gsapEasings.none,
-            scrollTrigger: {
-              trigger: rootEl,
-              start: "top bottom",
-              end: "bottom top",
-              scrub: true,
-            },
-          },
-        );
-
-        gsap.fromTo(
-          midEl,
-          { y: distances.parallaxMid * strength * 0.55 },
-          {
-            y: -distances.parallaxMid * strength,
+            y: -distances.parallaxBg * strength * 0.7,
             ease: gsapEasings.none,
             scrollTrigger: {
               trigger: rootEl,
@@ -78,9 +62,9 @@ export function EditorialParallaxScene() {
 
         gsap.fromTo(
           titleEl,
-          { y: 32 * strength, scale: scales.editorialTitle },
+          { y: 18 * strength, scale: scales.editorialTitle },
           {
-            y: -24 * strength,
+            y: -12 * strength,
             scale: 1,
             ease: gsapEasings.none,
             scrollTrigger: {
@@ -94,9 +78,9 @@ export function EditorialParallaxScene() {
 
         gsap.fromTo(
           fgEl,
-          { y: distances.parallaxFg },
+          { y: distances.parallaxFg * 0.6 },
           {
-            y: -distances.parallaxFg * 1.3 * strength,
+            y: -distances.parallaxFg * 0.8 * strength,
             ease: gsapEasings.none,
             scrollTrigger: {
               trigger: rootEl,
@@ -136,11 +120,11 @@ export function EditorialParallaxScene() {
       <div ref={bgRef} className="absolute inset-0">
         <CourtField
           tone="dark"
-          intensity="soft"
+          intensity="medium"
           animated={animateCourt}
           showBalls={false}
         />
-        <BrandDiagonals intensity="soft" className="opacity-45" />
+        <BrandDiagonals intensity="soft" className="opacity-50" />
         <div className="absolute inset-0 bg-gradient-to-b from-pw-navy-deep/55 via-pw-navy/20 to-pw-navy-deep/90" />
       </div>
 
@@ -166,9 +150,9 @@ export function EditorialParallaxScene() {
         </p>
       </div>
 
-      <Container className="relative z-10 py-16 text-center md:min-h-[88svh] md:py-24 md:text-left lg:grid lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:gap-16 xl:gap-20">
-        <div ref={midRef} className="relative mx-auto max-w-xl md:mx-0">
-          <p className="text-[0.68rem] uppercase tracking-[0.28em] text-pw-lime/90">
+      <Container className="relative z-10 py-20 text-center md:min-h-[72svh] md:py-28 md:text-left lg:grid lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:gap-16 xl:gap-20">
+        <div className="relative mx-auto max-w-xl md:mx-0">
+          <p className="text-[0.8rem] font-semibold uppercase tracking-[0.26em] text-pw-lime md:text-[0.88rem] md:tracking-[0.28em]">
             En la cancha
           </p>
           <h2 className="mt-4 text-editorial text-pw-white md:mt-5">
@@ -194,7 +178,7 @@ export function EditorialParallaxScene() {
 
         <div
           ref={fgRef}
-          className="relative mt-0 hidden min-h-[240px] items-center justify-end md:flex"
+          className="relative mt-0 hidden min-h-[200px] items-center justify-end md:flex"
         >
           <div
             aria-hidden
