@@ -272,7 +272,7 @@ export function ProductShowcaseScene() {
           <div
             ref={stageRef}
             className={cn(
-              "relative order-1 mx-auto flex w-full min-w-0 max-w-[34rem] items-center justify-center md:min-h-[min(64svh,520px)] lg:order-2 lg:max-w-none xl:max-w-[40rem]",
+              "relative order-1 mx-auto flex w-full min-w-0 max-w-[28rem] items-center justify-center md:min-h-[min(52svh,440px)] lg:order-2 lg:max-w-none xl:max-w-[34rem]",
               !prefersReducedMotion && "opacity-0",
             )}
           >

@@ -187,23 +187,23 @@ export function useHeroSceneTimeline(refs: HeroSceneRefs, flags: HeroSceneFlags)
 
         gsap.to(stageEl, {
           scale: scales.heroScrollOut,
-          y: -distances.scrollBridgeY,
+          y: -distances.scrollBridgeY * 0.55,
           ease: gsapEasings.none,
           scrollTrigger: {
             trigger: rootEl,
-            start: "center top",
+            start: "bottom top+=35%",
             end: "bottom top",
             scrub: true,
           },
         });
 
         gsap.to([eyebrowEl, titleEl, descriptionEl, ctaEl], {
-          opacity: 0,
-          y: -20,
+          opacity: 0.35,
+          y: -10,
           ease: gsapEasings.none,
           scrollTrigger: {
             trigger: rootEl,
-            start: "center top",
+            start: "bottom top+=35%",
             end: "bottom top",
             scrub: true,
           },

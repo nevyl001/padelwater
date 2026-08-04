@@ -18,7 +18,8 @@ import { useHeroSceneTimeline } from "@/components/scenes/useHeroSceneTimeline";
 import { cn } from "@/lib/cn";
 
 /**
- * Opening scene — official product light language (cyan + lime from packaging).
+ * Opening scene — copy stacked left, product right. Keeps the full message
+ * inside the first viewport without shearing description/CTAs at the fold.
  */
 export function HeroScene() {
   const rootRef = useRef<HTMLElement>(null);
@@ -57,30 +58,33 @@ export function HeroScene() {
     <section
       ref={rootRef}
       data-scene="hero"
-      className="relative flex min-h-[100svh] overflow-hidden bg-pw-navy-deep text-pw-white grain"
+      className="relative flex min-h-[100svh] overflow-x-clip bg-pw-navy-deep text-pw-white grain"
       aria-label="Presentación Pádel Water"
     >
-      <AuroraField
-        tone="deep"
-        intensity="soft"
-        animated={animateAurora}
-        className="opacity-90"
-      />
-      <CourtField tone="dark" intensity="medium" animated={animateCourt} />
-      <BrandDiagonals intensity="soft" className="opacity-55" />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_74%_42%,rgba(0,169,203,0.28),transparent_48%),radial-gradient(ellipse_at_18%_78%,rgba(191,215,69,0.12),transparent_44%)]"
-      />
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <AuroraField
+          tone="deep"
+          intensity="soft"
+          animated={animateAurora}
+          className="opacity-90"
+        />
+        <CourtField tone="dark" intensity="medium" animated={animateCourt} />
+        <BrandDiagonals intensity="soft" className="opacity-55" />
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-[radial-gradient(ellipse_at_74%_42%,rgba(0,169,203,0.28),transparent_48%),radial-gradient(ellipse_at_18%_78%,rgba(191,215,69,0.12),transparent_44%)]"
+        />
+      </div>
 
       <div
         ref={stageRef}
         className="relative z-20 flex w-full flex-1 origin-center"
         style={{ transformOrigin: "50% 45%" }}
       >
-        <Container className="relative flex w-full flex-1 items-center pb-16 pt-[calc(var(--header-offset)+0.5rem)] sm:pb-20 md:pb-24 md:pt-[calc(var(--header-offset)+2.5rem)] xl:pb-28">
-          <div className="mx-auto grid w-full max-w-[90rem] items-center gap-5 text-center sm:gap-7 md:gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.92fr)] lg:gap-16 lg:text-left xl:gap-20 2xl:gap-24">
-            <div className="relative z-20 order-1 mx-auto w-full max-w-md lg:mx-0 lg:max-w-[34rem] xl:max-w-[36rem]">
+        <Container className="relative flex w-full flex-1 items-center py-24 pt-[calc(var(--header-offset)+1rem)] md:py-28 md:pt-[calc(var(--header-offset)+2rem)]">
+          <div className="mx-auto grid w-full max-w-[90rem] items-center gap-8 text-center sm:gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-14 lg:text-left xl:gap-20">
+            {/* Single copy stack — never split across can height */}
+            <div className="relative z-20 order-1 mx-auto flex w-full max-w-md flex-col items-center lg:mx-0 lg:max-w-[36rem] lg:items-start">
               <MaskReveal ref={eyebrowRef} as="div" mode="manual" splitBy="block">
                 <SectionLabel tone="lime">{heroContent.eyebrow}</SectionLabel>
               </MaskReveal>
@@ -92,33 +96,14 @@ export function HeroScene() {
                 lines={heroContent.titleLines}
                 className="mt-4 sm:mt-5 md:mt-6"
               />
-            </div>
 
-            <div className="relative z-10 order-2 mx-auto flex w-full max-w-[28rem] items-center justify-center [perspective:1100px] min-h-[min(48svh,380px)] sm:min-h-[min(54svh,440px)] md:min-h-[min(68svh,560px)] lg:order-2 lg:row-span-2 lg:max-w-none xl:max-w-[36rem]">
-              <ProductGlow className="bottom-[6%] h-36 w-[78%] opacity-95 md:h-40 md:w-[70%]" />
-              <ProductGlow
-                tone="lime"
-                className="bottom-[18%] h-24 w-[48%] opacity-50 blur-2xl"
-              />
-              <div
-                ref={canRef}
-                className={cn(
-                  "relative z-10 [transform-style:preserve-3d]",
-                  !prefersReducedMotion && "opacity-0",
-                )}
-              >
-                <ProductCanStage mode="inline" size="hero" priority />
-              </div>
-            </div>
-
-            <div className="relative z-20 order-3 mx-auto w-full max-w-md lg:mx-0 lg:max-w-[34rem] xl:max-w-[36rem]">
               <TextReveal
                 ref={descriptionRef}
                 variant="body"
                 mode="manual"
                 text={heroContent.description}
                 splitBy="words"
-                className="mx-auto max-w-md text-base leading-relaxed text-white/75 sm:text-[1.05rem] md:mt-1 md:text-lg md:leading-[1.55] lg:mx-0"
+                className="mt-5 max-w-md text-base leading-relaxed text-white/75 sm:mt-6 sm:text-[1.05rem] md:mt-7 md:text-lg md:leading-[1.55]"
               />
 
               <MaskReveal
@@ -126,7 +111,7 @@ export function HeroScene() {
                 as="div"
                 mode="manual"
                 splitBy="block"
-                className="mt-7 sm:mt-8 md:mt-10"
+                className="mt-7 w-full sm:mt-8 md:mt-9"
               >
                 <div className="flex flex-col items-center gap-3 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-3.5 lg:justify-start">
                   <Button href={heroContent.primaryHref} size="lg" magnetic>
@@ -143,6 +128,23 @@ export function HeroScene() {
                 </div>
               </MaskReveal>
             </div>
+
+            <div className="relative z-10 order-2 mx-auto flex w-full max-w-[22rem] items-center justify-center [perspective:1100px] sm:max-w-[26rem] md:max-w-[28rem] lg:max-w-none">
+              <ProductGlow className="bottom-[8%] h-32 w-[78%] opacity-95 md:h-40 md:w-[70%]" />
+              <ProductGlow
+                tone="lime"
+                className="bottom-[20%] h-20 w-[48%] opacity-50 blur-2xl"
+              />
+              <div
+                ref={canRef}
+                className={cn(
+                  "relative z-10 [transform-style:preserve-3d]",
+                  !prefersReducedMotion && "opacity-0",
+                )}
+              >
+                <ProductCanStage mode="inline" size="hero" priority />
+              </div>
+            </div>
           </div>
         </Container>
       </div>
@@ -150,7 +152,7 @@ export function HeroScene() {
       <div
         ref={scrollHintRef}
         className={cn(
-          "absolute inset-x-0 bottom-5 z-20 flex justify-center md:bottom-7",
+          "absolute inset-x-0 bottom-4 z-20 flex justify-center md:bottom-6",
           !prefersReducedMotion && "opacity-0",
         )}
       >

@@ -33,11 +33,11 @@ export const ProductCanStage = forwardRef<HTMLDivElement, ProductCanStageProps>(
           className={cn(
             "aspect-[334/785]",
             size === "hero" &&
-              "w-[min(42vw,200px)] sm:w-[220px] md:w-[260px]",
+              "w-[min(34vw,168px)] sm:w-[188px] md:w-[220px]",
             size === "showcase" &&
-              "w-[min(48vw,220px)] sm:w-[240px] md:w-[280px]",
-            size === "story" && "w-[min(46vw,230px)]",
-            size === "inline" && "w-full max-w-[220px]",
+              "w-[min(38vw,176px)] sm:w-[196px] md:w-[228px]",
+            size === "story" && "w-[min(40vw,200px)]",
+            size === "inline" && "w-full max-w-[200px]",
             className,
           )}
           data-can-anchor

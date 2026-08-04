@@ -14,10 +14,10 @@ type ProductCanImageProps = {
 
 /** Tallboy can proportions (~2:5) with transparent cutout. */
 const sizeClass = {
-  hero: "w-[min(42vw,200px)] sm:w-[220px] md:w-[260px] lg:w-[280px]",
-  showcase: "w-[min(48vw,220px)] sm:w-[240px] md:w-[280px] xl:w-[300px]",
-  story: "w-[min(46vw,230px)]",
-  inline: "w-full max-w-[220px]",
+  hero: "w-[min(34vw,168px)] sm:w-[188px] md:w-[220px] lg:w-[236px]",
+  showcase: "w-[min(38vw,176px)] sm:w-[196px] md:w-[228px] xl:w-[244px]",
+  story: "w-[min(40vw,200px)]",
+  inline: "w-full max-w-[200px]",
 } as const;
 
 /**
