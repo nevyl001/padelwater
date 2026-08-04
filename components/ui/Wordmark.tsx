@@ -1,7 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { brandAssetPaths } from "@/data/brand-assets";
 import { cn } from "@/lib/cn";
 
 type WordmarkProps = {
@@ -9,54 +11,60 @@ type WordmarkProps = {
   href?: string;
   tone?: "light" | "dark";
   onNavigate?: () => void;
+  /** horizontal = nav/footer; icon = compact mark */
+  variant?: "horizontal" | "icon";
 };
 
 /**
- * PROVISIONAL_WORDMARK
- * Temporary typographic mark until the official logo asset is delivered.
- * Do not invent a new monogram or logo mark.
+ * Official Pádel Water mark — never invent a typographic substitute.
  */
 export function Wordmark({
   className,
   href = "/",
   tone = "dark",
   onNavigate,
+  variant = "horizontal",
 }: WordmarkProps) {
   const pathname = usePathname();
   const router = useRouter();
 
   function goHome(e: React.MouseEvent<HTMLAnchorElement>) {
     onNavigate?.();
-
     if (href !== "/") return;
-
-    // Already on home: scroll to the top instead of a no-op
     if (pathname === "/") {
       e.preventDefault();
       const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
-      // Keep URL clean if a hash was present
       if (window.location.hash) {
         router.replace("/", { scroll: false });
       }
     }
   }
 
+  const isIcon = variant === "icon";
+
   return (
     <Link
       href={href}
       onClick={goHome}
       className={cn(
-        "font-display text-[1.05rem] font-bold uppercase leading-none tracking-[0.04em] md:text-[1.15rem]",
-        tone === "light" ? "text-pw-white" : "text-pw-ink",
+        "relative inline-flex shrink-0 items-center",
+        isIcon ? "h-9 w-9 md:h-10 md:w-10" : "h-9 w-[9.5rem] sm:h-10 sm:w-[11rem] md:h-11 md:w-[12.5rem]",
         className,
       )}
       aria-label="Pádel Water — volver al inicio"
     >
-      <span className="text-pw-cyan">Pádel</span>{" "}
-      <span className={tone === "light" ? "text-pw-lime" : "text-pw-navy"}>
-        Water
-      </span>
+      <Image
+        src={isIcon ? brandAssetPaths.logoIconPng : brandAssetPaths.logoHorizontalPng}
+        alt="Pádel Water"
+        fill
+        sizes={isIcon ? "40px" : "(max-width: 640px) 152px, 200px"}
+        className={cn(
+          "object-contain object-left",
+          tone === "dark" && "drop-shadow-[0_1px_0_rgba(255,255,255,0.06)]",
+        )}
+        priority
+      />
     </Link>
   );
 }

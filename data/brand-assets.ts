@@ -1,18 +1,27 @@
 /**
- * Flip to true when final photography/logo assets are in public/brand.
- * Layout must not depend on this flag — only which media src is shown.
+ * Official brand media — paths under /public.
+ * Site identity follows these assets; do not invent placeholders.
  */
-export const BRAND_ASSETS_READY = false;
+export const BRAND_ASSETS_READY = true;
 
 export const brandAssetPaths = {
-  canFront: "/brand/product/can-front.webp",
-  canHero: "/brand/product/can-hero.webp",
-  logo: "/brand/logo/padel-water.svg",
+  logoHorizontal: "/branding/logo-horizontal.webp",
+  logoHorizontalPng: "/branding/logo-horizontal.png",
+  logoStacked: "/branding/logo-stacked.webp",
+  logoIcon: "/branding/logo-icon.webp",
+  logoIconPng: "/branding/logo-icon.png",
+  badge: "/branding/badge.webp",
+  /** Photographed can with transparent background */
+  canFront: "/product/can-front.webp",
+  canFrontPng: "/product/can-front.png",
+  canHero: "/product/can-hero.webp",
+  canDetail: "/product/can-detail.webp",
+  label: "/product/label.webp",
+  ogShare: "/branding/og-share.webp",
 } as const;
 
 export function resolveCanImage(
   preferred: string | null | undefined,
-): string | null {
-  if (!BRAND_ASSETS_READY) return null;
+): string {
   return preferred ?? brandAssetPaths.canFront;
 }

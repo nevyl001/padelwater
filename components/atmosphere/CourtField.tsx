@@ -300,7 +300,7 @@ export function CourtField({
           pos.y,
           r * 3.4,
         );
-        bloom.addColorStop(0, "rgba(183,243,51,0.55)");
+        bloom.addColorStop(0, "rgba(191,215,69,0.55)");
         bloom.addColorStop(1, "transparent");
         ctx.globalAlpha = Math.max(0, alpha * 0.55);
         ctx.fillStyle = bloom;

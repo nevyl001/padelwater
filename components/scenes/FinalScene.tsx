@@ -5,6 +5,7 @@ import { finalCta } from "@/data/site-content";
 import { Container } from "@/components/ui/Container";
 import { WhatsAppLink } from "@/components/ui/WhatsAppLink";
 import { AuroraField } from "@/components/atmosphere/AuroraField";
+import { BrandDiagonals } from "@/components/atmosphere/BrandDiagonals";
 import { MaskReveal } from "@/components/motion/MaskReveal";
 import { TextReveal } from "@/components/motion/TextReveal";
 import { useMotionPreferences } from "@/components/motion/MotionPreferences";
@@ -40,6 +41,7 @@ export function FinalScene() {
         intensity="soft"
         className="opacity-95"
       />
+      <BrandDiagonals intensity="soft" className="opacity-35" />
 
       <Container className="relative z-10 max-w-3xl text-center">
         <TextReveal

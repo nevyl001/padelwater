@@ -38,8 +38,8 @@ export function OrbitalRings({
             <stop offset="100%" stopColor="rgba(0,169,203,0.05)" />
           </linearGradient>
           <linearGradient id="orbit-lime" x1="100%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="rgba(183,243,51,0.45)" />
-            <stop offset="100%" stopColor="rgba(183,243,51,0.04)" />
+            <stop offset="0%" stopColor="rgba(191,215,69,0.45)" />
+            <stop offset="100%" stopColor="rgba(191,215,69,0.04)" />
           </linearGradient>
         </defs>
 
@@ -58,7 +58,7 @@ export function OrbitalRings({
             strokeDasharray="4 10"
             opacity={0.55 + (accent === 0 ? 0.25 : 0)}
           />
-          <circle cx="200" cy="22" r="3" fill="rgba(183,243,51,0.9)" />
+          <circle cx="200" cy="22" r="3" fill="rgba(191,215,69,0.9)" />
           <circle cx="378" cy="200" r="2" fill="rgba(0,169,203,0.8)" />
         </g>
 

@@ -40,8 +40,8 @@ export function AuroraField({
         className={cn(
           "absolute inset-0",
           soft
-            ? "bg-[radial-gradient(ellipse_at_30%_20%,rgba(0,169,203,0.22),transparent_55%),radial-gradient(ellipse_at_80%_70%,rgba(183,243,51,0.1),transparent_50%)]"
-            : "bg-[radial-gradient(ellipse_at_25%_15%,rgba(0,169,203,0.32),transparent_52%),radial-gradient(ellipse_at_75%_80%,rgba(183,243,51,0.14),transparent_48%),radial-gradient(ellipse_at_50%_50%,rgba(7,26,56,0.4),transparent_70%)]",
+            ? "bg-[radial-gradient(ellipse_at_30%_20%,rgba(0,169,203,0.22),transparent_55%),radial-gradient(ellipse_at_80%_70%,rgba(191,215,69,0.1),transparent_50%)]"
+            : "bg-[radial-gradient(ellipse_at_25%_15%,rgba(0,169,203,0.32),transparent_52%),radial-gradient(ellipse_at_75%_80%,rgba(191,215,69,0.14),transparent_48%),radial-gradient(ellipse_at_50%_50%,rgba(7,26,56,0.4),transparent_70%)]",
         )}
       />
 
@@ -59,7 +59,7 @@ export function AuroraField({
         data-aurora-layer="b"
         className={cn(
           "absolute -bottom-[25%] -right-[15%] h-[65%] w-[65%] rounded-full",
-          "bg-[radial-gradient(circle,rgba(183,243,51,0.18),transparent_70%)]",
+          "bg-[radial-gradient(circle,rgba(191,215,69,0.18),transparent_70%)]",
           "blur-3xl will-change-transform",
           animated && "animate-aurora-drift-b",
         )}

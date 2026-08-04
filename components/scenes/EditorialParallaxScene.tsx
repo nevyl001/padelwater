@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { brandStatement, communitySection } from "@/data/site-content";
 import { Container } from "@/components/ui/Container";
 import { CourtField } from "@/components/atmosphere/CourtField";
+import { BrandDiagonals } from "@/components/atmosphere/BrandDiagonals";
 import { useMotionPreferences } from "@/components/motion/MotionPreferences";
 import { distances, gsapEasings, scales } from "@/lib/motion";
 import { cn } from "@/lib/cn";
@@ -139,12 +140,13 @@ export function EditorialParallaxScene() {
           animated={animateCourt}
           showBalls={false}
         />
+        <BrandDiagonals intensity="soft" className="opacity-45" />
         <div className="absolute inset-0 bg-gradient-to-b from-pw-navy-deep/55 via-pw-navy/20 to-pw-navy-deep/90" />
       </div>
 
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,rgba(0,169,203,0.18),transparent_55%),radial-gradient(ellipse_at_80%_85%,rgba(183,243,51,0.1),transparent_40%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,rgba(0,169,203,0.2),transparent_55%),radial-gradient(ellipse_at_80%_85%,rgba(191,215,69,0.12),transparent_40%)]"
       />
 
       {/* Floating balls — margin zones only, behind copy */}
@@ -259,11 +261,11 @@ function PadelBallDecoration({ className }: { className?: string }) {
       viewBox="0 0 64 64"
       className={cn("h-12 w-12", className)}
     >
-      <circle cx="32" cy="32" r="28" fill="#B7F333" />
+      <circle cx="32" cy="32" r="28" fill="#BFD745" />
       <path
         d="M18 22c8 4 12 12 10 22M46 20c-6 8-6 18 0 26"
         fill="none"
-        stroke="#071A38"
+        stroke="#1F2754"
         strokeWidth="2.2"
         strokeLinecap="round"
         opacity="0.55"

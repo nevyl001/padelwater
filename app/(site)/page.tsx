@@ -27,6 +27,7 @@ function JsonLd() {
       name: product.name,
     },
     category: "Bebida de hidratación",
+    image: `${siteConfig.url}${product.media.front}`,
     size: product.volume,
   };
 

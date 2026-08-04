@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     template: "%s · Pádel Water",
   },
   description:
-    "Pádel Water es hidratación con electrolitos, creada para jugadores de pádel. Sabor coco, 470 ml.",
+    "Pádel Water es hidratación con electrolitos orales, creada para jugadores de pádel. Sabor coco, 470 ml.",
   applicationName: "Pádel Water",
   authors: [{ name: "Pádel Water" }],
   creator: "Pádel Water",
@@ -48,12 +48,25 @@ export const metadata: Metadata = {
     title: "Pádel Water — Hidratación para la cancha",
     description:
       "Hidratación con electrolitos, creada para acompañarte antes, durante y después del partido.",
+    images: [
+      {
+        url: "/opengraph-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Pádel Water",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Pádel Water — Hidratación para la cancha",
     description:
       "Hidratación con electrolitos, creada para jugadores de pádel.",
+    images: ["/twitter-image.png"],
+  },
+  icons: {
+    icon: [{ url: "/icon.png", type: "image/png" }],
+    apple: [{ url: "/apple-icon.png" }],
   },
   robots: {
     index: true,
@@ -63,8 +76,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#071A38" },
-    { media: "(prefers-color-scheme: dark)", color: "#031126" },
+    { media: "(prefers-color-scheme: light)", color: "#1F2754" },
+    { media: "(prefers-color-scheme: dark)", color: "#0C1028" },
   ],
   width: "device-width",
   initialScale: 1,

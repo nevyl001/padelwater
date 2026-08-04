@@ -1,69 +1,58 @@
 "use client";
 
+import Image from "next/image";
 import { cn } from "@/lib/cn";
-import { resolveCanImage } from "@/data/brand-assets";
+import { resolveCanImage, brandAssetPaths } from "@/data/brand-assets";
 import { product } from "@/data/product";
-import { ProductCanSilhouette } from "@/components/product/ProductCanSilhouette";
 
 type ProductCanImageProps = {
   className?: string;
   src?: string | null;
   priority?: boolean;
-  tone?: "navy" | "ice" | "water" | "lime";
   size?: "hero" | "story" | "inline" | "showcase";
-  quiet?: boolean;
-  label?: string;
-  /** Only the hero should pass this in development. */
-  showPendingLabel?: boolean;
 };
 
+/** Tallboy can proportions (~2:5) with transparent cutout. */
 const sizeClass = {
-  hero: "aspect-[2/5] h-[min(36svh,280px)] w-auto sm:h-[min(42svh,340px)] md:h-[min(58svh,480px)]",
-  showcase:
-    "aspect-[2/5] h-[min(54svh,380px)] w-auto sm:h-[min(50svh,400px)] md:h-[min(58svh,480px)] xl:h-[min(60svh,520px)]",
-  story:
-    "aspect-[2/5] h-[min(54svh,460px)] w-auto max-md:h-[min(46svh,340px)]",
-  inline: "aspect-[2/5] w-full max-w-[240px]",
+  hero: "w-[min(42vw,200px)] sm:w-[220px] md:w-[260px] lg:w-[280px]",
+  showcase: "w-[min(48vw,220px)] sm:w-[240px] md:w-[280px] xl:w-[300px]",
+  story: "w-[min(46vw,230px)]",
+  inline: "w-full max-w-[220px]",
 } as const;
 
 /**
- * Front product visual. Real photo when assets are ready;
- * otherwise a true can silhouette (not a rounded card).
+ * Official product photography — can cutout on transparent background.
  */
 export function ProductCanImage({
   className,
   src,
   priority = false,
-  tone = "navy",
   size = "inline",
-  quiet = false,
-  showPendingLabel = false,
 }: ProductCanImageProps) {
-  const image = resolveCanImage(src ?? product.media.front ?? product.media.hero);
-
-  if (image) {
-    return (
-      <div
-        className={cn("relative mx-auto", sizeClass[size], className)}
-        data-product-can-image
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={image}
-          alt={`${product.name} ${product.flavorLabel}, ${product.volume}`}
-          className="h-full w-full object-contain"
-          fetchPriority={priority ? "high" : "auto"}
-        />
-      </div>
-    );
-  }
+  const image = resolveCanImage(
+    src ??
+      (size === "hero" ? brandAssetPaths.canHero : null) ??
+      product.media.front ??
+      product.media.hero,
+  );
 
   return (
-    <ProductCanSilhouette
-      tone={tone}
-      quiet={quiet}
-      showPendingLabel={showPendingLabel}
-      className={cn(sizeClass[size], className)}
-    />
+    <div
+      className={cn(
+        "relative mx-auto aspect-[334/785]",
+        sizeClass[size],
+        className,
+      )}
+      data-product-can-image
+    >
+      <Image
+        src={image}
+        alt={`${product.name} ${product.flavorLabel}, ${product.volume}`}
+        fill
+        sizes="(max-width: 768px) 48vw, 300px"
+        className="object-contain drop-shadow-[0_32px_48px_rgba(0,169,203,0.35)]"
+        priority={priority}
+      />
+    </div>
   );
 }

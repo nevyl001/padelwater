@@ -1,17 +1,21 @@
 @import "tailwindcss";
 
 :root {
-  --pw-navy: #071a38;
-  --pw-navy-deep: #031126;
-  --pw-lime: #b7f333;
-  --pw-lime-hover: #c8f85a;
+  /* Official packaging-derived tokens */
+  --pw-navy: #1f2754;
+  --pw-navy-deep: #0c1028;
+  --pw-lime: #bfd745;
+  --pw-lime-hover: #d4e73b;
+  --pw-lime-hot: #d8f048;
   --pw-cyan: #00a9cb;
+  --pw-cyan-bright: #00aeef;
   --pw-ice: #eef8f7;
   --pw-white: #ffffff;
   --pw-ink: #10151c;
   --pw-muted: #697383;
-
+  --pw-silver: #bebfc4;
   --pw-water: #0a6f8f;
+
   --pw-lime-soft: #e8f9c4;
 
   --background: var(--pw-ice);
@@ -40,11 +44,14 @@
   --color-pw-navy-deep: var(--pw-navy-deep);
   --color-pw-lime: var(--pw-lime);
   --color-pw-lime-hover: var(--pw-lime-hover);
+  --color-pw-lime-hot: var(--pw-lime-hot);
   --color-pw-cyan: var(--pw-cyan);
+  --color-pw-cyan-bright: var(--pw-cyan-bright);
   --color-pw-ice: var(--pw-ice);
   --color-pw-white: var(--pw-white);
   --color-pw-ink: var(--pw-ink);
   --color-pw-muted: var(--pw-muted);
+  --color-pw-silver: var(--pw-silver);
   --color-pw-water: var(--pw-water);
   --color-pw-lime-soft: var(--pw-lime-soft);
   --color-background: var(--background);
@@ -100,19 +107,21 @@
   .text-display {
     font-family: var(--font-display), ui-sans-serif, sans-serif;
     font-size: clamp(3rem, 7vw, 7rem);
-    line-height: 0.94;
-    letter-spacing: -0.03em;
+    line-height: 0.92;
+    letter-spacing: -0.02em;
     text-transform: uppercase;
     font-weight: 700;
+    font-style: oblique;
   }
 
   .text-hero {
     font-family: var(--font-display), ui-sans-serif, sans-serif;
-    font-size: clamp(2.15rem, 4.2vw, 4.25rem);
-    line-height: 1.02;
-    letter-spacing: -0.025em;
+    font-size: clamp(2.35rem, 4.6vw, 4.6rem);
+    line-height: 0.98;
+    letter-spacing: -0.02em;
     text-transform: uppercase;
     font-weight: 700;
+    font-style: oblique;
   }
 
   .container-pw {
@@ -122,20 +131,22 @@
 
   .text-editorial {
     font-family: var(--font-display), ui-sans-serif, sans-serif;
-    font-size: clamp(2.35rem, 5.2vw, 5rem);
-    line-height: 1.0;
-    letter-spacing: -0.03em;
+    font-size: clamp(2.5rem, 5.4vw, 5.25rem);
+    line-height: 0.96;
+    letter-spacing: -0.025em;
     text-transform: uppercase;
     font-weight: 700;
+    font-style: oblique;
   }
 
   .text-section {
     font-family: var(--font-display), ui-sans-serif, sans-serif;
-    font-size: clamp(1.85rem, 3.6vw, 3.25rem);
-    line-height: 1.02;
-    letter-spacing: -0.025em;
+    font-size: clamp(2rem, 3.8vw, 3.4rem);
+    line-height: 0.98;
+    letter-spacing: -0.02em;
     text-transform: uppercase;
     font-weight: 700;
+    font-style: oblique;
   }
 
   .text-body-lg {

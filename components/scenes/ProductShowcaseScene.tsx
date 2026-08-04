@@ -20,6 +20,7 @@ import { ProductCanStage } from "@/components/product/ProductCanStage";
 import { ProductGlow } from "@/components/product/ProductGlow";
 import { ProductInformationPanel } from "@/components/product/ProductInformationPanel";
 import { AuroraField } from "@/components/atmosphere/AuroraField";
+import { BrandDiagonals } from "@/components/atmosphere/BrandDiagonals";
 import { OrbitalRings } from "@/components/atmosphere/OrbitalRings";
 import { useMotionPreferences } from "@/components/motion/MotionPreferences";
 import { useProductShowcaseSceneTimeline } from "@/components/scenes/useProductShowcaseSceneTimeline";
@@ -181,21 +182,22 @@ export function ProductShowcaseScene() {
       }
     >
       <AuroraField tone="deep" animated={animateAurora} intensity="medium" />
+      <BrandDiagonals intensity="soft" className="opacity-40" />
 
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-90"
+        className="pointer-events-none absolute inset-0 opacity-95"
         style={{
           background:
-            "radial-gradient(ellipse 48% 40% at var(--px) var(--py), rgba(0,169,203,0.28), transparent 64%)",
+            "radial-gradient(ellipse 48% 40% at var(--px) var(--py), rgba(0,169,203,0.32), transparent 64%)",
         }}
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-40"
+        className="pointer-events-none absolute inset-0 opacity-50"
         style={{
           background:
-            "radial-gradient(ellipse 32% 28% at calc(var(--px) + 5%) calc(var(--py) + 10%), rgba(183,243,51,0.12), transparent 60%)",
+            "radial-gradient(ellipse 32% 28% at calc(var(--px) + 5%) calc(var(--py) + 10%), rgba(191,215,69,0.16), transparent 60%)",
         }}
       />
 
@@ -278,7 +280,11 @@ export function ProductShowcaseScene() {
               ref={glowRef}
               className="pointer-events-none absolute inset-0 flex items-center justify-center"
             >
-              <ProductGlow className="bottom-auto top-[58%] h-40 w-[72%] -translate-y-1/2 opacity-80 md:h-44 md:w-[62%]" />
+              <ProductGlow className="bottom-auto top-[58%] h-44 w-[78%] -translate-y-1/2 opacity-90 md:h-48 md:w-[68%]" />
+              <ProductGlow
+                tone="lime"
+                className="bottom-auto top-[48%] h-28 w-[42%] -translate-y-1/2 opacity-45 blur-2xl"
+              />
             </div>
 
             <OrbitalRings
@@ -299,9 +305,7 @@ export function ProductShowcaseScene() {
             >
               <ProductCanStage
                 mode="inline"
-                tone={active.canTone}
                 size="showcase"
-                quiet
               />
             </div>
           </div>

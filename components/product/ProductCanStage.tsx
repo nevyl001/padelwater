@@ -8,12 +8,9 @@ import { ProductHighlight } from "@/components/product/ProductHighlight";
 
 type ProductCanStageProps = {
   className?: string;
-  tone?: "navy" | "ice" | "water" | "lime";
   size?: "hero" | "story" | "inline" | "showcase";
-  quiet?: boolean;
   showReflection?: boolean;
   priority?: boolean;
-  showPendingLabel?: boolean;
   mode?: "fixed" | "inline" | "ghost";
 };
 
@@ -21,12 +18,9 @@ export const ProductCanStage = forwardRef<HTMLDivElement, ProductCanStageProps>(
   function ProductCanStage(
     {
       className,
-      tone = "navy",
       size = "inline",
-      quiet = false,
       showReflection = true,
       priority = false,
-      showPendingLabel = false,
       mode = "inline",
     },
     ref,
@@ -37,13 +31,13 @@ export const ProductCanStage = forwardRef<HTMLDivElement, ProductCanStageProps>(
           ref={ref}
           aria-hidden
           className={cn(
+            "aspect-[334/785]",
             size === "hero" &&
-              "aspect-[2/5] h-[min(36svh,280px)] w-auto sm:h-[min(42svh,340px)] md:h-[min(58svh,480px)]",
+              "w-[min(42vw,200px)] sm:w-[220px] md:w-[260px]",
             size === "showcase" &&
-              "aspect-[2/5] h-[min(54svh,380px)] w-auto sm:h-[min(50svh,400px)] md:h-[min(58svh,480px)] xl:h-[min(60svh,520px)]",
-            size === "story" &&
-              "aspect-[2/5] h-[min(54svh,460px)] w-auto max-md:h-[min(46svh,340px)]",
-            size === "inline" && "aspect-[2/5] w-full max-w-[240px]",
+              "w-[min(48vw,220px)] sm:w-[240px] md:w-[280px]",
+            size === "story" && "w-[min(46vw,230px)]",
+            size === "inline" && "w-full max-w-[220px]",
             className,
           )}
           data-can-anchor
@@ -57,19 +51,12 @@ export const ProductCanStage = forwardRef<HTMLDivElement, ProductCanStageProps>(
         data-can-stage={mode}
         className={cn(
           "relative",
-          mode === "fixed" &&
-            "pointer-events-none fixed left-0 top-0 z-30",
+          mode === "fixed" && "pointer-events-none fixed left-0 top-0 z-30",
           className,
         )}
       >
         <div className="relative">
-          <ProductCanImage
-            tone={tone}
-            size={size}
-            quiet={quiet}
-            priority={priority}
-            showPendingLabel={showPendingLabel}
-          />
+          <ProductCanImage size={size} priority={priority} />
           <ProductHighlight />
         </div>
         {showReflection ? <ProductReflection /> : null}

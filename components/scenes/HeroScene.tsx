@@ -7,6 +7,7 @@ import { SectionLabel } from "@/components/ui/SectionLabel";
 import { Container } from "@/components/ui/Container";
 import { CourtField } from "@/components/atmosphere/CourtField";
 import { AuroraField } from "@/components/atmosphere/AuroraField";
+import { BrandDiagonals } from "@/components/atmosphere/BrandDiagonals";
 import { ProductCanStage } from "@/components/product/ProductCanStage";
 import { ProductGlow } from "@/components/product/ProductGlow";
 import { MaskReveal } from "@/components/motion/MaskReveal";
@@ -17,8 +18,7 @@ import { useHeroSceneTimeline } from "@/components/scenes/useHeroSceneTimeline";
 import { cn } from "@/lib/cn";
 
 /**
- * Opening scene — cinematic entry, natural pointer depth, scroll bridge.
- * Mobile: title → can → copy/CTA (designed stack).
+ * Opening scene — official product light language (cyan + lime from packaging).
  */
 export function HeroScene() {
   const rootRef = useRef<HTMLElement>(null);
@@ -67,9 +67,10 @@ export function HeroScene() {
         className="opacity-90"
       />
       <CourtField tone="dark" intensity="soft" animated={animateCourt} />
+      <BrandDiagonals intensity="soft" className="opacity-50" />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_72%_40%,rgba(0,169,203,0.22),transparent_48%),radial-gradient(ellipse_at_18%_78%,rgba(183,243,51,0.08),transparent_44%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_74%_42%,rgba(0,169,203,0.28),transparent_48%),radial-gradient(ellipse_at_18%_78%,rgba(191,215,69,0.12),transparent_44%)]"
       />
 
       <div
@@ -93,8 +94,12 @@ export function HeroScene() {
               />
             </div>
 
-            <div className="relative z-10 order-2 mx-auto flex w-full max-w-[28rem] items-center justify-center [perspective:1100px] min-h-[min(36svh,280px)] sm:min-h-[min(42svh,340px)] md:min-h-[min(58svh,480px)] lg:order-2 lg:row-span-2 lg:max-w-none xl:max-w-[36rem]">
-              <ProductGlow className="bottom-[7%] h-32 w-[68%] opacity-95 md:h-36 md:w-[64%]" />
+            <div className="relative z-10 order-2 mx-auto flex w-full max-w-[28rem] items-center justify-center [perspective:1100px] min-h-[min(48svh,380px)] sm:min-h-[min(54svh,440px)] md:min-h-[min(68svh,560px)] lg:order-2 lg:row-span-2 lg:max-w-none xl:max-w-[36rem]">
+              <ProductGlow className="bottom-[6%] h-36 w-[78%] opacity-95 md:h-40 md:w-[70%]" />
+              <ProductGlow
+                tone="lime"
+                className="bottom-[18%] h-24 w-[48%] opacity-50 blur-2xl"
+              />
               <div
                 ref={canRef}
                 className={cn(
@@ -102,13 +107,7 @@ export function HeroScene() {
                   !prefersReducedMotion && "opacity-0",
                 )}
               >
-                <ProductCanStage
-                  mode="inline"
-                  tone="navy"
-                  size="hero"
-                  priority
-                  showPendingLabel={process.env.NODE_ENV !== "production"}
-                />
+                <ProductCanStage mode="inline" size="hero" priority />
               </div>
             </div>
 
